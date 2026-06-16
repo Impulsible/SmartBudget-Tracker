@@ -6,128 +6,15 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<IdentityUser> UserManager
 @inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <PageTitle>SmartBudget - Take Control of Your Money</PageTitle>
-
-<style>
-    /* ===== USER AVATAR STYLES ===== */
-    .user-avatar-sm {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #10B981, #059669);
-        color: white;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: default;
-        transition: all 0.2s ease;
-        border: 2px solid rgba(16, 185, 129, 0.2);
-        flex-shrink: 0;
-    }
-    
-    .user-avatar-sm:hover {
-        transform: scale(1.05);
-        border-color: rgba(16, 185, 129, 0.5);
-        box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-    }
-    
-    .user-greeting {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #94A3B8;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-    
-    .user-greeting i {
-        color: #10B981;
-        font-size: 1.1rem;
-    }
-    
-    .dashboard-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        color: #10B981;
-        text-decoration: none;
-        font-weight: 500;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-    }
-    
-    .dashboard-link:hover {
-        background: rgba(16, 185, 129, 0.1);
-        color: #059669;
-    }
-    
-    .dashboard-link i {
-        font-size: 1.1rem;
-    }
-    
-    /* ===== MOBILE USER AVATAR ===== */
-    .mobile-user-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 16px;
-        background: rgba(16, 185, 129, 0.08);
-        border-radius: 12px;
-        margin-bottom: 8px;
-    }
-    
-    .mobile-user-info .user-avatar-sm {
-        width: 48px;
-        height: 48px;
-        font-size: 18px;
-        flex-shrink: 0;
-    }
-    
-    .mobile-user-info div {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .mobile-user-info span {
-        font-weight: 600;
-        color: #F1F5F9;
-        font-size: 1rem;
-    }
-    
-    .mobile-user-info small {
-        color: #94A3B8;
-        font-size: 0.75rem;
-    }
-    
-    /* ===== NAVBAR USER AVATAR POSITION ===== */
-    .nav-links-pro {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .nav-links-pro .user-avatar-sm {
-        margin-left: 4px;
-    }
-    
-    /* ===== HIDE ELEMENTS INITIALLY ===== */
-    #userGreeting { display: none; }
-    #userInitials { display: none; }
-    #mobileUserGreeting { display: none; }
-    .dashboard-link { display: none; }
-    #authSection { display: none; }
-    #mobileAuthSection { display: none; }
-</style>
 
 <div class="marketing-page">
     <nav class="navbar-pro" id="mainNavbar">
         <div class="container">
             <div class="navbar-left">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
                     <i class="bi bi-list"></i>
                     <span class="menu-text">Menu</span>
                 </button>
@@ -139,9 +26,9 @@
             <div class="nav-links-pro desktop-nav">
                 @if (_isLoggedIn)
                 {
-                    <div class="user-greeting" id="userGreeting"><i class="bi bi-person-circle"></i><span>Welcome back, @_firstName! 👋</span></div>
-                    <div class="user-avatar-sm" id="userInitials">@_initials</div>
-                    <a href="/dashboard" class="dashboard-link" id="dashboardLink"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <div class="user-greeting"><i class="bi bi-person-circle"></i><span>Welcome back, @_firstName! 👋</span></div>
+                    <div class="user-avatar-sm">@_initials</div>
+                    <a href="/dashboard" class="dashboard-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
                     <a href="/Account/Logout" class="btn-primary-pro">Logout</a>
                 }
                 else
@@ -149,8 +36,8 @@
                     <a href="#features" class="nav-link">Features</a>
                     <a href="#pricing" class="nav-link">Pricing</a>
                     <a href="#learn" class="nav-link">Learn</a>
-                    <a href="/Account/Login" class="btn-login-pro" id="loginBtn">Sign In</a>
-                    <a href="/Account/Register" class="btn-primary-pro" id="signupBtn">Get Started</a>
+                    <a href="/Account/Login" class="btn-login-pro">Sign In</a>
+                    <a href="/Account/Register" class="btn-primary-pro">Get Started</a>
                 }
             </div>
         </div>
@@ -163,39 +50,29 @@
                 <div class="logo-icon-sm"><i class="bi bi-piggy-bank"></i></div>
                 <div><span class="mobile-logo-text">SmartBudget</span><small>Know where every naira goes</small></div>
             </div>
-            <button class="mobile-menu-close" id="mobileMenuClose"><i class="bi bi-x-lg"></i><span>Close</span></button>
+            <button class="mobile-menu-close" id="mobileMenuClose" type="button"><i class="bi bi-x-lg"></i><span>Close</span></button>
         </div>
         <div class="mobile-menu-body">
             @if (_isLoggedIn)
             {
-                <div class="mobile-user-info" id="mobileAuthSection">
+                <div class="mobile-user-info">
                     <div class="user-avatar-sm">@_initials</div>
                     <div>
-                        <span id="mobileUserGreeting">Hi, @_firstName! 👋</span>
+                        <span>Hi, @_firstName! 👋</span>
                         <small>@_userEmail</small>
                     </div>
                 </div>
                 <div class="mobile-divider"></div>
                 <a href="/dashboard" class="mobile-nav-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span><i class="bi bi-chevron-right arrow"></i></a>
-                <a href="/Account/Logout" class="mobile-nav-link logout-link"><i class="bi bi-box-arrow-right"></i><span>Logout</span><i class="bi bi-chevron-right arrow"></i></a>
+                <a href="/Account/Logout" class="mobile-nav-link" style="color:#FCA5A5 !important;"><i class="bi bi-box-arrow-right" style="color:#EF4444 !important;"></i><span>Logout</span><i class="bi bi-chevron-right arrow"></i></a>
             }
             else
             {
-                <div id="mobileAuthSection" style="display:none;">
-                    <div class="mobile-user-info">
-                        <i class="bi bi-person-circle"></i>
-                        <div>
-                            <span id="mobileUserGreeting"></span>
-                            <small></small>
-                        </div>
-                    </div>
-                    <div class="mobile-divider"></div>
-                </div>
-                <a href="#features" class="mobile-nav-link" data-link="features"><i class="bi bi-grid"></i><span>Features</span><i class="bi bi-chevron-right arrow"></i></a>
-                <a href="#pricing" class="mobile-nav-link" data-link="pricing"><i class="bi bi-tag"></i><span>Pricing</span><i class="bi bi-chevron-right arrow"></i></a>
-                <a href="#learn" class="mobile-nav-link" data-link="learn"><i class="bi bi-book"></i><span>Learn</span><i class="bi bi-chevron-right arrow"></i></a>
+                <a href="#features" class="mobile-nav-link"><i class="bi bi-grid"></i><span>Features</span><i class="bi bi-chevron-right arrow"></i></a>
+                <a href="#pricing" class="mobile-nav-link"><i class="bi bi-tag"></i><span>Pricing</span><i class="bi bi-chevron-right arrow"></i></a>
+                <a href="#learn" class="mobile-nav-link"><i class="bi bi-book"></i><span>Learn</span><i class="bi bi-chevron-right arrow"></i></a>
                 <div class="mobile-divider"></div>
-                <a href="/Account/Login" class="mobile-nav-link login-link"><i class="bi bi-box-arrow-in-right"></i><span>Sign In</span><i class="bi bi-chevron-right arrow"></i></a>
+                <a href="/Account/Login" class="mobile-nav-link"><i class="bi bi-box-arrow-in-right"></i><span>Sign In</span><i class="bi bi-chevron-right arrow"></i></a>
                 <a href="/Account/Register" class="mobile-nav-link signup-link"><i class="bi bi-person-plus"></i><span>Get Started</span><i class="bi bi-chevron-right arrow"></i></a>
             }
         </div>
@@ -340,11 +217,14 @@
                 <p>Join thousands of Nigerians who trust SmartBudget with their money.</p>
                 @if (_isLoggedIn)
                 {
-                    <a href="/dashboard" class="btn-gradient">Go to Dashboard →</a>
+                    <a href="/dashboard" class="btn-gradient btn-lg">Go to Dashboard →</a>
                 }
                 else
                 {
-                    <div class="cta-buttons"><a href="/Account/Register" class="btn-gradient btn-lg">Get Started Free →</a><a href="#features" class="btn-outline-pro btn-lg">Learn More</a></div>
+                    <div class="cta-buttons">
+                        <a href="/Account/Register" class="btn-gradient btn-lg">Get Started Free →</a>
+                        <a href="#features" class="btn-outline-pro btn-lg">Learn More</a>
+                    </div>
                 }
             </div>
         </div>
@@ -382,18 +262,8 @@
                 _isLoggedIn = true;
                 _userEmail = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
                 _fullName = user.FindFirst("FullName")?.Value ?? _userEmail.Split('@')[0];
-                
-                // Get first name
                 _firstName = _fullName.Split(' ')[0];
-                
-                // Get initials (first 2 characters)
                 _initials = _firstName.Length >= 2 ? _firstName.Substring(0, 2).ToUpper() : _firstName.ToUpper();
-                
-                Console.WriteLine($"SmartBudget: User authenticated - {_fullName}");
-            }
-            else
-            {
-                Console.WriteLine("SmartBudget: User not authenticated");
             }
         }
         catch (Exception ex)
@@ -401,19 +271,16 @@
             Console.WriteLine($"SmartBudget: Auth error - {ex.Message}");
             _isLoggedIn = false;
         }
-        await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // First load - ANIMATE from 0
             await JS.InvokeVoidAsync("initializeMarketingPage");
         }
         else
         {
-            // Navigation (back/forward) - SHOW FINAL VALUES immediately (NO animation)
             await JS.InvokeVoidAsync("resetAndInitializeCounters");
         }
     }

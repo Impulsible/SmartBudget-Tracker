@@ -3,6 +3,7 @@
 // Animated Counters, Mobile Menu, FAQ, Active Nav, Smooth Scroll
 // LIVE DASHBOARD ANIMATION ENGINE INCLUDED
 // AUTO-START ON PAGE LOAD
+// FIXED: Removed DOM manipulation that conflicts with Blazor buttons
 // ============================================
 
 (function() {
@@ -24,85 +25,6 @@
     // Live animation globals
     let liveCounterInterval = null;
     let liveChartInterval = null;
-    let liveBarInterval = null;
-
-    // ============================================
-    // USER AUTHENTICATION - Display First Name
-    // ============================================
-    async function loadUserProfile() {
-        try {
-            const response = await fetch('/api/auth/profile');
-            if (!response.ok) return;
-            
-            const data = await response.json();
-            if (!data.success) return;
-            
-            const fullName = data.fullName || 'User';
-            const firstName = fullName.split(' ')[0];
-            const initials = firstName.substring(0, 2).toUpperCase();
-            
-            // Update greeting in navbar
-            const greetingElement = document.getElementById('userGreeting');
-            if (greetingElement) {
-                greetingElement.textContent = 'Welcome back, ' + firstName + '! 👋';
-                greetingElement.style.display = 'inline-block';
-            }
-            
-            // Update user initials circle
-            const initialsElement = document.getElementById('userInitials');
-            if (initialsElement) {
-                initialsElement.textContent = initials;
-                initialsElement.style.display = 'inline-flex';
-            }
-            
-            // Update any mobile greeting
-            const mobileGreeting = document.getElementById('mobileUserGreeting');
-            if (mobileGreeting) {
-                mobileGreeting.textContent = 'Hi, ' + firstName + '!';
-                mobileGreeting.style.display = 'block';
-            }
-            
-            // Update dashboard link with user name
-            const dashboardLink = document.querySelector('.dashboard-link');
-            if (dashboardLink) {
-                dashboardLink.innerHTML = '<i class="bi bi-speedometer2"></i> Dashboard';
-                dashboardLink.style.display = 'inline-flex';
-            }
-            
-            // Show auth section, hide login/signup buttons
-            const authSection = document.getElementById('authSection');
-            const loginBtn = document.getElementById('loginBtn');
-            const signupBtn = document.getElementById('signupBtn');
-            const mobileAuthSection = document.getElementById('mobileAuthSection');
-            
-            if (authSection) {
-                authSection.style.display = 'flex';
-                authSection.style.alignItems = 'center';
-                authSection.style.gap = '12px';
-            }
-            if (loginBtn) loginBtn.style.display = 'none';
-            if (signupBtn) signupBtn.style.display = 'none';
-            
-            if (mobileAuthSection) {
-                mobileAuthSection.style.display = 'block';
-            }
-            
-            // Update mobile auth section
-            const mobileGreetingText = document.querySelector('.mobile-user-greeting');
-            if (mobileGreetingText) {
-                mobileGreetingText.textContent = 'Hi, ' + firstName + '! 👋';
-            }
-            
-            console.log('SmartBudget: User authenticated - ' + fullName);
-        } catch (e) {
-            console.log('SmartBudget: User not authenticated');
-            // Show login/signup buttons
-            const loginBtn = document.getElementById('loginBtn');
-            const signupBtn = document.getElementById('signupBtn');
-            if (loginBtn) loginBtn.style.display = 'inline-flex';
-            if (signupBtn) signupBtn.style.display = 'inline-flex';
-        }
-    }
 
     // ============================================
     // REMOVE YELLOW OUTLINE FROM ELEMENTS
@@ -113,21 +35,8 @@
             *:focus { outline: none !important; box-shadow: none !important; }
             a:focus, button:focus, .btn:focus, .btn-gradient:focus, .btn-outline-pro:focus { outline: none !important; box-shadow: none !important; }
             .gradient-text:focus { outline: none !important; }
-            #userGreeting { display: none; }
-            #userInitials { display: none; }
-            #mobileUserGreeting { display: none; }
-            .dashboard-link { display: none; }
-            #authSection { display: none; }
-            #mobileAuthSection { display: none; }
         `;
         document.head.appendChild(style);
-        
-        document.querySelectorAll('a, button, .btn, .btn-gradient, .btn-outline-pro').forEach(el => {
-            el.addEventListener('focus', (e) => {
-                e.target.style.outline = 'none';
-                e.target.style.boxShadow = 'none';
-            });
-        });
         console.log('SmartBudget: Yellow outline removed');
     }
 
@@ -142,12 +51,10 @@
         }
         console.log('SmartBudget: Starting live counters for ' + counters.length + ' counters');
 
-        // Clear any existing interval
         if (liveCounterInterval) {
             clearInterval(liveCounterInterval);
         }
 
-        // Function to animate a single counter from 0 to target
         function animateCounterFromZero(counter) {
             const target = parseInt(counter.dataset.target) || 0;
             const prefix = counter.dataset.prefix || '';
@@ -159,18 +66,9 @@
 
                 function animate(timestamp) {
                     if (!startTime) startTime = timestamp;
-
-                    const progress = Math.min(
-                        (timestamp - startTime) / duration,
-                        1
-                    );
-
+                    const progress = Math.min((timestamp - startTime) / duration, 1);
                     const eased = 1 - Math.pow(1 - progress, 3);
-
-                    counter.textContent =
-                        prefix +
-                        Math.floor(target * eased).toLocaleString() +
-                        suffix;
+                    counter.textContent = prefix + Math.floor(target * eased).toLocaleString() + suffix;
 
                     if (progress < 1) {
                         requestAnimationFrame(animate);
@@ -187,24 +85,19 @@
             startLoop();
         }
 
-        // Start animation for each counter
         counters.forEach(counter => {
             animateCounterFromZero(counter);
         });
 
-        // Also update counters every 4 seconds to simulate live data
         liveCounterInterval = setInterval(() => {
             counters.forEach(counter => {
                 const target = parseInt(counter.dataset.target) || 0;
                 const prefix = counter.dataset.prefix || '';
                 const suffix = counter.dataset.suffix || '';
-                
-                // Slight fluctuation (±1-3%) for live feel
                 const fluctuation = 0.97 + (Math.random() * 0.06);
                 const newValue = Math.floor(target * fluctuation);
                 const finalValue = Math.max(newValue, 0);
                 
-                // Update the counter smoothly
                 let startTime = null;
                 const duration = 1500;
                 const currentText = counter.textContent;
@@ -216,7 +109,6 @@
                     const eased = 1 - Math.pow(1 - progress, 3);
                     const current = Math.floor(startValue + (finalValue - startValue) * eased);
                     counter.textContent = prefix + current.toLocaleString() + suffix;
-                    
                     if (progress < 1) {
                         requestAnimationFrame(smoothUpdate);
                     } else {
@@ -243,7 +135,6 @@
             clearInterval(liveChartInterval);
         }
 
-        // Store original widths
         const barData = [];
         chartBars.forEach(bar => {
             const originalWidth = parseInt(bar.dataset.width);
@@ -257,14 +148,10 @@
         function animateBar(barDataItem) {
             const bar = barDataItem.element;
             const originalWidth = barDataItem.originalWidth;
-            
-            // Fluctuate ±2-5%
             const fluctuation = 0.95 + (Math.random() * 0.10);
             const newWidth = Math.min(Math.max(Math.floor(originalWidth * fluctuation), 5), 100);
-            
             barDataItem.currentWidth = newWidth;
             
-            // Add a subtle color change based on value
             const intensity = newWidth / 100;
             const r = Math.floor(16 + (56 * intensity));
             const g = Math.floor(185 - (50 * intensity));
@@ -276,7 +163,6 @@
             bar.style.boxShadow = `0 4px 20px rgba(16,185,129,${0.2 + (intensity * 0.3)})`;
         }
 
-        // Initial animation with stagger
         chartBars.forEach((bar, index) => {
             setTimeout(() => {
                 bar.style.transition = 'all 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
@@ -284,7 +170,6 @@
             }, 100 + (index * 150));
         });
 
-        // Live updates every 3 seconds
         liveChartInterval = setInterval(() => {
             barData.forEach((item, index) => {
                 setTimeout(() => {
@@ -304,12 +189,9 @@
         setInterval(() => {
             progressBars.forEach(bar => {
                 const currentWidth = parseFloat(bar.style.width) || 50;
-                
-                // Pulse effect
                 bar.style.transition = 'transform 1.2s ease, opacity 1.2s ease';
                 bar.style.transform = 'scaleY(1.2)';
                 bar.style.opacity = '0.8';
-                
                 setTimeout(() => {
                     bar.style.transform = 'scaleY(1)';
                     bar.style.opacity = '1';
@@ -323,7 +205,7 @@
     // ============================================
     function setCountersToFinal() {
         const counters = document.querySelectorAll('.counter');
-        console.log('SmartBudget: Setting ' + counters.length + ' counters to final values (no animation)');
+        console.log('SmartBudget: Setting ' + counters.length + ' counters to final values');
         
         counters.forEach((counter) => {
             const target = parseInt(counter.dataset.target) || 0;
@@ -335,8 +217,7 @@
         
         const chartBars = document.querySelectorAll('.chart-bar[data-width]');
         chartBars.forEach((bar) => {
-            const width = bar.dataset.width + '%';
-            bar.style.width = width;
+            bar.style.width = bar.dataset.width + '%';
             bar.dataset.animated = 'true';
         });
     }
@@ -347,7 +228,7 @@
     function initCounters() {
         const counters = document.querySelectorAll('.counter');
         if (counters.length === 0) {
-            console.log('SmartBudget: No counters found (not on marketing page)');
+            console.log('SmartBudget: No counters found');
             return;
         }
         console.log('SmartBudget: Found ' + counters.length + ' counters');
@@ -361,7 +242,6 @@
                 if (entry.isIntersecting) {
                     const counter = entry.target;
                     if (counter.dataset.animated === 'true') return;
-                    
                     counter.dataset.animated = 'true';
 
                     const target = parseInt(counter.dataset.target) || 0;
@@ -417,9 +297,7 @@
                 if (entry.isIntersecting) {
                     const bar = entry.target;
                     if (bar.dataset.animated === 'true') return;
-                    
                     bar.dataset.animated = 'true';
-                    
                     const width = bar.dataset.width + '%';
                     setTimeout(() => {
                         bar.style.transition = 'width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
@@ -438,7 +316,7 @@
     }
 
     // ============================================
-    // MOBILE MENU - Fixed: stops retrying after MAX_RETRIES
+    // MOBILE MENU
     // ============================================
     function initMobileMenu() {
         let menuBtn = document.getElementById('mobileMenuBtn');
@@ -449,10 +327,10 @@
         if (!menuBtn || !mobileMenu || !overlay) {
             mobileMenuRetries++;
             if (mobileMenuRetries <= MAX_RETRIES) {
-                console.log('SmartBudget: Mobile menu not found (attempt ' + mobileMenuRetries + '), retrying once...');
+                console.log('SmartBudget: Mobile menu not found (attempt ' + mobileMenuRetries + '), retrying...');
                 setTimeout(initMobileMenu, 500);
             } else {
-                console.log('SmartBudget: Mobile menu not found - stopping retries (not on marketing page)');
+                console.log('SmartBudget: Mobile menu not found - stopping retries');
             }
             return;
         }
@@ -478,6 +356,7 @@
             if (text) text.textContent = 'Menu';
         }
 
+        // Clean up old event listeners by cloning
         const newMenuBtn = menuBtn.cloneNode(true);
         menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
         menuBtn = newMenuBtn;
@@ -507,6 +386,7 @@
         overlay = newOverlay;
         overlay.onclick = closeMenu;
 
+        // Close menu when clicking mobile nav links
         const menuLinks = mobileMenu.querySelectorAll('.mobile-nav-link');
         menuLinks.forEach((link) => {
             link.addEventListener('click', () => {
@@ -522,17 +402,17 @@
     }
 
     // ============================================
-    // FAQ ACCORDION - Fixed: stops retrying after MAX_RETRIES
+    // FAQ ACCORDION
     // ============================================
     function initFaqAccordion() {
         const faqItems = document.querySelectorAll('.faq-item');
         if (faqItems.length === 0) {
             faqRetries++;
             if (faqRetries <= MAX_RETRIES) {
-                console.log('SmartBudget: No FAQ items found (attempt ' + faqRetries + '), retrying once...');
+                console.log('SmartBudget: No FAQ items found (attempt ' + faqRetries + '), retrying...');
                 setTimeout(initFaqAccordion, 500);
             } else {
-                console.log('SmartBudget: No FAQ items found - stopping retries (not on marketing page)');
+                console.log('SmartBudget: No FAQ items found - stopping retries');
             }
             return;
         }
@@ -586,7 +466,7 @@
     }
 
     // ============================================
-    // ACTIVE NAV LINK HIGHLIGHTING - Fixed: stops retrying after MAX_RETRIES
+    // ACTIVE NAV LINK HIGHLIGHTING
     // ============================================
     function initActiveNav() {
         const sections = document.querySelectorAll('section[id]');
@@ -596,10 +476,10 @@
         if (sections.length === 0) {
             activeNavRetries++;
             if (activeNavRetries <= MAX_RETRIES) {
-                console.log('SmartBudget: No sections found (attempt ' + activeNavRetries + '), retrying once...');
+                console.log('SmartBudget: No sections found (attempt ' + activeNavRetries + '), retrying...');
                 setTimeout(initActiveNav, 500);
             } else {
-                console.log('SmartBudget: No sections found - stopping retries (not on marketing page)');
+                console.log('SmartBudget: No sections found - stopping retries');
             }
             return;
         }
@@ -613,7 +493,6 @@
                 const sectionTop = section.offsetTop;
                 const sectionHeight = section.offsetHeight;
                 const sectionId = section.getAttribute('id');
-
                 if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
                     currentSection = sectionId;
                 }
@@ -647,7 +526,6 @@
         
         window._activeNavHandler = updateActiveNav;
         window.addEventListener('scroll', updateActiveNav, { passive: true });
-
         updateActiveNav();
     }
 
@@ -680,7 +558,6 @@
                             mobileMenu.classList.remove('open');
                             if (overlay) overlay.classList.remove('open');
                             document.body.style.overflow = '';
-
                             const menuBtn = document.getElementById('mobileMenuBtn');
                             if (menuBtn) {
                                 const icon = menuBtn.querySelector('i');
@@ -703,15 +580,11 @@
             console.log('SmartBudget: Live features already running');
             return;
         }
-        
         console.log('SmartBudget: Starting all live features...');
         isLiveRunning = true;
-        
-        // Start live animations
         startLiveCounters();
         startLiveChartBars();
         pulseProgressBars();
-        
         console.log('SmartBudget: All live features started!');
     }
 
@@ -773,8 +646,7 @@
         });
         
         document.querySelectorAll('.chart-bar').forEach((bar) => {
-            const width = bar.dataset.width + '%';
-            bar.style.width = width;
+            bar.style.width = bar.dataset.width + '%';
             bar.dataset.animated = 'true';
         });
     }
@@ -785,12 +657,6 @@
     function initializeAll() {
         console.log('SmartBudget: Initializing all features...');
         removeYellowOutline();
-        
-        // Load user profile first
-        loadUserProfile().then(() => {
-            console.log('SmartBudget: User profile loaded');
-        });
-        
         initCounters();
         initChartBars();
         initMobileMenu();
@@ -798,10 +664,7 @@
         initNavbarScroll();
         initActiveNav();
         initSmoothScroll();
-        
-        // Start live animations immediately
         startAllLiveFeatures();
-        
         isInitialized = true;
         console.log('SmartBudget: All features initialized successfully!');
     }
@@ -818,10 +681,6 @@
             clearInterval(liveChartInterval);
             liveChartInterval = null;
         }
-        if (liveBarInterval) {
-            clearInterval(liveBarInterval);
-            liveBarInterval = null;
-        }
         if (countersObserver) {
             countersObserver.disconnect();
             countersObserver = null;
@@ -835,7 +694,7 @@
     }
 
     // ============================================
-    // EXPOSE FOR BLZOR INTEROP
+    // EXPOSE FOR BLAZOR INTEROP
     // ============================================
     window.initializeMarketingPage = function() {
         console.log('SmartBudget: Called from Blazor (First Load)');
@@ -856,7 +715,7 @@
     };
 
     // ============================================
-    // AUTO-START ON DOM READY - IMMEDIATE!
+    // AUTO-START ON DOM READY
     // ============================================
     console.log('SmartBudget: Setting up auto-start...');
     
@@ -875,7 +734,6 @@
     // ============================================
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-            // Pause live animations
             if (liveCounterInterval) {
                 clearInterval(liveCounterInterval);
                 liveCounterInterval = null;
@@ -886,7 +744,6 @@
             }
             console.log('SmartBudget: Animations paused (tab hidden)');
         } else {
-            // Resume live animations
             if (!liveCounterInterval) {
                 startLiveCounters();
             }
@@ -898,9 +755,8 @@
     });
 
     // ============================================
-    // FALLBACK: Check if elements exist and start anyway
+    // FALLBACK
     // ============================================
-    // If after 2 seconds nothing has started, force start
     setTimeout(() => {
         if (!isLiveRunning) {
             console.log('SmartBudget: Force starting live features (fallback)...');
