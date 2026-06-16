@@ -5,7 +5,6 @@ using SmartBudget.Components;
 using SmartBudget.Data;
 using SmartBudget.Services;
 using SmartBudget.Components.Account;
-using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -269,22 +268,28 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// ✅ CRITICAL: Add UseRouting before any endpoint mapping
+app.UseRouting();
+
 app.UseAntiforgery();
 
 // Authentication & Authorization must be in this order
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map API controllers
+// ✅ CRITICAL: Map API controllers FIRST (before Razor components)
 app.MapControllers();
 
-// Map Razor components with interactive server rendering
+// ✅ Map Razor components
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// ✅ CRITICAL: Fallback to handle all non-API routes
+app.MapFallbackToPage("/_Host");
 
 // Log that the app is starting
 app.Logger.LogInformation("🚀 SmartBudget application starting...");
 app.Logger.LogInformation($"📁 Database: {(usePostgres ? "PostgreSQL (Render)" : "SQLite")}");
-app.Logger.LogInformation($"📊 Connection: {connectionString}");
 
 app.Run();
