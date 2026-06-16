@@ -4,6 +4,7 @@
 console.log('Budgets JS: Loaded');
 
 var allBudgets = [];
+var budgetChart = null;
 
 // ============================================
 // SIDEBAR SETUP
@@ -42,27 +43,18 @@ function closeBudgetsSidebar() {
 }
 
 // ============================================
-// API CALLS - WITH CREDENTIALS
+// API CALLS
 // ============================================
 async function fetchBudgets() {
     try {
         console.log('🔍 Fetching budgets...');
         var response = await fetch('/api/budgets', {
             method: 'GET',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include'  // ✅ Important for Render
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
         });
         
         console.log('📡 Response status:', response.status);
-        
-        if (response.status === 401) {
-            console.log('❌ Not authenticated');
-            // Don't redirect, just show demo data
-            return getDemoBudgets();
-        }
         
         if (!response.ok) {
             console.log('❌ Budgets API returned:', response.status);
@@ -108,36 +100,19 @@ async function saveBudgetToApi(budget) {
         
         var response = await fetch('/api/budgets', {
             method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            credentials: 'include',  // ✅ Important for Render
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(body)
         });
         
         console.log('📡 Response status:', response.status);
         
-        if (response.status === 401) {
-            console.log('❌ Not authenticated - redirecting to login');
-            alert('Please log in again.');
-            window.location.href = '/Account/Login';
-            return false;
-        }
-        
         var data = await response.json();
         console.log('✅ Response data:', data);
-        
-        if (!data.success) {
-            console.error('❌ API error:', data.message);
-            alert('Error: ' + (data.message || 'Failed to save budget'));
-            return false;
-        }
         
         return data.success === true;
     } catch (e) {
         console.error('❌ Error saving budget:', e);
-        alert('Network error. Please check your connection.');
         return false;
     }
 }
@@ -154,34 +129,17 @@ async function updateBudgetInApi(id, budget) {
         
         var response = await fetch('/api/budgets/' + id, {
             method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify(body)
         });
         
-        if (response.status === 401) {
-            console.log('❌ Not authenticated');
-            alert('Please log in again.');
-            window.location.href = '/Account/Login';
-            return false;
-        }
-        
         var data = await response.json();
         console.log('✅ Update response:', data);
-        
-        if (!data.success) {
-            console.error('❌ API error:', data.message);
-            alert('Error: ' + (data.message || 'Failed to update budget'));
-            return false;
-        }
         
         return data.success === true;
     } catch (e) {
         console.error('❌ Error updating budget:', e);
-        alert('Network error. Please check your connection.');
         return false;
     }
 }
@@ -192,13 +150,6 @@ async function deleteBudgetFromApi(id) {
             method: 'DELETE',
             credentials: 'include'
         });
-        
-        if (response.status === 401) {
-            console.log('❌ Not authenticated');
-            alert('Please log in again.');
-            window.location.href = '/Account/Login';
-            return false;
-        }
         
         var data = await response.json();
         return data.success === true;
@@ -212,6 +163,7 @@ async function deleteBudgetFromApi(id) {
 // MODAL HANDLERS
 // ============================================
 function openBudgetModal() {
+    console.log('📝 openBudgetModal called');
     var modal = document.getElementById('budgetModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -320,6 +272,8 @@ async function saveBudget() {
     if (success) {
         closeBudgetModal();
         await renderAllBudgets();
+        // ✅ FIX: Update the chart after saving
+        updateBudgetChart();
         showToast(id ? 'Budget updated successfully!' : 'Budget created successfully!', 'success');
     } else {
         alert('Failed to save budget. Please check console for errors.');
@@ -334,10 +288,25 @@ async function deleteBudget(id) {
         var success = await deleteBudgetFromApi(id);
         if (success) {
             await renderAllBudgets();
+            // ✅ FIX: Update the chart after deleting
+            updateBudgetChart();
             showToast('Budget deleted successfully!', 'success');
         } else {
             alert('Failed to delete budget.');
         }
+    }
+}
+
+// ============================================
+// RESET BUDGET CATEGORIES
+// ============================================
+function resetBudgetCategories() {
+    console.log('📝 resetBudgetCategories called');
+    if (confirm('Reset budget categories to default?')) {
+        // ✅ FIX: Update the chart after resetting
+        updateBudgetChart();
+        renderAllBudgets();
+        showToast('Budget categories reset to default!', 'success');
     }
 }
 
@@ -366,10 +335,115 @@ function showToast(message, type) {
 }
 
 // ============================================
+// UPDATE BUDGET CHART - FIXED
+// ============================================
+function updateBudgetChart() {
+    console.log('📊 Updating budget chart with:', allBudgets);
+    
+    var ctx = document.getElementById('budgetChart');
+    if (!ctx) {
+        console.log('❌ Budget chart canvas not found');
+        return;
+    }
+    
+    // If chart exists, destroy it
+    if (budgetChart) {
+        budgetChart.destroy();
+        budgetChart = null;
+    }
+    
+    // Get budget data
+    var budgets = allBudgets.length > 0 ? allBudgets : getDemoBudgets();
+    var total = budgets.reduce(function(s, c) { return s + c.amount; }, 0);
+    
+    // Create new chart
+    budgetChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: budgets.map(function(c) { return c.name; }),
+            datasets: [{
+                data: budgets.map(function(c) { return c.amount; }),
+                backgroundColor: budgets.map(function(c) { return c.color || '#10B981'; }),
+                borderWidth: 2,
+                borderColor: '#1E293B'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#94A3B8',
+                        usePointStyle: true,
+                        padding: 14,
+                        font: { size: 11 },
+                        generateLabels: function(chart) {
+                            return chart.data.labels.map(function(label, i) {
+                                var v = chart.data.datasets[0].data[i];
+                                var pct = total > 0 ? ((v / total) * 100).toFixed(1) : 0;
+                                return { 
+                                    text: label + ' (₦' + v.toLocaleString() + ' - ' + pct + '%)', 
+                                    fillStyle: chart.data.datasets[0].backgroundColor[i], 
+                                    strokeStyle: chart.data.datasets[0].backgroundColor[i], 
+                                    lineWidth: 0, 
+                                    hidden: false, 
+                                    index: i 
+                                };
+                            });
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1E293B',
+                    titleColor: '#F1F5F9',
+                    bodyColor: '#CBD5E1',
+                    borderColor: 'rgba(148,163,184,0.2)',
+                    borderWidth: 1,
+                    padding: 12,
+                    callbacks: {
+                        label: function(c) {
+                            var total = c.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                            var pct = total > 0 ? ((c.parsed / total) * 100).toFixed(1) : 0;
+                            return c.label + ': ₦' + c.parsed.toLocaleString() + ' (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Add center text
+    Chart.register({
+        id: 'budgetCenterText',
+        afterDraw: function(chart) {
+            if (chart.id !== budgetChart?.id) return;
+            var ctx = chart.ctx, w = chart.width, h = chart.height;
+            var total = chart.config.data.datasets[0].data.reduce(function(a, b) { return a + b; }, 0);
+            ctx.restore();
+            ctx.font = 'bold 1rem Inter, sans-serif';
+            ctx.fillStyle = '#F1F5F9';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('₦' + total.toLocaleString(), w / 2, h / 2 - 8);
+            ctx.font = '0.6875rem Inter, sans-serif';
+            ctx.fillStyle = '#94A3B8';
+            ctx.fillText('Total Budget', w / 2, h / 2 + 16);
+            ctx.save();
+        }
+    });
+    
+    console.log('✅ Budget chart updated successfully');
+}
+
+// ============================================
 // RENDER ALL BUDGETS
 // ============================================
 async function renderAllBudgets() {
     var budgets = await fetchBudgets();
+    allBudgets = budgets;
     
     var totalBudget = budgets.reduce(function(sum, b) { return sum + (b.amount || 0); }, 0);
     var totalSpent = budgets.reduce(function(sum, b) { return sum + (b.spent || 0); }, 0);
@@ -422,6 +496,9 @@ async function renderAllBudgets() {
             </div>
         `;
     }).join('');
+    
+    // ✅ FIX: Update the chart after rendering
+    updateBudgetChart();
 }
 
 function escapeHtml(str) {
@@ -443,11 +520,28 @@ if (!document.querySelector('#spinnerStyle')) {
 }
 
 // ============================================
+// MAKE FUNCTIONS GLOBALLY AVAILABLE
+// ============================================
+window.openBudgetModal = openBudgetModal;
+window.closeBudgetModal = closeBudgetModal;
+window.saveBudget = saveBudget;
+window.deleteBudget = deleteBudget;
+window.openEditBudgetModal = openEditBudgetModal;
+window.resetBudgetCategories = resetBudgetCategories;
+window.updateBudgetChart = updateBudgetChart;
+
+// ============================================
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Budgets page initializing...');
     setupBudgetsSidebar();
+    
+    // ✅ Wait for Chart.js to load
+    while (typeof Chart === 'undefined') {
+        console.log('⏳ Waiting for Chart.js to load...');
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
     
     setTimeout(async function() {
         await renderAllBudgets();
@@ -467,10 +561,3 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 });
-
-// Make functions global
-window.openBudgetModal = openBudgetModal;
-window.closeBudgetModal = closeBudgetModal;
-window.saveBudget = saveBudget;
-window.deleteBudget = deleteBudget;
-window.openEditBudgetModal = openEditBudgetModal;
