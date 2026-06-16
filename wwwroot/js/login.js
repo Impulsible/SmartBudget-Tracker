@@ -1,9 +1,11 @@
 // ============================================
-// LOGIN PAGE - Eye Toggle & Form Submit
+// SMARTBUDGET - LOGIN PAGE JAVASCRIPT
 // ============================================
 console.log('Login JS: Loaded');
 
-// Toggle password visibility
+// ============================================
+// TOGGLE PASSWORD VISIBILITY
+// ============================================
 function toggleLoginPassword() {
     var password = document.getElementById('loginPassword');
     var eyeIcon = document.getElementById('loginEyeIcon');
@@ -21,9 +23,11 @@ function toggleLoginPassword() {
     }
 }
 
-// Show error message
+// ============================================
+// SHOW ERROR MESSAGE
+// ============================================
 function showLoginError(message) {
-    console.log('Showing error:', message);
+    console.log('Login: Showing error:', message);
     
     var errorDiv = document.getElementById('errorMessageDiv');
     var errorText = document.getElementById('errorText');
@@ -40,15 +44,28 @@ function showLoginError(message) {
             errorDiv.style.display = 'none';
         }, 6000);
     } else {
-        // Fallback
+        // Fallback if elements not found
         alert(message);
     }
 }
 
-// Perform login
+// ============================================
+// HIDE ERROR MESSAGE
+// ============================================
+function hideLoginError() {
+    var errorDiv = document.getElementById('errorMessageDiv');
+    if (errorDiv) {
+        errorDiv.style.display = 'none';
+    }
+}
+
+// ============================================
+// PERFORM LOGIN
+// ============================================
 async function performLogin() {
     console.log('Login: performLogin called');
     
+    // Get elements
     var emailInput = document.getElementById('loginEmail');
     var passwordInput = document.getElementById('loginPassword');
     var rememberMeCheckbox = document.getElementById('rememberMeCheckbox');
@@ -73,11 +90,14 @@ async function performLogin() {
         return;
     }
     
+    // Get values
     var email = emailInput.value.trim();
     var password = passwordInput.value;
     var rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : true;
     
-    // Validation
+    // ============================================
+    // VALIDATION
+    // ============================================
     if (!email) {
         showLoginError('Please enter your email address.');
         emailInput.focus();
@@ -102,13 +122,15 @@ async function performLogin() {
         return;
     }
     
-    // Save original button text
+    // ============================================
+    // DISABLE BUTTON & SHOW LOADING
+    // ============================================
     var originalHTML = btn.innerHTML;
     btn.disabled = true;
     btn.innerHTML = '<div class="spinner-sm"></div><span>Signing in...</span>';
     
     try {
-        console.log('Login: Sending request to /api/auth/login');
+        console.log('Login: Sending request to /api/auth/login for:', email);
         
         var response = await fetch('/api/auth/login', {
             method: 'POST',
@@ -125,11 +147,14 @@ async function performLogin() {
         
         console.log('Login: Response status:', response.status);
         
+        // Parse response
         var result;
+        var responseText = await response.text();
+        
         try {
-            result = await response.json();
+            result = JSON.parse(responseText);
         } catch (parseError) {
-            console.error('Login: Failed to parse response:', parseError);
+            console.error('Login: Failed to parse response:', responseText);
             showLoginError('Server error. Please try again.');
             btn.disabled = false;
             btn.innerHTML = originalHTML;
@@ -138,17 +163,31 @@ async function performLogin() {
         
         console.log('Login: Response data:', result);
         
+        // ============================================
+        // HANDLE RESPONSE
+        // ============================================
         if (result.success) {
             console.log('Login: Success, redirecting to dashboard...');
-            // Store user info in session
+            
+            // Store user info in session if available
             if (result.user) {
-                sessionStorage.setItem('user', JSON.stringify(result.user));
+                try {
+                    sessionStorage.setItem('user', JSON.stringify(result.user));
+                } catch (e) {
+                    console.warn('Login: Could not store user in sessionStorage');
+                }
             }
+            
+            // Force redirect to dashboard
             window.location.href = '/dashboard';
         } else {
+            // Show error message
             showLoginError(result.message || 'Invalid email or password. Please try again.');
+            
+            // Re-enable button
             btn.disabled = false;
             btn.innerHTML = originalHTML;
+            
             // Clear password on failure
             passwordInput.value = '';
             passwordInput.focus();
@@ -156,16 +195,22 @@ async function performLogin() {
     } catch (error) {
         console.error('Login error:', error);
         showLoginError('Network error. Please check your connection and try again.');
+        
+        // Re-enable button
         btn.disabled = false;
         btn.innerHTML = originalHTML;
     }
 }
 
-// Initialize on DOM ready
+// ============================================
+// INITIALIZE ON DOM READY
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Login JS: DOM ready, initializing...');
     
-    // Setup login button
+    // ============================================
+    // SETUP LOGIN BUTTON
+    // ============================================
     var loginBtn = document.getElementById('loginBtn');
     
     if (loginBtn) {
@@ -174,20 +219,22 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.parentNode.replaceChild(newBtn, loginBtn);
         loginBtn = newBtn;
         
-        loginBtn.onclick = function(e) {
+        loginBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
             performLogin();
-        };
+        });
         console.log('Login JS: Button handler attached');
     } else {
         console.warn('Login JS: Login button not found');
     }
     
-    // Setup Enter key on email field
+    // ============================================
+    // SETUP ENTER KEY ON EMAIL FIELD
+    // ============================================
     var emailInput = document.getElementById('loginEmail');
     if (emailInput) {
-        emailInput.addEventListener('keypress', function(e) {
+        emailInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 performLogin();
@@ -196,10 +243,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Login JS: Email input handler attached');
     }
     
-    // Setup Enter key on password field
+    // ============================================
+    // SETUP ENTER KEY ON PASSWORD FIELD
+    // ============================================
     var passwordInput = document.getElementById('loginPassword');
     if (passwordInput) {
-        passwordInput.addEventListener('keypress', function(e) {
+        passwordInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 performLogin();
@@ -208,36 +257,37 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Login JS: Password input handler attached');
     }
     
-    // Auto-focus email
+    // ============================================
+    // AUTO-FOCUS EMAIL
+    // ============================================
     if (emailInput) {
         setTimeout(function() { 
             emailInput.focus(); 
         }, 300);
     }
     
-    // Hide error on input change
+    // ============================================
+    // HIDE ERROR ON INPUT CHANGE
+    // ============================================
     if (emailInput) {
         emailInput.addEventListener('input', function() {
-            var errorDiv = document.getElementById('errorMessageDiv');
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
+            hideLoginError();
         });
     }
     
     if (passwordInput) {
         passwordInput.addEventListener('input', function() {
-            var errorDiv = document.getElementById('errorMessageDiv');
-            if (errorDiv) {
-                errorDiv.style.display = 'none';
-            }
+            hideLoginError();
         });
     }
     
     console.log('Login JS: Initialized');
 });
 
-// Make functions globally accessible for inline onclick handlers
+// ============================================
+// MAKE FUNCTIONS GLOBALLY ACCESSIBLE
+// ============================================
 window.performLogin = performLogin;
 window.toggleLoginPassword = toggleLoginPassword;
 window.showLoginError = showLoginError;
+window.hideLoginError = hideLoginError;

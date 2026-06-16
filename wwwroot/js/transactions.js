@@ -2,8 +2,9 @@
 // SMARTBUDGET TRANSACTIONS PAGE
 // Full CRUD with Database Persistence via API
 // AUTO-START ON PAGE LOAD
+// FIXED: Category dropdown always populates
 // ============================================
-console.log('Transactions JS: Loaded');
+console.log('Transactions JS: Loaded (Fixed)');
 
 var currentPage = 1;
 var itemsPerPage = 10;
@@ -128,6 +129,7 @@ async function saveTransactionToApi(tx) {
             description: tx.desc,
             amount: tx.amount,
             type: tx.type,
+            category: tx.cat,  // FIXED: Added category field
             date: tx.date || new Date().toISOString()
         };
         
@@ -158,6 +160,7 @@ async function getCategoriesFromApi() {
         if (response.ok) {
             var data = await response.json();
             if (data.success && data.budgets && data.budgets.length > 0) {
+                console.log('Transactions: Loaded categories from budgets API');
                 return data.budgets.map(function(b) {
                     return { id: b.id, name: b.name, color: b.color };
                 });
@@ -167,7 +170,24 @@ async function getCategoriesFromApi() {
         console.error('Error fetching categories:', e);
     }
     
-    // Default categories
+    // Also try categories endpoint
+    try {
+        var catResponse = await fetch('/api/categories');
+        if (catResponse.ok) {
+            var catData = await catResponse.json();
+            if (catData.success && catData.categories && catData.categories.length > 0) {
+                console.log('Transactions: Loaded categories from categories API');
+                return catData.categories.map(function(c) {
+                    return { id: c.id, name: c.name, color: c.color };
+                });
+            }
+        }
+    } catch (e) {
+        console.error('Error fetching from categories endpoint:', e);
+    }
+    
+    // Default categories as fallback
+    console.log('Transactions: Using default categories');
     return [
         { id: 1, name: "Food", color: "#10B981" },
         { id: 2, name: "Transport", color: "#3B82F6" },
@@ -175,14 +195,20 @@ async function getCategoriesFromApi() {
         { id: 4, name: "Bills", color: "#EF4444" },
         { id: 5, name: "Entertainment", color: "#8B5CF6" },
         { id: 6, name: "Salary", color: "#06B6D4" },
-        { id: 7, name: "Other", color: "#64748B" }
+        { id: 7, name: "Utilities", color: "#F97316" },
+        { id: 8, name: "Rent", color: "#EC4899" },
+        { id: 9, name: "Insurance", color: "#6366F1" },
+        { id: 10, name: "Education", color: "#14B8A6" },
+        { id: 11, name: "Health", color: "#F43F5E" },
+        { id: 12, name: "Other", color: "#64748B" }
     ];
 }
 
 // ============================================
-// MODAL HANDLERS
+// MODAL HANDLERS - FIXED
 // ============================================
 function openTxModal() {
+    console.log('Opening transaction modal');
     var modal = document.getElementById('txModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -199,6 +225,7 @@ function openTxModal() {
         if (descInput) descInput.value = '';
         if (amountInput) amountInput.value = '';
         
+        // IMPORTANT: Populate category dropdown when opening modal
         renderCategoryDropdowns();
     }
 }
@@ -212,10 +239,13 @@ function closeTxModal() {
 }
 
 // ============================================
-// RENDER CATEGORY DROPDOWNS
+// RENDER CATEGORY DROPDOWNS - FIXED
 // ============================================
 async function renderCategoryDropdowns() {
+    console.log('Rendering category dropdowns...');
     var categories = await getCategoriesFromApi();
+    
+    console.log('Categories for dropdown:', categories);
     
     var html = '<option value="">-- Select Category --</option>';
     categories.forEach(function(c) {
@@ -225,7 +255,12 @@ async function renderCategoryDropdowns() {
     var txCat = document.getElementById('txCat');
     var filterCat = document.getElementById('txFilterCategory');
     
-    if (txCat) txCat.innerHTML = html;
+    if (txCat) {
+        txCat.innerHTML = html;
+        console.log('Transaction category dropdown populated with', categories.length, 'options');
+    } else {
+        console.log('txCat element not found');
+    }
     
     if (filterCat) {
         var filterHtml = '<option value="all">All Categories</option>';
@@ -233,13 +268,14 @@ async function renderCategoryDropdowns() {
             filterHtml += '<option value="' + c.name + '">' + c.name + '</option>';
         });
         filterCat.innerHTML = filterHtml;
+        console.log('Filter category dropdown populated');
+    } else {
+        console.log('txFilterCategory element not found');
     }
-    
-    console.log('Categories rendered');
 }
 
 // ============================================
-// ADD TRANSACTION - THIS IS THE KEY FUNCTION
+// ADD TRANSACTION - FIXED
 // ============================================
 window.addTransactionFull = async function() {
     console.log('addTransactionFull called');
@@ -270,8 +306,9 @@ window.addTransactionFull = async function() {
 
     // Disable save button and show loading
     var saveBtn = document.querySelector('#txModal .btn-save');
+    var originalText = '';
     if (saveBtn) {
-        var originalText = saveBtn.innerHTML;
+        originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;"></span> Saving...';
         saveBtn.disabled = true;
         
@@ -294,7 +331,7 @@ window.addTransactionFull = async function() {
 
     // Restore button
     if (saveBtn) {
-        saveBtn.innerHTML = 'Save Transaction';
+        saveBtn.innerHTML = originalText || 'Save Transaction';
         saveBtn.disabled = false;
     }
 
@@ -302,6 +339,8 @@ window.addTransactionFull = async function() {
         closeTxModal();
         currentPage = 1;
         await renderAllTransactions();
+        // Also refresh category dropdowns in case new category was added
+        await renderCategoryDropdowns();
         showToast('Transaction added successfully!', 'success');
     } else {
         alert('Failed to save transaction. Check console for details.');
@@ -403,7 +442,11 @@ function showToast(message, type) {
     container.appendChild(toast);
     
     setTimeout(function() {
-        toast.remove();
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(function() {
+            toast.remove();
+        }, 300);
     }, 3000);
 }
 
@@ -458,19 +501,10 @@ async function renderAllTransactions() {
     var balanceEl = document.getElementById('txBalance');
     var countEl = document.getElementById('txCount');
     
-    if (incomeEl) {
-        // Animate the value change
-        animateTxStatValue(incomeEl, totalIncome);
-    }
-    if (expenseEl) {
-        animateTxStatValue(expenseEl, totalExpenses);
-    }
-    if (balanceEl) {
-        animateTxStatValue(balanceEl, totalIncome - totalExpenses);
-    }
-    if (countEl) {
-        animateTxStatValue(countEl, filtered.length, false);
-    }
+    if (incomeEl) animateTxStatValue(incomeEl, totalIncome);
+    if (expenseEl) animateTxStatValue(expenseEl, totalExpenses);
+    if (balanceEl) animateTxStatValue(balanceEl, totalIncome - totalExpenses);
+    if (countEl) animateTxStatValue(countEl, filtered.length, false);
 
     // Pagination
     var totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
@@ -483,7 +517,7 @@ async function renderAllTransactions() {
     if (!tbody) return;
 
     if (pageItems.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:3rem;color:#64748B;"><i class="bi bi-receipt" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No transactions found.<br>Click "Add Transaction" to get started. </td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:3rem;color:#64748B;"><i class="bi bi-receipt" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No transactions found.<br>Click "Add Transaction" to get started.</td></tr>';
     } else {
         tbody.innerHTML = pageItems.map(function(t) {
             var icon = t.type === 'income' ? 'bi-arrow-down' : 'bi-arrow-up';
@@ -506,8 +540,8 @@ async function renderAllTransactions() {
                 '</td>' +
                 '<td><span class="category-badge">' + escapeHtml(t.cat || 'Other') + '</span></td>' +
                 '<td>' + dateStr + '</td>' +
-                '<td class="' + amountClass + '">' + sign + '₦' + t.amount.toLocaleString() + '</td>' +
-                '<td><span class="type-badge ' + typeClass + '">' + t.type + '</span></td>' +
+                '<td class="' + amountClass + '">' + sign + '₦' + (t.amount || 0).toLocaleString() + '</td>' +
+                '<td><span class="type-badge ' + typeClass + '">' + (t.type || 'expense') + '</span></td>' +
                 '<td><span class="status-badge Completed">Completed</span></td>' +
                 '<td>' +
                     '<div class="tx-actions">' +
@@ -545,13 +579,21 @@ async function renderAllTransactions() {
 function animateTxStatValue(element, value, isCurrency) {
     if (!element) return;
     
-    var prefix = isCurrency !== false ? '₦' : '';
     var currentText = element.textContent;
     var currentValue = parseFloat(currentText.replace(/[^0-9.-]/g, '')) || 0;
     var targetValue = value || 0;
     
+    if (currentValue === targetValue) {
+        if (isCurrency !== false) {
+            element.textContent = '₦' + targetValue.toLocaleString();
+        } else {
+            element.textContent = targetValue.toLocaleString();
+        }
+        return;
+    }
+    
     var startTime = null;
-    var duration = 600; // Faster animation for transactions
+    var duration = 600;
     
     function step(timestamp) {
         if (!startTime) startTime = timestamp;
@@ -613,7 +655,6 @@ function cleanupTransactions() {
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Transactions: DOM loaded - checking initialization...');
     
-    // If not already initialized, set up
     if (!isLiveTransactionsRunning) {
         console.log('Transactions: Initializing...');
         setupTxSidebar();
@@ -667,7 +708,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================
-// EXPOSE FOR BLZOR INTEROP
+// EXPOSE FOR BLAZOR INTEROP
 // ============================================
 window.cleanupTransactions = function() {
     console.log('Transactions: Cleanup called from Blazor');
@@ -681,7 +722,6 @@ window.closeTxModal = closeTxModal;
 // ============================================
 // FALLBACK: Check if elements exist and start anyway
 // ============================================
-// If after 1 second nothing has started, force start
 setTimeout(function() {
     if (!isLiveTransactionsRunning) {
         console.log('Transactions: Force starting (fallback)...');

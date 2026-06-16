@@ -5,7 +5,6 @@ using SmartBudget.Components;
 using SmartBudget.Data;
 using SmartBudget.Services;
 using SmartBudget.Components.Account;
-using SmartBudget.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +14,6 @@ builder.Services.AddRazorComponents()
 
 // Add API controllers
 builder.Services.AddControllers();
-
-// Add SignalR
-builder.Services.AddSignalR();
 
 // Add database context with SQLite (persistent file database)
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -87,14 +83,8 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityAuthenticationStateProvider>();
 builder.Services.AddScoped<ExportService>();
 
-// Register BudgetUpdateService for real-time notifications
-builder.Services.AddScoped<BudgetUpdateService>();
-
 // Add HttpClient for API calls
 builder.Services.AddHttpClient();
-
-// Add HttpContextAccessor for getting user info in services
-builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -228,9 +218,6 @@ app.UseAuthorization();
 // Map API controllers
 app.MapControllers();
 
-// Map SignalR hubs
-app.MapHub<BudgetHub>("/budgetHub");
-
 // Map Razor components with interactive server rendering
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
@@ -238,6 +225,5 @@ app.MapRazorComponents<App>()
 // Log that the app is starting
 app.Logger.LogInformation("🚀 SmartBudget application starting...");
 app.Logger.LogInformation($"📁 Database location: {builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=smartbudget.db"}");
-app.Logger.LogInformation("📡 SignalR hub mapped to /budgetHub");
 
 app.Run();

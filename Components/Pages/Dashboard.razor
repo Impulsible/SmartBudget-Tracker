@@ -1,7 +1,6 @@
 @page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-@using Microsoft.AspNetCore.SignalR.Client
 @attribute [Authorize]
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<IdentityUser> UserManager
@@ -314,58 +313,18 @@
     @@media (max-width: 480px){.dashboard-header{padding:.75rem}.header-greeting h2{font-size:.95rem}.header-greeting p{font-size:.75rem}.stat-card{border-radius:14px}.stat-card-body .stat-value{font-size:1.8rem}.stat-icon{width:40px;height:40px}.transactions-actions{flex-direction:column;width:100%}.chart-container{height:220px}.modal-body,.modal-header,.modal-footer{padding:1rem}}
 </style>
 
-<script src="js/dashboard.js"></script>
+<script src="/js/dashboard.js"></script>
 
 @code {
-    private HubConnection? _hubConnection;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            // Initialize SignalR connection for real-time updates
-            _hubConnection = new HubConnectionBuilder()
-                .WithUrl(Navigation.ToAbsoluteUri("/budgetHub"))
-                .WithAutomaticReconnect()
-                .Build();
-
-            _hubConnection.On("DashboardUpdated", async () =>
-            {
-                // 🔥 FIX: Force refresh on SignalR update
-                await InvokeAsync(() =>
-                {
-                    Console.WriteLine("Dashboard: Update received via SignalR");
-                    JS.InvokeVoidAsync("initDashboardPage");
-                });
-            });
-
-            await _hubConnection.StartAsync();
-            Console.WriteLine("Dashboard: SignalR connected");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Dashboard: SignalR error - {ex.Message}");
-        }
-        await base.OnInitializedAsync();
-    }
-
-    // 🔥 FIX 1: Run JS EVERY TIME, not just firstRender
+    // 🔥 FIX: Run EVERY time, not just firstRender
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await JS.InvokeVoidAsync("initDashboardPage");
     }
 
-    // 🔥 FIX 2: Force re-render on navigation
+    // 🔥 FIX: Force re-render on navigation
     protected override void OnParametersSet()
     {
         StateHasChanged();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_hubConnection != null)
-        {
-            await _hubConnection.DisposeAsync();
-        }
     }
 }

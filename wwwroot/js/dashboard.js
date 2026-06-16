@@ -1,8 +1,8 @@
 // ============================================
 // SMARTBUDGET DASHBOARD - Production Ready
-// NO DEMO DATA - Works exclusively with real API data
+// FIXED: Category Dropdown Now Populates
 // ============================================
-console.log('Dashboard JS: Loaded');
+console.log('Dashboard JS: Loaded (Fixed v2)');
 
 var spendingChart = null;
 var budgetChart = null;
@@ -33,275 +33,59 @@ var categoryColors = {
     "Health": "#F43F5E"
 };
 
-// ============================================
-// 🔥 FIX: RESET FUNCTIONS
-// ============================================
-function resetDashboard() {
-    console.log('Dashboard: Resetting...');
-    // Reset charts
-    if (spendingChart) {
-        spendingChart.destroy();
-        spendingChart = null;
-    }
-    if (budgetChart) {
-        budgetChart.destroy();
-        budgetChart = null;
-    }
-    // Reset data
-    budgetCategories = [];
-    transactions = [];
-    liveSpendingData = null;
-}
+// Default categories to show when no data exists
+var defaultCategories = [
+    "Food", "Transport", "Shopping", "Bills", "Entertainment",
+    "Salary", "Utilities", "Rent", "Insurance", "Education", "Health", "Other"
+];
 
 // ============================================
-// EXPOSE FUNCTIONS GLOBALLY
+// RENDER CATEGORY OPTIONS - FIXED
 // ============================================
-window.updateSpendingPeriod = function(period) {
-    console.log('updateSpendingPeriod called with:', period);
-    var btns = document.querySelectorAll('.chart-period');
-    btns.forEach(function(b) { b.classList.remove('active'); });
-    if (spendingChart) spendingChart.destroy();
-    var ctx = document.getElementById('spendingChart');
-    if (!ctx) return;
+function renderCategoryOptions() {
+    var select = document.getElementById('txCategory');
+    if (!select) {
+        console.log('Dashboard: txCategory select not found in DOM - will retry');
+        return;
+    }
     
-    var data = generateSpendingData(period);
-    btns[period === 'Monthly' ? 0 : 1].classList.add('active');
+    console.log('Dashboard: Rendering category options...');
+    console.log('Dashboard: budgetCategories:', budgetCategories.length);
+    console.log('Dashboard: transactions:', transactions.length);
     
-    liveSpendingData = {
-        income: data.income,
-        expense: data.expense
-    };
+    // Collect all unique categories
+    var allCategories = {};
     
-    spendingChart = new Chart(ctx, {
-        type: 'bar',
-        data: { 
-            labels: data.labels, 
-            datasets: [
-                { 
-                    label: 'Income', 
-                    data: data.income, 
-                    backgroundColor: 'rgba(16,185,129,0.7)', 
-                    borderColor: '#10B981', 
-                    borderWidth: 1, 
-                    borderRadius: 6, 
-                    maxBarThickness: 50 
-                },
-                { 
-                    label: 'Expenses', 
-                    data: data.expense, 
-                    backgroundColor: 'rgba(239,68,68,0.7)', 
-                    borderColor: '#EF4444', 
-                    borderWidth: 1, 
-                    borderRadius: 6, 
-                    maxBarThickness: 50 
-                }
-            ]
-        },
-        options: {
-            animation: { duration: 2000 },
-            responsive: true, 
-            maintainAspectRatio: false,
-            plugins: { 
-                legend: { 
-                    position: 'top', 
-                    align: 'end', 
-                    labels: { 
-                        color: '#94A3B8', 
-                        usePointStyle: true, 
-                        padding: 20, 
-                        font: { size: 11 } 
-                    } 
-                } 
-            },
-            scales: { 
-                x: { 
-                    grid: { color: 'rgba(148,163,184,0.06)' }, 
-                    ticks: { color: '#64748B' } 
-                }, 
-                y: { 
-                    grid: { color: 'rgba(148,163,184,0.06)' }, 
-                    ticks: { 
-                        color: '#64748B', 
-                        callback: function(v) { return '₦' + v.toLocaleString(); } 
-                    } 
-                } 
-            }
+    // Always include defaults first
+    defaultCategories.forEach(function(cat) {
+        allCategories[cat] = true;
+    });
+    
+    // Add categories from budgetCategories
+    budgetCategories.forEach(function(c) {
+        if (c.name && c.name !== "No Expenses" && c.name !== "No Data") {
+            allCategories[c.name] = true;
         }
     });
     
-    startLiveChartMovement();
-};
-
-// ============================================
-// GENERATE SPENDING DATA FROM REAL TRANSACTIONS
-// ============================================
-function generateSpendingData(period) {
-    var now = new Date();
-    var labels = [];
-    var income = [];
-    var expense = [];
-    
-    if (period === 'Monthly') {
-        labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-        var w1i = 0, w2i = 0, w3i = 0, w4i = 0;
-        var w1e = 0, w2e = 0, w3e = 0, w4e = 0;
-        
-        transactions.forEach(function(t) {
-            var d = new Date(t.date);
-            if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-                var day = d.getDate();
-                if (day <= 7) { 
-                    if (t.type === 'income') w1i += t.amount; 
-                    else w1e += t.amount; 
-                }
-                else if (day <= 14) { 
-                    if (t.type === 'income') w2i += t.amount; 
-                    else w2e += t.amount; 
-                }
-                else if (day <= 21) { 
-                    if (t.type === 'income') w3i += t.amount; 
-                    else w3e += t.amount; 
-                }
-                else { 
-                    if (t.type === 'income') w4i += t.amount; 
-                    else w4e += t.amount; 
-                }
-            }
-        });
-        
-        income = [w1i, w2i, w3i, w4i];
-        expense = [w1e, w2e, w3e, w4e];
-    } else {
-        labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        var dailyIncome = [0,0,0,0,0,0,0];
-        var dailyExpense = [0,0,0,0,0,0,0];
-        
-        var startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0,0,0,0);
-        
-        transactions.forEach(function(t) {
-            var d = new Date(t.date);
-            if (d >= startOfWeek && d <= now) {
-                var dayIndex = d.getDay();
-                if (t.type === 'income') {
-                    dailyIncome[dayIndex] += t.amount;
-                } else {
-                    dailyExpense[dayIndex] += t.amount;
-                }
-            }
-        });
-        
-        income = dailyIncome;
-        expense = dailyExpense;
-    }
-    
-    return { labels: labels, income: income, expense: expense };
-}
-
-window.resetBudgetCategories = function() {
-    if (confirm('Reset budget categories?')) {
-        budgetCategories = [];
-        updateBudgetCategoriesFromTransactions();
-        updateBudgetChart();
-        renderCategoryOptions();
-        updateStatsFromTransactions();
-    }
-};
-
-window.clearAllTransactions = async function() {
-    if (transactions.length === 0) { alert('No transactions to clear.'); return; }
-    if (confirm('Delete ALL transactions? This cannot be undone.')) {
-        try {
-            var response = await fetch('/api/transactions/clear', { method: 'DELETE' });
-            var data = await response.json();
-            if (data.success) {
-                await loadTransactionsFromApi();
-                await loadBudgetsFromApi();
-                renderTransactions();
-                renderCategoryOptions();
-                updateStatsFromTransactions();
-                updateSpendingChart();
-                updateBudgetChart();
-            }
-        } catch (e) { alert('Network error.'); }
-    }
-};
-
-window.addTransaction = async function() {
-    var desc = document.getElementById('txDescription').value.trim();
-    var amount = document.getElementById('txAmount').value;
-    var cat = document.getElementById('txCategory').value;
-    var type = document.getElementById('txType').value;
-    if (!desc || !amount) { alert('Please fill in all fields'); return; }
-    if (!cat) { alert('Please select a category'); return; }
-    try {
-        var response = await fetch('/api/transactions', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: desc, description: desc, amount: parseFloat(amount), type: type, category: cat })
-        });
-        var data = await response.json();
-        if (data.success) {
-            closeModal('transactionModal');
-            await loadTransactionsFromApi();
-            await loadBudgetsFromApi();
-            renderTransactions();
-            renderCategoryOptions();
-            updateStatsFromTransactions();
-            updateSpendingChart();
-            updateBudgetChart();
-        } else { alert('Failed to add transaction.'); }
-    } catch (e) { alert('Network error.'); }
-};
-
-window.addCategory = async function() {
-    var name = document.getElementById('catName').value.trim();
-    var amount = parseFloat(document.getElementById('catAmount').value);
-    var color = document.getElementById('catColor').value;
-    if (!name || !amount) { alert('Please fill in all fields.'); return; }
-    
-    try {
-        var response = await fetch('/api/budgets', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name, amount: amount, color: color })
-        });
-        var data = await response.json();
-        
-        if (data.success) {
-            await loadBudgetsFromApi();
-            renderCategoryOptions();
-            updateBudgetChart();
-            updateStatsFromTransactions();
-            closeModal('categoryModal');
-            alert('Category "' + name + '" added successfully!');
-        } else {
-            alert('Failed to add category: ' + (data.message || 'Unknown error'));
+    // Add categories from transactions
+    transactions.forEach(function(t) {
+        if (t.cat) {
+            allCategories[t.cat] = true;
         }
-    } catch (e) {
-        console.error('Error adding category:', e);
-        alert('Network error. Please try again.');
-    }
-};
-
-window.deleteTransaction = async function(id) {
-    if (confirm('Delete this transaction?')) {
-        try {
-            var response = await fetch('/api/transactions/' + id, { method: 'DELETE' });
-            var data = await response.json();
-            if (data.success) {
-                await loadTransactionsFromApi();
-                await loadBudgetsFromApi();
-                renderTransactions();
-                renderCategoryOptions();
-                updateStatsFromTransactions();
-                updateSpendingChart();
-                updateBudgetChart();
-            }
-        } catch (e) { alert('Network error.'); }
-    }
-};
+    });
+    
+    var uniqueCats = Object.keys(allCategories).sort();
+    console.log('Dashboard: Categories for dropdown:', uniqueCats);
+    
+    var html = '<option value="">Select category</option>';
+    uniqueCats.forEach(function(c) {
+        html += '<option value="' + c + '">' + c + '</option>';
+    });
+    
+    select.innerHTML = html;
+    console.log('Dashboard: Category dropdown populated with', uniqueCats.length, 'options');
+}
 
 // ============================================
 // GET OR CREATE CATEGORY COLOR
@@ -381,32 +165,11 @@ function updateBudgetCategoriesFromTransactions() {
 }
 
 // ============================================
-// AUTO-START - Load real data immediately
-// ============================================
-(function autoStartDashboard() {
-    console.log('Dashboard: Auto-starting with real data...');
-    setTimeout(function() {
-        loadAllData().then(function() {
-            renderTransactions();
-            renderCategoryOptions();
-            updateStatsFromTransactions();
-            updateSpendingChart();
-            updateBudgetChart();
-            setupSidebar();
-            fetchUserProfile();
-            setupEventListeners();
-            handleResponsiveCharts();
-            startLiveDashboard();
-            console.log('Dashboard: Started successfully with real data!');
-        });
-    }, 100);
-})();
-
-// ============================================
-// LOAD DATA FROM API - ONLY REAL DATA
+// LOAD DATA FROM API
 // ============================================
 async function loadTransactionsFromApi() {
     try {
+        console.log('Dashboard: Fetching transactions...');
         var response = await fetch('/api/transactions?pageSize=100');
         if (response.ok) {
             var data = await response.json();
@@ -414,11 +177,11 @@ async function loadTransactionsFromApi() {
                 transactions = data.transactions.map(function(t) {
                     return {
                         id: t.id,
-                        desc: t.title || t.description,
+                        desc: t.title || t.description || 'Unknown',
                         cat: t.category || 'Other',
                         date: new Date(t.date),
-                        amount: t.amount,
-                        type: t.type,
+                        amount: t.amount || 0,
+                        type: t.type || 'expense',
                         status: t.status || 'Completed'
                     };
                 });
@@ -426,20 +189,19 @@ async function loadTransactionsFromApi() {
                 if (ids.length > 0) {
                     nextId = Math.max.apply(null, ids) + 1;
                 }
-                console.log('Dashboard: Loaded ' + transactions.length + ' transactions from database');
+                console.log('Dashboard: Loaded', transactions.length, 'transactions');
                 return true;
             } else {
-                console.log('Dashboard: No transactions found in database');
+                console.log('Dashboard: No transactions found');
                 transactions = [];
                 return false;
             }
-        } else {
-            console.log('Dashboard: Failed to load transactions - API error');
-            transactions = [];
-            return false;
         }
+        console.log('Dashboard: API error');
+        transactions = [];
+        return false;
     } catch (e) {
-        console.log('Dashboard: Error loading transactions - ' + e.message);
+        console.log('Dashboard: Network error:', e.message);
         transactions = [];
         return false;
     }
@@ -447,51 +209,53 @@ async function loadTransactionsFromApi() {
 
 async function loadBudgetsFromApi() {
     try {
+        console.log('Dashboard: Fetching budgets...');
         var response = await fetch('/api/budgets');
         if (response.ok) {
             var data = await response.json();
             if (data.success && data.budgets && data.budgets.length > 0) {
                 budgetCategories = data.budgets.map(function(b) {
-                    categoryColors[b.name] = b.color;
-                    return { name: b.name, amount: b.amount, color: b.color };
+                    if (b.color) categoryColors[b.name] = b.color;
+                    return { 
+                        name: b.name, 
+                        amount: b.amount || 0, 
+                        color: b.color || getCategoryColor(b.name)
+                    };
                 });
-                console.log('Dashboard: Loaded ' + budgetCategories.length + ' budgets from database');
+                console.log('Dashboard: Loaded', budgetCategories.length, 'budgets');
                 return true;
             } else {
-                console.log('Dashboard: No budgets found in database');
+                console.log('Dashboard: No budgets found');
                 budgetCategories = [];
                 return false;
             }
-        } else {
-            console.log('Dashboard: Failed to load budgets - API error');
-            budgetCategories = [];
-            return false;
         }
+        console.log('Dashboard: Budgets API error');
+        budgetCategories = [];
+        return false;
     } catch (e) {
-        console.log('Dashboard: Error loading budgets - ' + e.message);
+        console.log('Dashboard: Network error:', e.message);
         budgetCategories = [];
         return false;
     }
 }
 
 async function loadAllData() {
+    console.log('Dashboard: Loading all data...');
     await Promise.all([loadTransactionsFromApi(), loadBudgetsFromApi()]);
-    if (transactions.length > 0) {
+    
+    if (transactions.length > 0 && budgetCategories.length === 0) {
         updateBudgetCategoriesFromTransactions();
-    } else if (budgetCategories.length === 0) {
-        budgetCategories = [{ name: "No Data", amount: 1, color: "#64748B" }];
     }
+    
+    console.log('Dashboard: Data loaded - Tx:', transactions.length, 'Budgets:', budgetCategories.length);
 }
 
 // ============================================
-// 🔥 FIX: INIT - Called from Blazor EVERY TIME
+// INIT - Called from Blazor
 // ============================================
 window.initDashboardPage = function() {
-    console.log('Dashboard: Initializing from Blazor...');
-    
-    // 🔥 Reset dashboard state first
-    resetDashboard();
-    
+    console.log('Dashboard: Initializing...');
     setupSidebar();
     fetchUserProfile();
     setupEventListeners();
@@ -505,20 +269,309 @@ window.initDashboardPage = function() {
             updateSpendingChart();
             updateBudgetChart();
             startLiveDashboard();
+            console.log('Dashboard: Initialized successfully');
         });
+    } else {
+        // Already running, just refresh dropdown
+        renderCategoryOptions();
     }
 };
 
 // ============================================
-// RESPONSIVE HANDLING
+// AUTO-START
 // ============================================
-function handleResponsiveCharts() {
-    window.addEventListener('resize', function() {
-        if (spendingChart) spendingChart.resize();
-        if (budgetChart) budgetChart.resize();
-        if (window.innerWidth > 768) closeSidebar();
+(function autoStartDashboard() {
+    console.log('Dashboard: Auto-starting...');
+    setTimeout(function() {
+        loadAllData().then(function() {
+            renderTransactions();
+            renderCategoryOptions();
+            updateStatsFromTransactions();
+            updateSpendingChart();
+            updateBudgetChart();
+            setupSidebar();
+            fetchUserProfile();
+            setupEventListeners();
+            handleResponsiveCharts();
+            startLiveDashboard();
+            console.log('Dashboard: Auto-started');
+        });
+    }, 100);
+})();
+
+// ============================================
+// EXPOSE FUNCTIONS GLOBALLY
+// ============================================
+window.updateSpendingPeriod = function(period) {
+    console.log('updateSpendingPeriod:', period);
+    var btns = document.querySelectorAll('.chart-period');
+    btns.forEach(function(b) { b.classList.remove('active'); });
+    if (spendingChart) spendingChart.destroy();
+    var ctx = document.getElementById('spendingChart');
+    if (!ctx) return;
+    
+    var data = generateSpendingData(period);
+    btns[period === 'Monthly' ? 0 : 1].classList.add('active');
+    
+    liveSpendingData = {
+        income: data.income,
+        expense: data.expense
+    };
+    
+    spendingChart = new Chart(ctx, {
+        type: 'bar',
+        data: { 
+            labels: data.labels, 
+            datasets: [
+                { 
+                    label: 'Income', 
+                    data: data.income, 
+                    backgroundColor: 'rgba(16,185,129,0.7)', 
+                    borderColor: '#10B981', 
+                    borderWidth: 1, 
+                    borderRadius: 6, 
+                    maxBarThickness: 50 
+                },
+                { 
+                    label: 'Expenses', 
+                    data: data.expense, 
+                    backgroundColor: 'rgba(239,68,68,0.7)', 
+                    borderColor: '#EF4444', 
+                    borderWidth: 1, 
+                    borderRadius: 6, 
+                    maxBarThickness: 50 
+                }
+            ]
+        },
+        options: {
+            animation: { duration: 2000 },
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { 
+                    position: 'top', 
+                    align: 'end', 
+                    labels: { 
+                        color: '#94A3B8', 
+                        usePointStyle: true, 
+                        padding: 20, 
+                        font: { size: 11 } 
+                    } 
+                } 
+            },
+            scales: { 
+                x: { 
+                    grid: { color: 'rgba(148,163,184,0.06)' }, 
+                    ticks: { color: '#64748B' } 
+                }, 
+                y: { 
+                    grid: { color: 'rgba(148,163,184,0.06)' }, 
+                    ticks: { 
+                        color: '#64748B', 
+                        callback: function(v) { return '₦' + v.toLocaleString(); } 
+                    } 
+                } 
+            }
+        }
     });
+    
+    startLiveChartMovement();
+};
+
+// ============================================
+// GENERATE SPENDING DATA
+// ============================================
+function generateSpendingData(period) {
+    var now = new Date();
+    var labels = [];
+    var income = [];
+    var expense = [];
+    
+    if (period === 'Monthly') {
+        labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        var w1i = 0, w2i = 0, w3i = 0, w4i = 0;
+        var w1e = 0, w2e = 0, w3e = 0, w4e = 0;
+        
+        transactions.forEach(function(t) {
+            var d = new Date(t.date);
+            if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+                var day = d.getDate();
+                if (day <= 7) { 
+                    if (t.type === 'income') w1i += t.amount; 
+                    else w1e += t.amount; 
+                }
+                else if (day <= 14) { 
+                    if (t.type === 'income') w2i += t.amount; 
+                    else w2e += t.amount; 
+                }
+                else if (day <= 21) { 
+                    if (t.type === 'income') w3i += t.amount; 
+                    else w3e += t.amount; 
+                }
+                else { 
+                    if (t.type === 'income') w4i += t.amount; 
+                    else w4e += t.amount; 
+                }
+            }
+        });
+        
+        income = [w1i, w2i, w3i, w4i];
+        expense = [w1e, w2e, w3e, w4e];
+    } else {
+        labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        var dailyIncome = [0,0,0,0,0,0,0];
+        var dailyExpense = [0,0,0,0,0,0,0];
+        
+        var startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0,0,0,0);
+        
+        transactions.forEach(function(t) {
+            var d = new Date(t.date);
+            if (d >= startOfWeek && d <= now) {
+                var dayIndex = d.getDay();
+                if (t.type === 'income') {
+                    dailyIncome[dayIndex] += t.amount;
+                } else {
+                    dailyExpense[dayIndex] += t.amount;
+                }
+            }
+        });
+        
+        income = dailyIncome;
+        expense = dailyExpense;
+    }
+    
+    return { labels: labels, income: income, expense: expense };
 }
+
+// ============================================
+// ADD TRANSACTION - FIXED
+// ============================================
+window.addTransaction = async function() {
+    var desc = document.getElementById('txDescription').value.trim();
+    var amount = document.getElementById('txAmount').value;
+    var cat = document.getElementById('txCategory').value;
+    var type = document.getElementById('txType').value;
+    
+    if (!desc || !amount) { alert('Please fill in all fields'); return; }
+    if (!cat) { alert('Please select a category'); return; }
+    
+    try {
+        var response = await fetch('/api/transactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                title: desc, 
+                description: desc, 
+                amount: parseFloat(amount), 
+                type: type, 
+                category: cat 
+            })
+        });
+        var data = await response.json();
+        if (data.success) {
+            closeModal('transactionModal');
+            await loadAllData();
+            renderTransactions();
+            renderCategoryOptions();
+            updateStatsFromTransactions();
+            updateSpendingChart();
+            updateBudgetChart();
+        } else { 
+            alert('Failed to add transaction.'); 
+        }
+    } catch (e) { 
+        alert('Network error.'); 
+    }
+};
+
+// ============================================
+// ADD CATEGORY - FIXED
+// ============================================
+window.addCategory = async function() {
+    var name = document.getElementById('catName').value.trim();
+    var amount = parseFloat(document.getElementById('catAmount').value);
+    var color = document.getElementById('catColor').value;
+    if (!name || !amount) { alert('Please fill in all fields.'); return; }
+    
+    try {
+        var response = await fetch('/api/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, amount: amount, color: color })
+        });
+        var data = await response.json();
+        
+        if (data.success) {
+            await loadBudgetsFromApi();
+            renderCategoryOptions();
+            updateBudgetChart();
+            updateStatsFromTransactions();
+            closeModal('categoryModal');
+            alert('Category "' + name + '" added successfully!');
+        } else {
+            alert('Failed to add category: ' + (data.message || 'Unknown error'));
+        }
+    } catch (e) {
+        console.error('Error adding category:', e);
+        alert('Network error. Please try again.');
+    }
+};
+
+// ============================================
+// DELETE TRANSACTION
+// ============================================
+window.deleteTransaction = async function(id) {
+    if (confirm('Delete this transaction?')) {
+        try {
+            var response = await fetch('/api/transactions/' + id, { method: 'DELETE' });
+            var data = await response.json();
+            if (data.success) {
+                await loadAllData();
+                renderTransactions();
+                renderCategoryOptions();
+                updateStatsFromTransactions();
+                updateSpendingChart();
+                updateBudgetChart();
+            }
+        } catch (e) { alert('Network error.'); }
+    }
+};
+
+// ============================================
+// RESET BUDGET CATEGORIES
+// ============================================
+window.resetBudgetCategories = function() {
+    if (confirm('Reset budget categories?')) {
+        budgetCategories = [];
+        updateBudgetCategoriesFromTransactions();
+        updateBudgetChart();
+        renderCategoryOptions();
+        updateStatsFromTransactions();
+    }
+};
+
+// ============================================
+// CLEAR ALL TRANSACTIONS
+// ============================================
+window.clearAllTransactions = async function() {
+    if (transactions.length === 0) { alert('No transactions to clear.'); return; }
+    if (confirm('Delete ALL transactions? This cannot be undone.')) {
+        try {
+            var response = await fetch('/api/transactions/clear', { method: 'DELETE' });
+            var data = await response.json();
+            if (data.success) {
+                await loadAllData();
+                renderTransactions();
+                renderCategoryOptions();
+                updateStatsFromTransactions();
+                updateSpendingChart();
+                updateBudgetChart();
+            }
+        } catch (e) { alert('Network error.'); }
+    }
+};
 
 // ============================================
 // SIDEBAR
@@ -551,7 +604,7 @@ function closeSidebar() {
 }
 
 // ============================================
-// USER INFO - 🔥 FIX: Auto-loads on navigation
+// USER INFO
 // ============================================
 async function fetchUserProfile() {
     try {
@@ -563,21 +616,16 @@ async function fetchUserProfile() {
         var email = data.email || '';
         var firstName = fullName.split(' ')[0];
         var initials = firstName.substring(0, 2).toUpperCase();
-        
-        // Sidebar
         var sf = document.getElementById('sidebarFullName');
         var se = document.getElementById('sidebarEmail');
         var si = document.getElementById('sidebarInitials');
+        var hg = document.getElementById('headerGreeting');
+        var hi = document.getElementById('headerInitials');
         if (sf) sf.textContent = fullName;
         if (se) se.textContent = email;
         if (si) si.textContent = initials;
-        
-        // Header
-        var hg = document.getElementById('headerGreeting');
-        var hi = document.getElementById('headerInitials');
         if (hg) hg.textContent = 'Welcome back, ' + firstName + '! 👋';
         if (hi) hi.textContent = initials;
-        
         console.log('Dashboard: User loaded - ' + fullName);
     } catch (e) { console.error('Profile error:', e); }
 }
@@ -593,7 +641,8 @@ function setupEventListeners() {
     if (btnTx) btnTx.onclick = function() { openModal('transactionModal'); };
     if (btnCat) btnCat.onclick = function() { openModal('categoryModal'); };
     if (catCol) catCol.onchange = function() {
-        document.getElementById('colorPreview').style.background = this.value;
+        var preview = document.getElementById('colorPreview');
+        if (preview) preview.style.background = this.value;
     };
 
     document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
@@ -607,30 +656,48 @@ function setupEventListeners() {
 
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.modal-overlay').forEach(function(m) { m.style.display = 'none'; });
+            document.querySelectorAll('.modal-overlay').forEach(function(m) { 
+                m.style.display = 'none'; 
+            });
             document.body.style.overflow = '';
         }
     });
 }
 
+// ============================================
+// MODAL FUNCTIONS - FIXED
+// ============================================
 function openModal(id) {
-    document.getElementById(id).style.display = 'flex';
+    console.log('Opening modal:', id);
+    var modal = document.getElementById(id);
+    if (!modal) return;
+    
+    modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    
     if (id === 'categoryModal') {
         document.getElementById('catName').value = '';
         document.getElementById('catAmount').value = '';
         document.getElementById('catColor').value = '#10B981';
-        document.getElementById('colorPreview').style.background = '#10B981';
+        var preview = document.getElementById('colorPreview');
+        if (preview) preview.style.background = '#10B981';
     }
+    
     if (id === 'transactionModal') {
         document.getElementById('txDescription').value = '';
         document.getElementById('txAmount').value = '';
-        renderCategoryOptions();
+        // IMPORTANT: Populate category dropdown when opening modal
+        setTimeout(function() {
+            renderCategoryOptions();
+        }, 50);
     }
 }
 
 function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+    var modal = document.getElementById(id);
+    if (modal) {
+        modal.style.display = 'none';
+    }
     document.body.style.overflow = '';
 }
 
@@ -890,6 +957,10 @@ function updateBudgetChart() {
 
     var total = budgetCategories.reduce(function(s, c) { return s + c.amount; }, 0);
 
+    if (budgetCategories.length === 0 || total === 0) {
+        budgetCategories = [{ name: "No Data", amount: 1, color: "#64748B" }];
+    }
+
     budgetChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -992,13 +1063,13 @@ function updateStatsFromTransactions() {
 }
 
 // ============================================
-// RENDER FUNCTIONS
+// RENDER TRANSACTIONS
 // ============================================
 function renderTransactions() {
     var tbody = document.getElementById('transactionsBody');
     if (!tbody) return;
     if (transactions.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:3rem;color:#64748B;"><i class="bi bi-receipt" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No transactions found.<br>Click "Add Transaction" to get started. </td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:3rem;color:#64748B;"><i class="bi bi-receipt" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No transactions found.<br>Click "Add Transaction" to get started.</td></tr>';
         return;
     }
     tbody.innerHTML = transactions.slice(0, 10).map(function(t) {
@@ -1008,43 +1079,25 @@ function renderTransactions() {
         var amountClass = t.type === 'income' ? 'amount-income' : 'amount-expense';
         var dateStr = new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
         return '<tr>' +
-            '<td><div class="transaction-desc"><div class="transaction-icon ' + iconClass + '"><i class="bi ' + icon + '"></i></div><span>' + t.desc + '</span></div></td>' +
-            '<td><span class="category-badge">' + t.cat + '</span></td>' +
+            '<td><div class="transaction-desc"><div class="transaction-icon ' + iconClass + '"><i class="bi ' + icon + '"></i></div><span>' + (t.desc || 'Unknown') + '</span></div></td>' +
+            '<td><span class="category-badge">' + (t.cat || 'Other') + '</span></td>' +
             '<td>' + dateStr + '</td>' +
-            '<td class="' + amountClass + '">' + sign + '₦' + t.amount.toLocaleString() + '</td>' +
-            '<td><span class="status-badge ' + t.status + '">' + t.status + '</span></td>' +
+            '<td class="' + amountClass + '">' + sign + '₦' + (t.amount || 0).toLocaleString() + '</td>' +
+            '<td><span class="status-badge ' + (t.status || 'Completed') + '">' + (t.status || 'Completed') + '</span></td>' +
             '<td><button class="btn-delete" onclick="deleteTransaction(' + t.id + ')" title="Delete"><i class="bi bi-trash"></i></button></td>' +
         '</tr>';
     }).join('');
 }
 
 // ============================================
-// RENDER CATEGORY OPTIONS - Shows all categories
+// RESPONSIVE HANDLING
 // ============================================
-function renderCategoryOptions() {
-    var select = document.getElementById('txCategory');
-    if (!select) return;
-    
-    var allCategories = {};
-    
-    budgetCategories.forEach(function(c) {
-        if (c.name && c.name !== "No Expenses" && c.name !== "No Data") {
-            allCategories[c.name] = true;
-        }
+function handleResponsiveCharts() {
+    window.addEventListener('resize', function() {
+        if (spendingChart) spendingChart.resize();
+        if (budgetChart) budgetChart.resize();
+        if (window.innerWidth > 768) closeSidebar();
     });
-    
-    transactions.forEach(function(t) {
-        if (t.cat) allCategories[t.cat] = true;
-    });
-    
-    var uniqueCats = Object.keys(allCategories).sort();
-    
-    var html = '<option value="">Select category</option>';
-    uniqueCats.forEach(function(c) {
-        html += '<option value="' + c + '">' + c + '</option>';
-    });
-    
-    select.innerHTML = html;
 }
 
 // ============================================

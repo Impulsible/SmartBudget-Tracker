@@ -128,15 +128,15 @@ body {
    USER AVATAR STYLES
    ============================================ */
 .marketing-page .user-avatar-sm {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, #10B981, #059669);
     color: white;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     cursor: default;
     transition: all 0.2s ease;
@@ -151,13 +151,7 @@ body {
 }
 
 .marketing-page .user-greeting {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #10B981;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
-    font-weight: 500;
+    display: none;
 }
 
 .marketing-page .user-greeting i {
@@ -167,14 +161,15 @@ body {
 .marketing-page .dashboard-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
+    gap: 4px;
+    padding: 6px 12px;
     color: #10B981;
     text-decoration: none;
     font-weight: 500;
     font-size: 0.85rem;
     border-radius: 8px;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .marketing-page .dashboard-link:hover {
@@ -187,24 +182,27 @@ body {
 }
 
 /* ============================================
-   NAVIGATION BAR
+   NAVIGATION BAR - FIXED
    ============================================ */
 .marketing-page .navbar-pro {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
+    min-height: 72px;
     z-index: 1000;
-    background: rgba(11, 17, 32, 0.92);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    padding: 0.75rem 0;
-    transition: all 0.3s ease;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+
+    background: rgba(11, 17, 32, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+
+    border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+
+    display: flex;
+    align-items: center;
 }
 
 .marketing-page .navbar-pro.scrolled {
-    padding: 0.5rem 0;
     background: rgba(11, 17, 32, 0.98);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
     border-bottom-color: rgba(148, 163, 184, 0.1);
@@ -214,6 +212,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 72px;
+    gap: 1rem;
 }
 
 .marketing-page .navbar-left {
@@ -262,14 +262,14 @@ body {
 }
 
 .marketing-page .desktop-nav {
-    display: flex;
-    align-items: center;
+    display: none;
 }
 
 .marketing-page .nav-links-pro {
     display: flex;
-    gap: 0.25rem;
     align-items: center;
+    gap: 1rem;
+    flex-wrap: nowrap;
 }
 
 .marketing-page .nav-links-pro > a {
@@ -307,6 +307,7 @@ body {
     text-decoration: none;
     transition: all 0.2s ease;
     margin-left: 0.5rem;
+    white-space: nowrap;
 }
 
 .marketing-page .btn-login-pro:hover {
@@ -331,6 +332,7 @@ body {
     margin-left: 0.5rem;
     position: relative;
     overflow: hidden;
+    white-space: nowrap;
 }
 
 .marketing-page .btn-primary-pro::before {
@@ -353,17 +355,25 @@ body {
     left: 100%;
 }
 
+/* Prevent nav items from wrapping */
+.marketing-page .dashboard-link,
+.marketing-page .btn-login-pro,
+.marketing-page .btn-primary-pro,
+.marketing-page .user-greeting {
+    white-space: nowrap;
+}
+
 /* ============================================
    MOBILE MENU
    ============================================ */
 .marketing-page .mobile-menu-btn {
-    display: none;
+    display: flex;
+    align-items: center;
     background: rgba(30, 41, 59, 0.8);
     border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 8px;
     padding: 0.4rem 0.8rem;
     cursor: pointer;
-    align-items: center;
     gap: 0.4rem;
     color: #F1F5F9;
     transition: all 0.2s ease;
@@ -614,16 +624,26 @@ body {
 }
 
 /* ============================================
-   HERO SECTION
+   HERO SECTION - FIXED
    ============================================ */
 .marketing-page .hero-pro {
     width: 100%;
-    padding: 6rem 0 4rem;
-    background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
-    min-height: 100vh;
-    min-height: 100dvh;
+
+    padding-top: 90px;
+    padding-bottom: 4rem;
+
+    min-height: auto;
+
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+
+    background: linear-gradient(
+        135deg,
+        #0B1120 0%,
+        #111827 50%,
+        #1A2332 100%
+    );
+
     position: relative;
     overflow: hidden;
 }
@@ -644,19 +664,18 @@ body {
 .marketing-page .hero-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2.5rem;
-    align-items: center;
+    gap: 3rem;
+    align-items: start;
     position: relative;
     z-index: 1;
-    text-align: center;
 }
 
 .marketing-page .hero-content {
-    order: 2;
+    order: 1;
 }
 
 .marketing-page .hero-image {
-    order: 1;
+    order: 2;
 }
 
 .marketing-page .hero-badge {
@@ -696,8 +715,6 @@ body {
     margin-bottom: 1.5rem;
     line-height: 1.7;
     max-width: 520px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .marketing-page .hero-buttons-pro {
@@ -771,7 +788,7 @@ body {
 .marketing-page .hero-stats {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
 }
 
@@ -781,13 +798,13 @@ body {
 
 .marketing-page .stat-number {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #10B981;
 }
 
 .marketing-page .stat-label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #94A3B8;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -804,6 +821,9 @@ body {
 }
 
 .marketing-page .dashboard-mockup {
+    margin-top: 1rem;
+    position: relative;
+    z-index: 1;
     background: #1E293B;
     border-radius: 16px;
     padding: 1rem;
@@ -883,61 +903,50 @@ body {
 }
 
 /* ============================================
-   STATS SECTION - FIXED STYLING
+   STATS SECTION
    ============================================ */
 .marketing-page .stats-pro {
     width: 100%;
     background: #111827;
-    padding: 4rem 0;
+    padding: 3rem 0;
     border-top: 1px solid rgba(148, 163, 184, 0.06);
     border-bottom: 1px solid rgba(148, 163, 184, 0.06);
 }
 
 .marketing-page .stats-grid-pro {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
     text-align: center;
 }
 
 .marketing-page .stat-item-pro {
     text-align: center;
-    padding: 1.5rem 1rem;
-    background: rgba(30, 41, 59, 0.4);
-    border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.06);
-    transition: all 0.3s ease;
-}
-
-.marketing-page .stat-item-pro:hover {
-    transform: translateY(-4px);
-    border-color: rgba(16, 185, 129, 0.15);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-    background: rgba(30, 41, 59, 0.6);
+    padding: 1rem;
+    background: rgba(30, 41, 59, 0.3);
+    border-radius: 10px;
 }
 
 .marketing-page .stat-number-pro {
-    font-size: 2.8rem;
+    font-size: 1.8rem;
     font-weight: 800;
     background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    margin-bottom: 0.5rem;
-    line-height: 1.2;
+    margin-bottom: 0.3rem;
 }
 
 .marketing-page .stat-label-pro {
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: #F1F5F9;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.2rem;
 }
 
 .marketing-page .stat-item-pro p {
-    font-size: 0.8rem;
-    color: #94A3B8;
-    margin: 0;
+    font-size: 0.7rem;
+    color: #64748B;
 }
 
 /* ============================================
@@ -1613,14 +1622,25 @@ body {
         font-size: 2.5rem;
     }
     
+    /* Show desktop nav on tablet+ */
+    .marketing-page .desktop-nav {
+        display: flex;
+        align-items: center;
+    }
+    
+    .marketing-page .mobile-menu-btn {
+        display: none;
+    }
+    
+    /* Hero section tablet fixes */
     .marketing-page .hero-pro {
-        padding: 8rem 0 5rem;
+        padding-top: 120px;
     }
     
     .marketing-page .hero-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 3rem;
-        text-align: left;
+        gap: 4rem;
+        align-items: center;
     }
     
     .marketing-page .hero-content {
@@ -1656,11 +1676,6 @@ body {
     
     .marketing-page .stats-grid-pro {
         grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-    }
-    
-    .marketing-page .stat-number-pro {
-        font-size: 3rem;
     }
     
     .marketing-page .features-grid-pro {
@@ -1715,13 +1730,14 @@ body {
     .marketing-page .footer-links-pro {
         text-align: left;
     }
-    
-    .marketing-page .desktop-nav {
+}
+
+/* Desktop - 992px+ */
+@media (min-width: 992px) {
+    /* Show user greeting on desktop */
+    .marketing-page .user-greeting {
         display: flex;
-    }
-    
-    .marketing-page .mobile-menu-btn {
-        display: none;
+        align-items: center;
     }
 }
 
@@ -1741,6 +1757,10 @@ body {
     
     .marketing-page .cta-content-pro h2 {
         font-size: 2.5rem;
+    }
+    
+    .marketing-page .stat-number-pro {
+        font-size: 3rem;
     }
 }
 
@@ -1813,101 +1833,4 @@ body {
     outline: 2px solid #10B981 !important;
     outline-offset: 2px !important;
     box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2) !important;
-}
-
-/* ============================================
-   USER AVATAR & DASHBOARD LINK - FIXED STYLES
-   ============================================ */
-
-/* User Avatar - Green circle with initials */
-.marketing-page .user-avatar-sm {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #10B981, #059669);
-    color: white;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: default;
-    transition: all 0.2s ease;
-    border: 2px solid rgba(16, 185, 129, 0.3);
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-}
-
-.marketing-page .user-avatar-sm:hover {
-    transform: scale(1.08);
-    border-color: rgba(16, 185, 129, 0.6);
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
-}
-
-/* Dashboard Link - Green with icon */
-.marketing-page .dashboard-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    color: #10B981 !important;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    background: rgba(16, 185, 129, 0.08);
-    border: 1px solid rgba(16, 185, 129, 0.15);
-}
-
-.marketing-page .dashboard-link:hover {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34D399 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-}
-
-.marketing-page .dashboard-link i {
-    font-size: 1.1rem;
-    color: #10B981;
-}
-
-/* User Greeting - Welcome text */
-.marketing-page .user-greeting {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #94A3B8;
-    padding: 6px 12px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    background: rgba(148, 163, 184, 0.05);
-    border-radius: 8px;
-}
-
-.marketing-page .user-greeting i {
-    color: #10B981;
-    font-size: 1.2rem;
-}
-
-/* Logout Button */
-.marketing-page .btn-primary-pro {
-    display: inline-flex;
-    align-items: center;
-    padding: 8px 18px;
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-    color: white !important;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.25s ease;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-    border: none;
-}
-
-.marketing-page .btn-primary-pro:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
 }
