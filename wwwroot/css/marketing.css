@@ -4,10 +4,12 @@
    Navy + Emerald Color System
    Scoped to .marketing-page to avoid conflicts
    ============================================ */
+
 /* Smooth scrolling for anchor links */
 html {
     scroll-behavior: smooth;
 }
+
 /* CSS Custom Properties - Scoped to marketing page */
 .marketing-page {
     --brand-primary: #10B981;
@@ -74,7 +76,7 @@ body {
     width: 100%;
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
 }
 
 /* ============================================
@@ -82,7 +84,7 @@ body {
    ============================================ */
 .marketing-page .section-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
 }
 
 .marketing-page .section-badge {
@@ -92,29 +94,29 @@ body {
     background: rgba(16, 185, 129, 0.08);
     color: #10B981;
     border-radius: 2rem;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     letter-spacing: 0.025em;
     text-transform: uppercase;
     border: 1px solid rgba(16, 185, 129, 0.15);
 }
 
 .marketing-page .section-title-pro {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #F1F5F9;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     line-height: 1.2;
     letter-spacing: -0.02em;
 }
 
 .marketing-page .section-subtitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #94A3B8;
     max-width: 600px;
     margin: 0 auto;
-    line-height: 1.7;
+    line-height: 1.6;
 }
 
 .marketing-page .gradient-text {
@@ -181,15 +183,15 @@ body {
     font-size: 1rem;
 }
 
-/* /* ============================================
-   NAVIGATION BAR - FULLY FIXED RESPONSIVE
+/* ============================================
+   NAVIGATION BAR - FIXED RESPONSIVE
    ============================================ */
 .marketing-page .navbar-pro {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    min-height: 72px;
+    min-height: 64px;
     z-index: 1000;
     background: rgba(11, 17, 32, 0.96);
     backdrop-filter: blur(24px);
@@ -209,20 +211,20 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 72px;
-    gap: 1rem;
+    min-height: 64px;
+    gap: 0.75rem;
 }
 
 .marketing-page .navbar-left {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .marketing-page .logo-area {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     text-decoration: none;
     transition: opacity 0.2s ease;
 }
@@ -232,8 +234,8 @@ body {
 }
 
 .marketing-page .logo-icon {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     border-radius: 8px;
     display: flex;
@@ -243,12 +245,12 @@ body {
 }
 
 .marketing-page .logo-icon i {
-    font-size: 18px;
+    font-size: 16px;
     color: white;
 }
 
 .marketing-page .logo-text {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #F1F5F9;
     letter-spacing: -0.01em;
@@ -258,16 +260,14 @@ body {
     color: #10B981;
 }
 
-/* === DESKTOP NAV - HIDDEN ON MOBILE === */
 .marketing-page .desktop-nav {
-    display: none !important;
+    display: none;
 }
 
-/* === NAV LINKS INSIDE DESKTOP NAV === */
 .marketing-page .nav-links-pro {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     flex-wrap: nowrap;
 }
 
@@ -275,8 +275,8 @@ body {
     color: #94A3B8;
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.85rem;
-    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.65rem;
     border-radius: 8px;
     transition: all 0.2s ease;
 }
@@ -292,21 +292,20 @@ body {
     font-weight: 600;
 }
 
-/* === BUTTON STYLES === */
 .marketing-page .btn-login-pro {
     display: inline-flex;
     align-items: center;
-    padding: 0.4rem 1rem;
+    padding: 0.4rem 0.9rem;
     border: 1px solid rgba(148, 163, 184, 0.25);
     border-radius: 8px;
     background: transparent;
     color: #CBD5E1;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
-    margin-left: 0.5rem;
+    margin-left: 0.25rem;
     white-space: nowrap;
 }
 
@@ -319,17 +318,17 @@ body {
 .marketing-page .btn-primary-pro {
     display: inline-flex;
     align-items: center;
-    padding: 0.4rem 1.2rem;
+    padding: 0.4rem 1.1rem;
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: white !important;
     border-radius: 8px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.25s ease;
     box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
-    margin-left: 0.5rem;
+    margin-left: 0.25rem;
     position: relative;
     overflow: hidden;
     white-space: nowrap;
@@ -363,55 +362,8 @@ body {
     white-space: nowrap;
 }
 
-/* === MOBILE MENU BUTTON - VISIBLE ONLY ON MOBILE === */
-.marketing-page .mobile-menu-btn {
-    display: flex !important;
-    align-items: center;
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(148, 163, 184, 0.15);
-    border-radius: 8px;
-    padding: 0.5rem 0.9rem;
-    cursor: pointer;
-    gap: 0.4rem;
-    color: #F1F5F9;
-    transition: all 0.2s ease;
-    font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
-    flex-shrink: 0;
-}
-
-.marketing-page .mobile-menu-btn:hover {
-    background: rgba(30, 41, 59, 1);
-    border-color: #10B981;
-}
-
-.marketing-page .mobile-menu-btn i {
-    font-size: 1.3rem;
-    pointer-events: none;
-}
-
-.marketing-page .menu-text {
-    font-size: 0.85rem;
-    font-weight: 500;
-    pointer-events: none;
-}
-
 /* ============================================
-   TABLET/DESKTOP: 768px+
-   Show desktop nav, hide mobile menu button
-   ============================================ */
-@media (min-width: 768px) {
-    .marketing-page .desktop-nav {
-        display: flex !important;
-    }
-    
-    .marketing-page .mobile-menu-btn {
-        display: none !important;
-    }
-}
-
-/* ============================================
-   MOBILE MENU
+   MOBILE MENU BUTTON
    ============================================ */
 .marketing-page .mobile-menu-btn {
     display: flex;
@@ -419,13 +371,14 @@ body {
     background: rgba(30, 41, 59, 0.8);
     border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 8px;
-    padding: 0.4rem 0.8rem;
+    padding: 0.4rem 0.75rem;
     cursor: pointer;
-    gap: 0.4rem;
+    gap: 0.35rem;
     color: #F1F5F9;
     transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    flex-shrink: 0;
 }
 
 .marketing-page .mobile-menu-btn:hover {
@@ -439,11 +392,14 @@ body {
 }
 
 .marketing-page .menu-text {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 500;
     pointer-events: none;
 }
 
+/* ============================================
+   MOBILE MENU PANEL
+   ============================================ */
 .marketing-page .mobile-menu-overlay {
     position: fixed;
     top: 0;
@@ -468,7 +424,7 @@ body {
     top: 0;
     left: -100%;
     width: 85%;
-    max-width: 340px;
+    max-width: 320px;
     height: 100vh;
     height: 100dvh;
     background: #111827;
@@ -496,12 +452,12 @@ body {
 .marketing-page .mobile-logo {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
 }
 
 .marketing-page .logo-icon-sm {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     border-radius: 8px;
     display: flex;
@@ -510,19 +466,19 @@ body {
 }
 
 .marketing-page .logo-icon-sm i {
-    font-size: 18px;
+    font-size: 16px;
     color: white;
 }
 
 .marketing-page .mobile-logo-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: #F1F5F9;
     display: block;
 }
 
 .marketing-page .mobile-logo small {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: #64748B;
 }
 
@@ -530,15 +486,15 @@ body {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.2);
     border-radius: 2rem;
-    padding: 0.4rem 0.8rem;
+    padding: 0.35rem 0.75rem;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
     color: #FCA5A5;
     transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .marketing-page .mobile-menu-close:hover {
@@ -548,7 +504,7 @@ body {
 
 .marketing-page .mobile-menu-body {
     flex: 1;
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     overflow-y: auto;
 }
 
@@ -556,63 +512,63 @@ body {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.8rem;
+    padding: 0.75rem;
     background: rgba(16, 185, 129, 0.08);
     border-radius: 10px;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
     border: 1px solid rgba(16, 185, 129, 0.12);
 }
 
 .marketing-page .mobile-user-info .user-avatar-sm {
-    width: 40px;
-    height: 40px;
-    font-size: 14px;
+    width: 38px;
+    height: 38px;
+    font-size: 13px;
 }
 
 .marketing-page .mobile-user-info div span {
     display: block;
     font-weight: 600;
     color: #F1F5F9;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .marketing-page .mobile-user-info div small {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #94A3B8;
 }
 
 .marketing-page .mobile-nav-link {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.7rem 0.6rem;
+    gap: 0.5rem;
+    padding: 0.6rem 0.5rem;
     color: #94A3B8;
     text-decoration: none;
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     border-radius: 8px;
     transition: all 0.2s ease;
     cursor: pointer;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
 }
 
 .marketing-page .mobile-nav-link i:first-child {
-    width: 22px;
+    width: 20px;
     color: #10B981;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 .marketing-page .mobile-nav-link .arrow {
     margin-left: auto;
     opacity: 0;
     transition: all 0.2s ease;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .marketing-page .mobile-nav-link:hover {
     color: #10B981;
     background: rgba(16, 185, 129, 0.06);
-    padding-left: 0.8rem;
+    padding-left: 0.7rem;
 }
 
 .marketing-page .mobile-nav-link:hover .arrow {
@@ -630,19 +586,19 @@ body {
 .marketing-page .mobile-divider {
     height: 1px;
     background: rgba(148, 163, 184, 0.1);
-    margin: 0.6rem 0;
+    margin: 0.5rem 0;
 }
 
 .marketing-page .signup-link {
     background: rgba(16, 185, 129, 0.1);
     border-radius: 8px;
     padding: 0.7rem 0.6rem;
-    margin-top: 0.5rem;
+    margin-top: 0.4rem;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .marketing-page .mobile-menu-footer {
-    padding: 1rem 1.25rem;
+    padding: 0.75rem 1rem;
     border-top: 1px solid rgba(148, 163, 184, 0.1);
     text-align: center;
 }
@@ -650,13 +606,13 @@ body {
 .marketing-page .mobile-social {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
-    margin-bottom: 0.8rem;
+    gap: 1.25rem;
+    margin-bottom: 0.5rem;
 }
 
 .marketing-page .mobile-social a {
     color: #94A3B8;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     transition: color 0.2s ease;
     text-decoration: none;
 }
@@ -667,30 +623,18 @@ body {
 
 .marketing-page .mobile-menu-footer p {
     color: #64748B;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 /* ============================================
-   HERO SECTION - FIXED
+   HERO SECTION - CENTERED ON MOBILE
    ============================================ */
 .marketing-page .hero-pro {
     width: 100%;
-
-    padding-top: 90px;
-    padding-bottom: 4rem;
-
+    padding-top: 80px;
+    padding-bottom: 2.5rem;
     min-height: auto;
-
-    display: flex;
-    align-items: flex-start;
-
-    background: linear-gradient(
-        135deg,
-        #0B1120 0%,
-        #111827 50%,
-        #1A2332 100%
-    );
-
+    background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
     position: relative;
     overflow: hidden;
 }
@@ -709,74 +653,83 @@ body {
 }
 
 .marketing-page .hero-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+    text-align: center;
     position: relative;
     z-index: 1;
 }
 
 .marketing-page .hero-content {
-    order: 1;
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .marketing-page .hero-image {
-    order: 2;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
 }
 
 .marketing-page .hero-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.35rem;
     background: rgba(16, 185, 129, 0.08);
-    padding: 0.4rem 1rem;
+    padding: 0.35rem 0.9rem;
     border-radius: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .marketing-page .hero-badge i {
     color: #10B981;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
 }
 
 .marketing-page .hero-badge span {
     color: #10B981;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
 .marketing-page .hero-title-pro {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #F1F5F9;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     line-height: 1.15;
     letter-spacing: -0.025em;
 }
 
 .marketing-page .hero-subtitle-pro {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #94A3B8;
-    margin-bottom: 1.5rem;
-    line-height: 1.7;
-    max-width: 520px;
+    margin-bottom: 1.25rem;
+    line-height: 1.6;
+    max-width: 100%;
 }
 
 .marketing-page .hero-buttons-pro {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 300px;
     align-items: center;
 }
 
 .marketing-page .btn-gradient {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.7rem 1.5rem;
+    gap: 0.35rem;
+    padding: 0.65rem 1.25rem;
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: white;
     text-decoration: none;
@@ -788,6 +741,7 @@ body {
     overflow: hidden;
     width: 100%;
     justify-content: center;
+    font-size: 0.9rem;
 }
 
 .marketing-page .btn-gradient::before {
@@ -813,8 +767,8 @@ body {
 .marketing-page .btn-outline-pro {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.7rem 1.5rem;
+    gap: 0.35rem;
+    padding: 0.65rem 1.25rem;
     background: transparent;
     border: 1px solid rgba(148, 163, 184, 0.25);
     color: #F1F5F9;
@@ -824,6 +778,7 @@ body {
     transition: all 0.25s ease;
     width: 100%;
     justify-content: center;
+    font-size: 0.9rem;
 }
 
 .marketing-page .btn-outline-pro:hover {
@@ -835,7 +790,7 @@ body {
 .marketing-page .hero-stats {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 1rem;
     flex-wrap: wrap;
 }
 
@@ -845,13 +800,13 @@ body {
 
 .marketing-page .stat-number {
     display: block;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #10B981;
 }
 
 .marketing-page .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #94A3B8;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -859,7 +814,7 @@ body {
 
 .marketing-page .stat-divider {
     width: 1px;
-    height: 30px;
+    height: 24px;
     background: rgba(148, 163, 184, 0.15);
 }
 
@@ -868,33 +823,34 @@ body {
 }
 
 .marketing-page .dashboard-mockup {
-    margin-top: 1rem;
+    margin-top: 0;
     position: relative;
     z-index: 1;
     background: #1E293B;
-    border-radius: 16px;
-    padding: 1rem;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(16, 185, 129, 0.1);
+    border-radius: 14px;
+    padding: 0.9rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(148, 163, 184, 0.1);
+    width: 100%;
 }
 
 .marketing-page .mockup-header {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    padding-bottom: 0.8rem;
+    gap: 0.6rem;
+    padding-bottom: 0.6rem;
     border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
 }
 
 .marketing-page .mockup-dots {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.25rem;
 }
 
 .marketing-page .mockup-dots span {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
 }
 
@@ -904,33 +860,33 @@ body {
 
 .marketing-page .mockup-title {
     color: #94A3B8;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
 .marketing-page .mockup-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
-    margin-bottom: 1rem;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .marketing-page .mockup-stat {
     text-align: center;
-    padding: 0.5rem;
+    padding: 0.4rem;
     background: #1A2332;
     border-radius: 8px;
 }
 
 .marketing-page .mockup-stat .stat-label {
     display: block;
-    font-size: 0.55rem;
+    font-size: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.15rem;
 }
 
 .marketing-page .mockup-stat .stat-value {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #F1F5F9;
 }
@@ -938,15 +894,14 @@ body {
 .marketing-page .mockup-chart {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .marketing-page .chart-bar {
-    height: 6px;
+    height: 5px;
     background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
-    border-radius: 4px;
+    border-radius: 3px;
     transition: width 0.8s ease;
-    width: 0%;
 }
 
 /* ============================================
@@ -955,7 +910,7 @@ body {
 .marketing-page .stats-pro {
     width: 100%;
     background: #111827;
-    padding: 3rem 0;
+    padding: 2rem 0;
     border-top: 1px solid rgba(148, 163, 184, 0.06);
     border-bottom: 1px solid rgba(148, 163, 184, 0.06);
 }
@@ -963,36 +918,36 @@ body {
 .marketing-page .stats-grid-pro {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 0.75rem;
     text-align: center;
 }
 
 .marketing-page .stat-item-pro {
     text-align: center;
-    padding: 1rem;
+    padding: 0.75rem;
     background: rgba(30, 41, 59, 0.3);
     border-radius: 10px;
 }
 
 .marketing-page .stat-number-pro {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 800;
     background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    margin-bottom: 0.3rem;
-}
-
-.marketing-page .stat-label-pro {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #F1F5F9;
     margin-bottom: 0.2rem;
 }
 
+.marketing-page .stat-label-pro {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #F1F5F9;
+    margin-bottom: 0.1rem;
+}
+
 .marketing-page .stat-item-pro p {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #64748B;
 }
 
@@ -1002,22 +957,22 @@ body {
 .marketing-page .features-pro {
     width: 100%;
     background: #0B1120;
-    padding: 3rem 0;
+    padding: 2.5rem 0;
     position: relative;
 }
 
 .marketing-page .features-grid-pro {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
     position: relative;
     z-index: 1;
 }
 
 .marketing-page .feature-card-pro {
     background: #1E293B;
-    padding: 1.5rem;
-    border-radius: 16px;
+    padding: 1.25rem;
+    border-radius: 14px;
     transition: all 0.3s ease;
     border: 1px solid rgba(148, 163, 184, 0.1);
     position: relative;
@@ -1049,42 +1004,42 @@ body {
 }
 
 .marketing-page .feature-icon-pro {
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
     background: rgba(16, 185, 129, 0.08);
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     border: 1px solid rgba(16, 185, 129, 0.15);
 }
 
 .marketing-page .feature-icon-pro i {
-    font-size: 22px;
+    font-size: 20px;
     color: #10B981;
 }
 
 .marketing-page .feature-card-pro h3 {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     color: #F1F5F9;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .marketing-page .feature-card-pro p {
     color: #94A3B8;
-    line-height: 1.6;
-    margin-bottom: 0.8rem;
-    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 0.6rem;
+    font-size: 0.82rem;
 }
 
 .marketing-page .feature-tag {
     display: inline-block;
-    padding: 0.2rem 0.6rem;
+    padding: 0.15rem 0.5rem;
     background: #1A2332;
     border-radius: 2rem;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #94A3B8;
     border: 1px solid rgba(148, 163, 184, 0.08);
 }
@@ -1095,7 +1050,7 @@ body {
 .marketing-page .how-it-works-pro {
     width: 100%;
     background: #111827;
-    padding: 3rem 0;
+    padding: 2.5rem 0;
     border-top: 1px solid rgba(148, 163, 184, 0.06);
 }
 
@@ -1103,16 +1058,16 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .marketing-page .step-card {
     text-align: center;
     width: 100%;
-    max-width: 320px;
-    padding: 1.5rem;
+    max-width: 280px;
+    padding: 1.25rem;
     background: #1E293B;
-    border-radius: 16px;
+    border-radius: 14px;
     border: 1px solid rgba(148, 163, 184, 0.1);
     transition: all 0.3s ease;
 }
@@ -1124,47 +1079,47 @@ body {
 }
 
 .marketing-page .step-number {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     background: rgba(16, 185, 129, 0.08);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 0.8rem;
-    font-size: 1rem;
+    margin: 0 auto 0.6rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: #10B981;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .marketing-page .step-icon {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
     background: #1A2332;
-    border-radius: 14px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
+    margin: 0 auto 0.75rem;
 }
 
 .marketing-page .step-icon i {
-    font-size: 26px;
+    font-size: 22px;
     color: #10B981;
 }
 
 .marketing-page .step-card h3 {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: #F1F5F9;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .marketing-page .step-card p {
     color: #94A3B8;
-    line-height: 1.6;
-    font-size: 0.9rem;
+    line-height: 1.5;
+    font-size: 0.8rem;
 }
 
 .marketing-page .step-arrow {
@@ -1173,7 +1128,7 @@ body {
 }
 
 .marketing-page .step-arrow i {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
 }
 
 /* ============================================
@@ -1182,19 +1137,19 @@ body {
 .marketing-page .testimonials-pro {
     width: 100%;
     background: #0B1120;
-    padding: 3rem 0;
+    padding: 2.5rem 0;
 }
 
 .marketing-page .testimonials-grid-pro {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
 }
 
 .marketing-page .testimonial-card-pro {
     background: #1E293B;
-    padding: 1.5rem;
-    border-radius: 16px;
+    padding: 1.25rem;
+    border-radius: 14px;
     border: 1px solid rgba(148, 163, 184, 0.1);
     transition: all 0.3s ease;
 }
@@ -1207,34 +1162,34 @@ body {
 }
 
 .marketing-page .stars {
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
 }
 
 .marketing-page .stars i {
     color: #F59E0B;
     margin-right: 0.1rem;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .marketing-page .testimonial-card-pro p {
     color: #94A3B8;
-    line-height: 1.7;
-    margin-bottom: 1rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
     font-style: italic;
-    font-size: 0.9rem;
+    font-size: 0.82rem;
 }
 
 .marketing-page .testimonial-author-pro {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    padding-top: 0.8rem;
+    gap: 0.6rem;
+    padding-top: 0.6rem;
     border-top: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .marketing-page .author-avatar {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
     background: rgba(16, 185, 129, 0.08);
     border-radius: 50%;
     display: flex;
@@ -1243,18 +1198,18 @@ body {
 }
 
 .marketing-page .author-avatar i {
-    font-size: 20px;
+    font-size: 16px;
     color: #10B981;
 }
 
 .marketing-page .testimonial-author-pro strong {
     display: block;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: #F1F5F9;
 }
 
 .marketing-page .testimonial-author-pro span {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #64748B;
 }
 
@@ -1264,22 +1219,22 @@ body {
 .marketing-page .pricing-pro {
     width: 100%;
     background: #111827;
-    padding: 3rem 0;
+    padding: 2.5rem 0;
     border-top: 1px solid rgba(148, 163, 184, 0.06);
 }
 
 .marketing-page .pricing-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
-    max-width: 400px;
+    gap: 1.5rem;
+    max-width: 380px;
     margin: 0 auto;
 }
 
 .marketing-page .pricing-card {
     background: #1E293B;
-    border-radius: 16px;
-    padding: 1.5rem;
+    border-radius: 14px;
+    padding: 1.25rem;
     position: relative;
     transition: all 0.3s ease;
     border: 1px solid rgba(148, 163, 184, 0.1);
@@ -1304,9 +1259,9 @@ body {
     transform: translateX(-50%);
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: white;
-    padding: 0.3rem 1rem;
+    padding: 0.25rem 0.9rem;
     border-radius: 2rem;
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1315,71 +1270,71 @@ body {
 
 .marketing-page .pricing-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .marketing-page .pricing-header h3 {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: #F1F5F9;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.5rem;
 }
 
 .marketing-page .price {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 0.2rem;
-    margin-bottom: 0.3rem;
+    gap: 0.15rem;
+    margin-bottom: 0.2rem;
 }
 
 .marketing-page .currency {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #10B981;
 }
 
 .marketing-page .amount {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: #F1F5F9;
 }
 
 .marketing-page .period {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #94A3B8;
 }
 
 .marketing-page .pricing-header p {
     color: #64748B;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
 }
 
 .marketing-page .pricing-features {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .marketing-page .feature {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0;
+    gap: 0.5rem;
+    padding: 0.4rem 0;
 }
 
 .marketing-page .feature i {
     color: #10B981;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .marketing-page .feature span {
     color: #94A3B8;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
 }
 
 .marketing-page .btn-pricing {
     display: block;
     text-align: center;
-    padding: 0.7rem;
+    padding: 0.65rem;
     background: #1A2332;
     color: #F1F5F9;
     text-decoration: none;
@@ -1387,7 +1342,7 @@ body {
     font-weight: 600;
     transition: all 0.25s ease;
     border: 1px solid rgba(148, 163, 184, 0.1);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .marketing-page .btn-pricing:hover {
@@ -1399,7 +1354,7 @@ body {
 .marketing-page .btn-pricing-primary {
     display: block;
     text-align: center;
-    padding: 0.7rem;
+    padding: 0.65rem;
     background: linear-gradient(135deg, #10B981 0%, #059669 100%);
     color: white;
     text-decoration: none;
@@ -1407,7 +1362,7 @@ body {
     font-weight: 600;
     transition: all 0.25s ease;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .marketing-page .btn-pricing-primary:hover {
@@ -1421,7 +1376,7 @@ body {
 .marketing-page .faq-pro {
     width: 100%;
     background: #0B1120;
-    padding: 3rem 0;
+    padding: 2.5rem 0;
 }
 
 .marketing-page .faq-grid {
@@ -1432,7 +1387,7 @@ body {
 .marketing-page .faq-item {
     background: #1E293B;
     border-radius: 12px;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
     border: 1px solid rgba(148, 163, 184, 0.1);
     overflow: hidden;
     transition: all 0.3s ease;
@@ -1445,8 +1400,8 @@ body {
 .marketing-page .faq-question {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    padding: 1rem 1.25rem;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
     cursor: pointer;
     transition: background 0.2s ease;
 }
@@ -1457,20 +1412,20 @@ body {
 
 .marketing-page .faq-question i:first-child {
     color: #10B981;
-    font-size: 1rem;
+    font-size: 0.9rem;
 }
 
 .marketing-page .faq-question span {
     flex: 1;
     font-weight: 600;
     color: #F1F5F9;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 
 .marketing-page .faq-question i:last-child {
     color: #64748B;
     transition: transform 0.3s ease;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .marketing-page .faq-item.open .faq-question i:last-child {
@@ -1481,27 +1436,27 @@ body {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease, padding 0.3s ease;
-    padding: 0 1.25rem;
+    padding: 0 1rem;
 }
 
 .marketing-page .faq-item.open .faq-answer {
     max-height: 500px;
-    padding: 0 1.25rem 1rem;
+    padding: 0 1rem 0.85rem;
 }
 
 .marketing-page .faq-answer p {
     color: #94A3B8;
-    line-height: 1.7;
-    font-size: 0.9rem;
+    line-height: 1.6;
+    font-size: 0.82rem;
 }
 
 /* ============================================
-   CTA SECTION
+   CTA SECTION - CENTERED
    ============================================ */
 .marketing-page .cta-pro {
     width: 100%;
     background: linear-gradient(135deg, #111827 0%, #1A2332 100%);
-    padding: 3rem 0;
+    padding: 2.5rem 0;
     text-align: center;
     border-top: 1px solid rgba(148, 163, 184, 0.06);
     border-bottom: 1px solid rgba(148, 163, 184, 0.06);
@@ -1523,78 +1478,97 @@ body {
 .marketing-page .cta-content-pro {
     position: relative;
     z-index: 1;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
 .marketing-page .cta-content-pro h2 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #F1F5F9;
-    margin-bottom: 0.8rem;
+    margin-bottom: 0.6rem;
     letter-spacing: -0.02em;
 }
 
 .marketing-page .cta-content-pro p {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #94A3B8;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .marketing-page .cta-buttons {
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 0.6rem;
     align-items: center;
 }
 
 .marketing-page .btn-lg {
-    padding: 0.9rem 2rem;
-    font-size: 1rem;
+    padding: 0.8rem 1.75rem;
+    font-size: 0.95rem;
     width: 100%;
+    max-width: 280px;
     justify-content: center;
 }
 
 /* ============================================
-   FOOTER
+   FOOTER - PROFESSIONAL DESIGN (FIXED)
    ============================================ */
 .marketing-page .footer-pro {
     width: 100%;
     background: #0B1120;
     padding: 3rem 0 1.5rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.06);
 }
 
 .marketing-page .footer-grid-pro {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem 1.5rem;
     margin-bottom: 2rem;
+}
+
+/* Brand Column */
+.marketing-page .footer-brand-col {
+    grid-column: 1 / -1;
     text-align: center;
 }
 
-.marketing-page .footer-logo-pro i {
-    font-size: 1.8rem;
-    color: #10B981;
-    margin-bottom: 0.8rem;
+.marketing-page .footer-logo-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
 }
 
-.marketing-page .footer-logo-pro h3 {
-    font-size: 1.2rem;
+.marketing-page .footer-logo-icon i {
+    font-size: 24px;
+    color: #10B981;
+}
+
+.marketing-page .footer-brand-col h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
     color: #F1F5F9;
     margin-bottom: 0.5rem;
 }
 
-.marketing-page .footer-logo-pro p {
+.marketing-page .footer-description {
     color: #94A3B8;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     line-height: 1.6;
-    margin-bottom: 0.8rem;
-    max-width: 300px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 280px;
+    margin: 0 auto 0.75rem;
 }
 
 .marketing-page .footer-social {
     display: flex;
-    gap: 0.8rem;
+    gap: 0.6rem;
     justify-content: center;
 }
 
@@ -1608,7 +1582,7 @@ body {
     justify-content: center;
     color: #94A3B8;
     transition: all 0.25s ease;
-    border: 1px solid rgba(148, 163, 184, 0.1);
+    border: 1px solid rgba(148, 163, 184, 0.08);
     text-decoration: none;
 }
 
@@ -1620,203 +1594,231 @@ body {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-.marketing-page .footer-links-pro h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #F1F5F9;
-    margin-bottom: 1rem;
+/* Link Columns */
+.marketing-page .footer-links-col {
+    text-align: center;
 }
 
-.marketing-page .footer-links-pro a {
+.marketing-page .footer-links-col h4 {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #F1F5F9;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.7;
+}
+
+.marketing-page .footer-links-col a {
     display: block;
     color: #94A3B8;
     text-decoration: none;
-    font-size: 0.85rem;
-    margin-bottom: 0.6rem;
-    transition: color 0.2s ease;
+    font-size: 0.78rem;
+    padding: 0.3rem 0;
+    transition: all 0.2s ease;
 }
 
-.marketing-page .footer-links-pro a:hover {
+.marketing-page .footer-links-col a:hover {
     color: #10B981;
+    padding-left: 4px;
 }
 
-.marketing-page .footer-bottom-pro {
+/* Footer Bottom */
+.marketing-page .footer-bottom {
     text-align: center;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(148, 163, 184, 0.08);
+    border-top: 1px solid rgba(148, 163, 184, 0.06);
 }
 
-.marketing-page .footer-bottom-pro p {
+.marketing-page .footer-bottom p {
     color: #64748B;
     font-size: 0.7rem;
+    margin: 0;
+}
+
+.marketing-page .footer-tagline {
+    color: #10B981 !important;
+    font-weight: 500;
+    margin-top: 0.25rem !important;
+    font-size: 0.65rem !important;
 }
 
 /* ============================================
-   RESPONSIVE DESIGN - Mobile First
+   FOOTER RESPONSIVE
    ============================================ */
-
-/* Tablet - 768px */
 @media (min-width: 768px) {
+    .marketing-page .footer-grid-pro {
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .marketing-page .footer-brand-col {
+        grid-column: auto;
+        text-align: left;
+    }
+
+    .marketing-page .footer-description {
+        margin: 0 0 0.75rem 0;
+        max-width: 220px;
+    }
+
+    .marketing-page .footer-social {
+        justify-content: flex-start;
+    }
+
+    .marketing-page .footer-links-col {
+        text-align: left;
+    }
+
+    .marketing-page .footer-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .marketing-page .footer-tagline {
+        margin-top: 0 !important;
+    }
+
     .marketing-page .container {
         padding: 0 2rem;
     }
-    
+
     .marketing-page .section-header {
-        margin-bottom: 4rem;
+        margin-bottom: 3rem;
     }
-    
+
     .marketing-page .section-title-pro {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
     }
-    
-    /* Show desktop nav on tablet+ */
+
     .marketing-page .desktop-nav {
         display: flex;
-        align-items: center;
     }
-    
+
     .marketing-page .mobile-menu-btn {
         display: none;
     }
-    
-    /* Hero section tablet fixes */
+
     .marketing-page .hero-pro {
-        padding-top: 120px;
+        padding-top: 110px;
+        padding-bottom: 3rem;
     }
-    
+
     .marketing-page .hero-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 4rem;
+        flex-direction: row;
+        text-align: left;
         align-items: center;
     }
-    
+
     .marketing-page .hero-content {
-        order: 1;
+        align-items: flex-start;
     }
-    
-    .marketing-page .hero-image {
-        order: 2;
-    }
-    
+
     .marketing-page .hero-title-pro {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
-    
+
     .marketing-page .hero-subtitle-pro {
         margin-left: 0;
         margin-right: 0;
     }
-    
+
     .marketing-page .hero-buttons-pro {
         flex-direction: row;
-        justify-content: flex-start;
+        max-width: none;
     }
-    
+
     .marketing-page .btn-gradient,
     .marketing-page .btn-outline-pro {
         width: auto;
     }
-    
+
     .marketing-page .hero-stats {
         justify-content: flex-start;
     }
-    
+
     .marketing-page .stats-grid-pro {
         grid-template-columns: repeat(4, 1fr);
     }
-    
+
     .marketing-page .features-grid-pro {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .marketing-page .steps-grid {
         flex-direction: row;
         gap: 0.5rem;
     }
-    
+
     .marketing-page .step-arrow {
         transform: none;
     }
-    
+
     .marketing-page .testimonials-grid-pro {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     .marketing-page .pricing-grid {
         grid-template-columns: repeat(3, 1fr);
         max-width: 100%;
     }
-    
+
     .marketing-page .cta-buttons {
         flex-direction: row;
         justify-content: center;
     }
-    
+
     .marketing-page .btn-lg {
         width: auto;
     }
-    
-    .marketing-page .footer-grid-pro {
-        grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-        text-align: left;
-    }
-    
-    .marketing-page .footer-logo-pro {
-        text-align: left;
-    }
-    
-    .marketing-page .footer-logo-pro p {
-        margin-left: 0;
-        margin-right: 0;
-    }
-    
-    .marketing-page .footer-social {
-        justify-content: flex-start;
-    }
-    
-    .marketing-page .footer-links-pro {
-        text-align: left;
-    }
 }
 
-/* Desktop - 992px+ */
+/* ============================================
+   Desktop - 992px+
+   ============================================ */
 @media (min-width: 992px) {
-    /* Show user greeting on desktop */
     .marketing-page .user-greeting {
         display: flex;
         align-items: center;
+        gap: 0.5rem;
+        color: #94A3B8;
+        font-size: 0.85rem;
     }
-}
 
-/* Desktop - 1024px */
-@media (min-width: 1024px) {
     .marketing-page .hero-title-pro {
-        font-size: 3.8rem;
+        font-size: 3.2rem;
     }
-    
+
     .marketing-page .features-grid-pro {
         grid-template-columns: repeat(3, 1fr);
     }
-    
+
     .marketing-page .section-title-pro {
-        font-size: 3rem;
+        font-size: 2.8rem;
     }
-    
+
     .marketing-page .cta-content-pro h2 {
+        font-size: 2.2rem;
+    }
+
+    .marketing-page .stat-number-pro {
         font-size: 2.5rem;
     }
-    
-    .marketing-page .stat-number-pro {
-        font-size: 3rem;
+
+    .marketing-page .footer-pro {
+        padding: 4rem 0 1.5rem;
     }
 }
 
-/* Large Desktop - 1200px */
+/* ============================================
+   Large Desktop - 1200px+
+   ============================================ */
 @media (min-width: 1200px) {
     .marketing-page .hero-title-pro {
-        font-size: 4.2rem;
+        font-size: 3.8rem;
     }
-    
+
     .marketing-page .container {
         padding: 0 3rem;
     }
@@ -1844,7 +1846,7 @@ body {
     .marketing-page .mobile-menu-container {
         display: none !important;
     }
-    
+
     .marketing-page {
         background: white !important;
         color: black !important;
