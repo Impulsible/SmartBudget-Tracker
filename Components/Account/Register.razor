@@ -1,0 +1,179 @@
+@page "/Account/Register"
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
+@inject NavigationManager Navigation
+@inject RoleManager<IdentityRole> RoleManager
+
+<PageTitle>SmartBudget - Create Account</PageTitle>
+
+<div class="auth-page">
+    <a href="/" class="back-to-home">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Home</span>
+    </a>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <a href="/" class="auth-logo">
+                    <div class="logo-icon-wrapper"><i class="bi bi-piggy-bank"></i></div>
+                    <h2>SmartBudget</h2>
+                </a>
+                <p class="auth-subtitle">Start your financial journey today</p>
+            </div>
+
+            <div id="errorMessageDiv" class="alert alert-error" style="display:none;">
+                <div class="alert-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <div class="alert-content"><strong>Registration Failed</strong><span id="errorText"></span></div>
+            </div>
+
+            <div id="successMessageDiv" class="alert alert-success" style="display:none;">
+                <div class="alert-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div class="alert-content"><strong>Success!</strong><span id="successText"></span></div>
+            </div>
+
+            <div class="auth-form">
+                <div class="form-group">
+                    <label class="form-label"><span class="label-icon"><i class="bi bi-person"></i></span>Full Name</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="John Doe" autocomplete="name" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><span class="label-icon"><i class="bi bi-envelope"></i></span>Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="you@example.com" autocomplete="email" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><span class="label-icon"><i class="bi bi-lock"></i></span>Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" class="form-control" placeholder="Create a strong password" autocomplete="new-password" onkeyup="validatePassword()" />
+                        <span class="password-toggle" onclick="togglePassword('password','passwordEyeIcon')" tabindex="-1" style="cursor:pointer;">
+                            <i class="bi bi-eye" id="passwordEyeIcon"></i>
+                        </span>
+                    </div>
+                    <p style="color:#64748B;font-size:0.75rem;margin-top:0.5rem;">
+                        <i class="bi bi-info-circle"></i> Min 6 chars, 1 uppercase, 1 lowercase, 1 number
+                    </p>
+                    <div class="password-requirements" id="passwordRequirements" style="display:none;">
+                        <div class="req-item" id="lengthReq"><i class="bi bi-circle"></i><span>At least 6 characters</span></div>
+                        <div class="req-item" id="upperReq"><i class="bi bi-circle"></i><span>One uppercase letter</span></div>
+                        <div class="req-item" id="lowerReq"><i class="bi bi-circle"></i><span>One lowercase letter</span></div>
+                        <div class="req-item" id="digitReq"><i class="bi bi-circle"></i><span>One number</span></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label"><span class="label-icon"><i class="bi bi-shield-lock"></i></span>Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmPasswordInput" class="form-control" placeholder="Confirm your password" autocomplete="new-password" onkeyup="validateMatch()" />
+                        <span class="password-toggle" onclick="togglePassword('confirmPasswordInput','confirmPasswordEyeIcon')" tabindex="-1" style="cursor:pointer;">
+                            <i class="bi bi-eye" id="confirmPasswordEyeIcon"></i>
+                        </span>
+                    </div>
+                    <div id="matchMessage"></div>
+                </div>
+
+                <div class="form-group terms-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agreeTermsCheckbox" />
+                        <span class="checkmark"></span>
+                        <span class="terms-text">I agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a></span>
+                    </label>
+                </div>
+
+                <button type="button" class="btn-auth btn-primary" id="registerBtn" onclick="createAccount()">
+                    <span>Create free account</span>
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="/Account/Login" class="auth-link">Sign in</a></p>
+            </div>
+        </div>
+
+        <div class="auth-banner">
+            <div class="banner-pattern"></div>
+            <div class="banner-content">
+                <div class="banner-icon"><i class="bi bi-shield-check"></i></div>
+                <h3>Join the SmartBudget community</h3>
+                <p>Get access to powerful tools that help you track expenses, create budgets, and achieve your savings goals.</p>
+                <div class="feature-list">
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>100% free forever</span></div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>Bank-level security</span></div>
+                    <div class="feature-item"><i class="bi bi-check-circle-fill"></i><span>No credit card required</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0B1120,#111827 50%,#1A2332);position:relative;overflow:hidden;padding:2rem}
+    .auth-page::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(circle at 20% 80%,rgba(16,185,129,0.06),transparent 50%),radial-gradient(circle at 80% 20%,rgba(16,185,129,0.04),transparent 50%);pointer-events:none}
+    .back-to-home{position:fixed;top:1.5rem;left:1.5rem;display:inline-flex;align-items:center;gap:0.5rem;color:#94A3B8;text-decoration:none;font-size:0.875rem;font-weight:500;padding:0.5rem 1rem;border-radius:8px;background:rgba(30,41,59,0.8);border:1px solid rgba(148,163,184,0.15);transition:all 0.2s;z-index:100;backdrop-filter:blur(10px)}
+    .back-to-home:hover{color:#10B981;background:rgba(30,41,59,1);border-color:#10B981;transform:translateX(-4px)}
+    .back-to-home i{font-size:1rem;transition:transform 0.2s}.back-to-home:hover i{transform:translateX(-2px)}
+    .auth-container{display:grid;grid-template-columns:1fr 1fr;max-width:1100px;width:100%;background:rgba(30,41,59,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:24px;overflow:hidden;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5),0 0 0 1px rgba(148,163,184,0.1);position:relative;z-index:1}
+    .auth-card{padding:3rem 2.5rem;background:#1E293B;display:flex;flex-direction:column;justify-content:center}
+    .auth-header{margin-bottom:2rem}
+    .auth-logo{display:flex;align-items:center;gap:1rem;margin-bottom:0.5rem;text-decoration:none;cursor:pointer}.auth-logo:hover{opacity:0.9}
+    .logo-icon-wrapper{width:44px;height:44px;background:linear-gradient(135deg,#10B981,#059669);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(16,185,129,0.3)}
+    .logo-icon-wrapper i{font-size:24px;color:white}
+    .auth-logo h2{font-size:1.75rem;font-weight:700;color:#F1F5F9;margin:0;letter-spacing:-0.02em}
+    .auth-subtitle{color:#94A3B8;font-size:0.9375rem;margin-top:0.25rem}
+    .alert{display:flex;gap:1rem;padding:1rem 1.25rem;border-radius:12px;margin-bottom:1.5rem;align-items:flex-start}
+    .alert-icon{font-size:1.25rem;flex-shrink:0;margin-top:2px}.alert-content{display:flex;flex-direction:column;gap:0.25rem}
+    .alert-content strong{font-size:0.875rem;font-weight:600}.alert-content span{font-size:0.8125rem;line-height:1.5}
+    .alert-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5}.alert-error strong{color:#EF4444}
+    .alert-success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:#6EE7B7}.alert-success strong{color:#10B981}
+    .auth-form{display:flex;flex-direction:column;gap:1.25rem}.form-group{margin:0}
+    .form-label{display:flex;align-items:center;gap:0.5rem;font-size:0.8125rem;font-weight:600;color:#CBD5E1;margin-bottom:0.5rem;letter-spacing:0.01em}
+    .label-icon{color:#10B981;font-size:1rem}
+    .form-control{width:100%;padding:0.75rem 1rem;background:#0F172A;border:1px solid rgba(148,163,184,0.15);border-radius:10px;color:#F1F5F9;font-size:0.9375rem;transition:all 0.2s;outline:none;font-family:'Inter',sans-serif}
+    .form-control:focus{border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.1);background:#0F172A}
+    .form-control::placeholder{color:#64748B}
+    .input-wrapper{position:relative}.input-wrapper .form-control{padding-right:3rem}
+    .password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:#64748B;padding:0.5rem;border-radius:6px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;z-index:5}
+    .password-toggle:hover{color:#CBD5E1;background:rgba(148,163,184,0.1)}.password-toggle i{font-size:1.125rem}
+    .password-requirements{margin-top:0.75rem;display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem 1rem}
+    .req-item{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;color:#64748B;transition:all 0.2s}
+    .req-item i{font-size:0.875rem;transition:all 0.3s}.req-item.met{color:#10B981}.req-item.met i{color:#10B981}
+    .field-success{color:#6EE7B7;display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.5rem;padding:0.5rem 0.75rem;border-radius:8px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.1)}
+    .field-error{color:#FCA5A5;display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;margin-top:0.5rem;padding:0.5rem 0.75rem;border-radius:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.1)}
+    .terms-group{margin:0.5rem 0}
+    .checkbox-label{display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;font-size:0.8125rem;color:#94A3B8;position:relative;padding-left:2rem}
+    .checkbox-label input[type="checkbox"]{position:absolute;opacity:0;cursor:pointer;height:0;width:0}
+    .checkmark{position:absolute;left:0;top:2px;height:20px;width:20px;background:#0F172A;border:2px solid rgba(148,163,184,0.3);border-radius:6px;transition:all 0.2s}
+    .checkbox-label:hover .checkmark{border-color:#10B981}
+    .checkbox-label input:checked~.checkmark{background:#10B981;border-color:#10B981}
+    .checkmark::after{content:"";position:absolute;display:none;left:6px;top:2px;width:5px;height:10px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg)}
+    .checkbox-label input:checked~.checkmark::after{display:block}
+    .terms-text a{color:#10B981;text-decoration:none;font-weight:500;transition:color 0.2s}.terms-text a:hover{color:#34D399;text-decoration:underline}
+    .btn-auth{display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.875rem;border:none;border-radius:12px;font-size:0.9375rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:'Inter',sans-serif;margin-top:0.5rem}
+    .btn-primary{background:linear-gradient(135deg,#10B981,#059669);color:white;box-shadow:0 4px 12px rgba(16,185,129,0.2)}
+    .btn-primary:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 20px rgba(16,185,129,0.3)}
+    .btn-primary:disabled{opacity:0.7;cursor:not-allowed}
+    .spinner-sm{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;display:inline-block}
+    @@keyframes spin{to{transform:rotate(360deg)}}
+    .auth-footer{margin-top:2rem;text-align:center;padding-top:1.5rem;border-top:1px solid rgba(148,163,184,0.1)}
+    .auth-footer p{color:#94A3B8;font-size:0.875rem}
+    .auth-link{color:#10B981;text-decoration:none;font-weight:600;transition:color 0.2s}.auth-link:hover{color:#34D399;text-decoration:underline}
+    .auth-banner{background:linear-gradient(135deg,#0F172A,#1E293B);padding:3rem 2.5rem;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+    .banner-pattern{position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 20% 30%,rgba(16,185,129,0.1),transparent 50%),radial-gradient(circle at 80% 70%,rgba(16,185,129,0.05),transparent 50%)}
+    .banner-content{position:relative;z-index:1;text-align:center;max-width:380px}
+    .banner-icon{width:80px;height:80px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;border:2px solid rgba(16,185,129,0.2)}
+    .banner-icon i{font-size:40px;color:#10B981}.banner-content h3{font-size:1.5rem;font-weight:700;color:#F1F5F9;margin-bottom:1rem}
+    .banner-content p{color:#94A3B8;line-height:1.7;margin-bottom:2rem;font-size:0.9375rem}.feature-list{text-align:left}
+    .feature-item{display:flex;align-items:center;gap:0.75rem;padding:0.75rem;margin-bottom:0.5rem;font-size:0.875rem;color:#CBD5E1;background:rgba(148,163,184,0.05);border-radius:10px;transition:all 0.2s}
+    .feature-item:hover{background:rgba(148,163,184,0.1);transform:translateX(4px)}.feature-item i{color:#10B981;font-size:1.125rem}
+    @@media (max-width:968px){.auth-container{grid-template-columns:1fr;max-width:500px}.auth-banner{display:none}.auth-card{padding:2.5rem 2rem}.back-to-home{top:1rem;left:1rem}}
+    @@media (max-width:768px){.auth-page{padding:1rem}.auth-card{padding:2rem 1.5rem}.password-requirements{grid-template-columns:1fr}.auth-logo h2{font-size:1.5rem}}
+    @@media (max-width:480px){.auth-card{padding:1.5rem 1.25rem}.form-control{font-size:0.875rem}.back-to-home span{display:none}.back-to-home{padding:0.5rem;border-radius:8px}}
+</style>
+
+@code {
+    // This page uses JavaScript for all functionality
+    // No C# code needed - everything is handled by register.js
+}

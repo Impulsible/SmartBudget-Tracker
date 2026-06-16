@@ -1,0 +1,332 @@
+@page "/Account/Logout"
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>SmartBudget - Logout</PageTitle>
+
+<div class="logout-page">
+    <!-- Back to Home Link -->
+    <a href="/" class="back-to-home">
+        <i class="bi bi-arrow-left"></i>
+        <span>Back to Home</span>
+    </a>
+
+    <div class="logout-container">
+        <div class="logout-card">
+            @if (isLoggingOut)
+            {
+                <div class="logout-icon">
+                    <div class="icon-pulse">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </div>
+                </div>
+                <h2>Signing out...</h2>
+                <p>Please wait while we securely sign you out of your account.</p>
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                </div>
+                <div class="security-note">
+                    <i class="bi bi-shield-check"></i>
+                    <span>Clearing secure session data</span>
+                </div>
+            }
+            else
+            {
+                <div class="logout-icon success">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <h2>Logged Out Successfully</h2>
+                <p>You have been securely signed out of your account. Your data remains safe and protected.</p>
+                
+                <div class="action-buttons">
+                    <a href="/" class="btn-home">
+                        <i class="bi bi-house"></i>
+                        Return to Home
+                    </a>
+                    <a href="/Account/Login" class="btn-login">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Sign In Again
+                    </a>
+                </div>
+                
+                <div class="auto-redirect" id="autoRedirect">
+                    <p>You will be redirected to the home page in <span class="countdown" id="countdownDisplay">@countdown</span> seconds</p>
+                </div>
+            }
+        </div>
+        
+        <div class="logout-footer">
+            <p>Need help? <a href="/contact">Contact Support</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* ============================================
+       LOGOUT PAGE STYLES
+       Professional Dark Theme
+       ============================================ */
+    
+    .logout-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        position: relative;
+        overflow: hidden;
+        padding: 2rem;
+    }
+    
+    .logout-page::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .back-to-home {
+        position: fixed;
+        top: 1.5rem; left: 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #94A3B8;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        transition: all 0.2s ease;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+    }
+
+    .back-to-home:hover {
+        color: #10B981;
+        background: rgba(30, 41, 59, 1);
+        border-color: #10B981;
+        transform: translateX(-4px);
+    }
+
+    .back-to-home i { font-size: 1rem; transition: transform 0.2s ease; }
+    .back-to-home:hover i { transform: translateX(-2px); }
+    
+    .logout-container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 480px;
+    }
+    
+    .logout-card {
+        background: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        text-align: center;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(148, 163, 184, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+    
+    .logout-icon { margin-bottom: 1.5rem; display: flex; justify-content: center; }
+    
+    .icon-pulse {
+        width: 80px; height: 80px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(16, 185, 129, 0.2);
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .icon-pulse i { font-size: 40px; color: #10B981; }
+    
+    .logout-icon.success i {
+        font-size: 56px;
+        color: #10B981;
+        animation: popIn 0.5s ease-out;
+    }
+    
+    .logout-card h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.75rem;
+        letter-spacing: -0.02em;
+    }
+    
+    .logout-card p {
+        color: #94A3B8;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .spinner-container { display: flex; justify-content: center; margin: 1.5rem 0; }
+    
+    .spinner {
+        width: 44px; height: 44px;
+        border: 3px solid rgba(148, 163, 184, 0.2);
+        border-top-color: #10B981;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    
+    .security-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding: 0.75rem 1rem;
+        background: rgba(16, 185, 129, 0.08);
+        border-radius: 12px;
+        color: #6EE7B7;
+        font-size: 0.8125rem;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+    
+    .security-note i { font-size: 1rem; }
+    
+    .action-buttons { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
+    
+    .btn-home,
+    .btn-login {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.875rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9375rem;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-home {
+        background: rgba(148, 163, 184, 0.1);
+        color: #CBD5E1;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+    
+    .btn-home:hover {
+        background: rgba(148, 163, 184, 0.2);
+        border-color: rgba(148, 163, 184, 0.3);
+        transform: translateY(-1px);
+        color: #F1F5F9;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn-login:hover::before { left: 100%; }
+    .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); }
+    
+    .auto-redirect { padding-top: 1rem; border-top: 1px solid rgba(148, 163, 184, 0.1); }
+    .auto-redirect p { font-size: 0.75rem; color: #64748B; margin: 0; }
+    .countdown { color: #10B981; font-weight: 600; }
+    
+    .logout-footer { text-align: center; margin-top: 1.5rem; }
+    .logout-footer p { color: #64748B; font-size: 0.75rem; }
+    .logout-footer a { color: #10B981; text-decoration: none; font-weight: 500; transition: color 0.2s ease; }
+    .logout-footer a:hover { color: #34D399; text-decoration: underline; }
+    
+    @@keyframes spin { to { transform: rotate(360deg); } }
+    
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+    }
+    
+    @@keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @@media (max-width: 768px) {
+        .logout-page { padding: 1rem; }
+        .logout-card { padding: 2.5rem 1.5rem; }
+        .logout-card h2 { font-size: 1.5rem; }
+        .back-to-home { top: 1rem; left: 1rem; }
+    }
+    
+    @@media (max-width: 480px) {
+        .logout-card { padding: 2rem 1.25rem; border-radius: 20px; }
+        .icon-pulse { width: 64px; height: 64px; }
+        .icon-pulse i { font-size: 32px; }
+        .btn-home, .btn-login { padding: 0.75rem 1.25rem; font-size: 0.875rem; }
+        .back-to-home span { display: none; }
+        .back-to-home { padding: 0.5rem; border-radius: 8px; }
+    }
+</style>
+
+@code {
+    private bool isLoggingOut = true;
+    private string message = "";
+    private int countdown = 5;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Perform logout - clears all authentication cookies
+            await SignInManager.SignOutAsync();
+            
+            // Brief delay for smooth UX transition
+            await Task.Delay(1500);
+            
+            // Update state to show success
+            isLoggingOut = false;
+            message = "You have been successfully logged out.";
+            StateHasChanged();
+            
+            // Start JavaScript countdown
+            await Task.Delay(100);
+        }
+        catch (Exception ex)
+        {
+            isLoggingOut = false;
+            message = $"An error occurred during logout: {ex.Message}";
+            Console.WriteLine($"Logout error: {ex.Message}");
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!isLoggingOut)
+        {
+            // Start the countdown using JavaScript for smoother animation
+            await JS.InvokeVoidAsync("startLogoutCountdown", 5);
+        }
+    }
+}

@@ -1,0 +1,674 @@
+@page "/"
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.SignalR.Client
+@attribute [AllowAnonymous]
+@inject AuthenticationStateProvider AuthProvider
+@inject UserManager<IdentityUser> UserManager
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<PageTitle>SmartBudget - Take Control of Your Money</PageTitle>
+
+<link rel="stylesheet" href="css/marketing.css" />
+<script src="js/marketing.js"></script>
+
+<div class="marketing-page">
+    <!-- ============================================
+    NAVIGATION
+    ============================================ -->
+    <nav class="navbar-pro" id="mainNavbar">
+        <div class="container">
+            <div class="navbar-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="bi bi-list"></i>
+                    <span class="menu-text">Menu</span>
+                </button>
+                <a href="/" class="logo-area">
+                    <div class="logo-icon"><i class="bi bi-piggy-bank"></i></div>
+                    <span class="logo-text">Smart<span>Budget</span></span>
+                </a>
+            </div>
+            <div class="nav-links-pro desktop-nav">
+                @if (_isLoggedIn)
+                {
+                    <div class="user-greeting" id="userGreeting"><i class="bi bi-person-circle"></i><span>Welcome back, @_firstName! 👋</span></div>
+                    <div class="user-avatar-sm" id="userInitials">@_initials</div>
+                    <a href="/dashboard" class="dashboard-link" id="dashboardLink"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    <a href="/Account/Logout" class="btn-primary-pro">Logout</a>
+                }
+                else
+                {
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#learn">Learn</a>
+                    <a href="/Account/Login" class="btn-login-pro" id="loginBtn">Sign In</a>
+                    <a href="/Account/Register" class="btn-primary-pro" id="signupBtn">Get Started</a>
+                }
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================
+    MOBILE MENU
+    ============================================ -->
+    <div class="mobile-menu-overlay" id="mobileOverlay"></div>
+    <div class="mobile-menu-container" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <div class="mobile-logo">
+                <div class="logo-icon-sm"><i class="bi bi-piggy-bank"></i></div>
+                <div>
+                    <span class="mobile-logo-text">SmartBudget</span>
+                    <small>Know where every naira goes</small>
+                </div>
+            </div>
+            <button class="mobile-menu-close" id="mobileMenuClose">
+                <i class="bi bi-x-lg"></i>
+                <span>Close</span>
+            </button>
+        </div>
+        <div class="mobile-menu-body">
+            @if (_isLoggedIn)
+            {
+                <div class="mobile-user-info" id="mobileAuthSection">
+                    <div class="user-avatar-sm">@_initials</div>
+                    <div>
+                        <span id="mobileUserGreeting">Hi, @_firstName! 👋</span>
+                        <small>@_userEmail</small>
+                    </div>
+                </div>
+                <div class="mobile-divider"></div>
+                <a href="/dashboard" class="mobile-nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+                <a href="/Account/Logout" class="mobile-nav-link logout-link">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+            }
+            else
+            {
+                <a href="#features" class="mobile-nav-link" data-link="features">
+                    <i class="bi bi-grid"></i>
+                    <span>Features</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+                <a href="#pricing" class="mobile-nav-link" data-link="pricing">
+                    <i class="bi bi-tag"></i>
+                    <span>Pricing</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+                <a href="#learn" class="mobile-nav-link" data-link="learn">
+                    <i class="bi bi-book"></i>
+                    <span>Learn</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+                <div class="mobile-divider"></div>
+                <a href="/Account/Login" class="mobile-nav-link login-link">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    <span>Sign In</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+                <a href="/Account/Register" class="mobile-nav-link signup-link">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Get Started</span>
+                    <i class="bi bi-chevron-right arrow"></i>
+                </a>
+            }
+        </div>
+        <div class="mobile-menu-footer">
+            <div class="mobile-social">
+                <a href="#"><i class="bi bi-twitter-x"></i></a>
+                <a href="#"><i class="bi bi-linkedin"></i></a>
+                <a href="#"><i class="bi bi-github"></i></a>
+                <a href="#"><i class="bi bi-instagram"></i></a>
+            </div>
+            <p>&copy; @DateTime.Now.Year SmartBudget</p>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="hero-pro">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <i class="bi bi-star-fill"></i>
+                        <span>Trusted by 50,000+ Nigerians</span>
+                    </div>
+                    <h1 class="hero-title-pro">
+                        Take Control of<br />
+                        Your Financial <span class="gradient-text">Future</span>
+                    </h1>
+                    <p class="hero-subtitle-pro">
+                        Track expenses, manage budgets, and reach your savings goals with SmartBudget.
+                        Join thousands of Nigerians taking control of their money.
+                    </p>
+                    <div class="hero-buttons-pro">
+                        @if (_isLoggedIn)
+                        {
+                            <a href="/dashboard" class="btn-gradient">Go to Dashboard →</a>
+                        }
+                        else
+                        {
+                            <a href="/Account/Register" class="btn-gradient">Get Started Free →</a>
+                            <a href="#features" class="btn-outline-pro">Learn More</a>
+                        }
+                    </div>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="stat-number"><span class="counter" data-target="50000" data-prefix="" data-suffix="+">0</span></span>
+                            <span class="stat-label">Active Users</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="hero-stat">
+                            <span class="stat-number"><span class="counter" data-target="20" data-prefix="₦" data-suffix="B+">0</span></span>
+                            <span class="stat-label">Tracked</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="hero-stat">
+                            <span class="stat-number"><span class="counter" data-target="95" data-prefix="" data-suffix="%">0</span></span>
+                            <span class="stat-label">Satisfaction</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="dashboard-mockup" id="dashboardMockup">
+                        <div class="mockup-header">
+                            <div class="mockup-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <span class="mockup-title">SmartBudget Dashboard</span>
+                        </div>
+                        <div class="mockup-content">
+                            <div class="mockup-stats">
+                                <div class="mockup-stat">
+                                    <span class="stat-label">Total Income</span>
+                                    <span class="stat-value counter" data-target="350000" data-prefix="₦" data-suffix="">0</span>
+                                </div>
+                                <div class="mockup-stat">
+                                    <span class="stat-label">Total Expenses</span>
+                                    <span class="stat-value counter" data-target="210000" data-prefix="₦" data-suffix="">0</span>
+                                </div>
+                                <div class="mockup-stat">
+                                    <span class="stat-label">Savings</span>
+                                    <span class="stat-value counter" data-target="140000" data-prefix="₦" data-suffix="">0</span>
+                                </div>
+                            </div>
+                            <div class="mockup-chart">
+                                <div class="chart-bar" data-width="75"></div>
+                                <div class="chart-bar" data-width="45"></div>
+                                <div class="chart-bar" data-width="60"></div>
+                                <div class="chart-bar" data-width="30"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    STATS SECTION
+    ============================================ -->
+    <section class="stats-pro">
+        <div class="container">
+            <div class="stats-grid-pro">
+                <div class="stat-item-pro">
+                    <div class="stat-number-pro"><span class="counter" data-target="50000" data-prefix="" data-suffix="+">0</span></div>
+                    <div class="stat-label-pro">Active Users</div>
+                    <p>Trusted by thousands</p>
+                </div>
+                <div class="stat-item-pro">
+                    <div class="stat-number-pro"><span class="counter" data-target="20" data-prefix="₦" data-suffix="B+">0</span></div>
+                    <div class="stat-label-pro">Money Tracked</div>
+                    <p>And counting</p>
+                </div>
+                <div class="stat-item-pro">
+                    <div class="stat-number-pro"><span class="counter" data-target="95" data-prefix="" data-suffix="%">0</span></div>
+                    <div class="stat-label-pro">User Satisfaction</div>
+                    <p>Raving reviews</p>
+                </div>
+                <div class="stat-item-pro">
+                    <div class="stat-number-pro"><span class="counter" data-target="100000" data-prefix="" data-suffix="+">0</span></div>
+                    <div class="stat-label-pro">Transactions</div>
+                    <p>Processed daily</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FEATURES SECTION
+    ============================================ -->
+    <section id="features" class="features-pro">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Why Choose Us</span>
+                <h2 class="section-title-pro">Everything you need to<br />succeed financially</h2>
+                <p class="section-subtitle">Powerful features to help you track, budget, and save money.</p>
+            </div>
+            <div class="features-grid-pro">
+                <div class="feature-card-pro">
+                    <div class="feature-icon-pro"><i class="bi bi-receipt"></i></div>
+                    <h3>Track Expenses</h3>
+                    <p>Log every transaction in seconds. Categorize spending and see exactly where your money goes each month.</p>
+                    <span class="feature-tag">Real-time tracking</span>
+                </div>
+                <div class="feature-card-pro">
+                    <div class="feature-icon-pro"><i class="bi bi-piggy-bank"></i></div>
+                    <h3>Create Budgets</h3>
+                    <p>Set monthly spending limits for each category and get alerts when you're close to exceeding them.</p>
+                    <span class="feature-tag">Smart alerts</span>
+                </div>
+                <div class="feature-card-pro">
+                    <div class="feature-icon-pro"><i class="bi bi-trophy"></i></div>
+                    <h3>Save for Goals</h3>
+                    <p>Track progress toward your savings goals and stay motivated with visual indicators and milestones.</p>
+                    <span class="feature-tag">Goal tracking</span>
+                </div>
+                <div class="feature-card-pro">
+                    <div class="feature-icon-pro"><i class="bi bi-graph-up"></i></div>
+                    <h3>Powerful Reports</h3>
+                    <p>Visualize your spending patterns with beautiful charts and export data to CSV for deeper analysis.</p>
+                    <span class="feature-tag">Analytics</span>
+                </div>
+                <div class="feature-card-pro">
+                    <div class="feature-icon-pro"><i class="bi bi-phone"></i></div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access your finances anywhere, anytime with our fully responsive design that works on all devices.</p>
+                    <span class="feature-tag">Any device</span>
+                </div>
+                <div class="feature-card-pro">
+                    <div class="feature-icon-pro"><i class="bi bi-shield-lock"></i></div>
+                    <h3>Bank-Level Security</h3>
+                    <p>Your financial data is encrypted and protected with enterprise-grade security measures.</p>
+                    <span class="feature-tag">Secure</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    HOW IT WORKS SECTION
+    ============================================ -->
+    <section id="learn" class="how-it-works-pro">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Simple Process</span>
+                <h2 class="section-title-pro">Get started in 3 easy steps</h2>
+                <p class="section-subtitle">Join thousands of users who have taken control of their finances.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="bi bi-person-plus"></i></div>
+                    <h3>Create Account</h3>
+                    <p>Sign up for free in less than 2 minutes. No credit card required.</p>
+                </div>
+                <div class="step-arrow"><i class="bi bi-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="bi bi-receipt"></i></div>
+                    <h3>Add Transactions</h3>
+                    <p>Log your income and expenses quickly with our simple interface.</p>
+                </div>
+                <div class="step-arrow"><i class="bi bi-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="bi bi-graph-up"></i></div>
+                    <h3>Track & Save</h3>
+                    <p>Watch your savings grow with insights and analytics that keep you motivated.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    TESTIMONIALS SECTION
+    ============================================ -->
+    <section class="testimonials-pro">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Testimonials</span>
+                <h2 class="section-title-pro">Loved by thousands of users</h2>
+                <p class="section-subtitle">Don't just take our word for it — hear from our satisfied users.</p>
+            </div>
+            <div class="testimonials-grid-pro">
+                <div class="testimonial-card-pro">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p>"SmartBudget helped me save over ₦500,000 in just 6 months. Best financial decision I ever made!"</p>
+                    <div class="testimonial-author-pro">
+                        <div class="author-avatar"><i class="bi bi-person-circle"></i></div>
+                        <div>
+                            <strong>Chioma O.</strong>
+                            <span>Lagos, Nigeria</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card-pro">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p>"Finally, a budgeting app that actually works. The interface is clean and intuitive. Highly recommended!"</p>
+                    <div class="testimonial-author-pro">
+                        <div class="author-avatar"><i class="bi bi-person-circle"></i></div>
+                        <div>
+                            <strong>Emeka O.</strong>
+                            <span>Abuja, Nigeria</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card-pro">
+                    <div class="stars">
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p>"The savings goals feature keeps me motivated. I'm finally saving for my dream vacation!"</p>
+                    <div class="testimonial-author-pro">
+                        <div class="author-avatar"><i class="bi bi-person-circle"></i></div>
+                        <div>
+                            <strong>Folake A.</strong>
+                            <span>Port Harcourt, Nigeria</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    PRICING SECTION
+    ============================================ -->
+    <section id="pricing" class="pricing-pro">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Pricing</span>
+                <h2 class="section-title-pro">Simple, transparent pricing</h2>
+                <p class="section-subtitle">Choose the plan that works for you. Upgrade anytime.</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Free</h3>
+                        <div class="price">
+                            <span class="currency">₦</span>
+                            <span class="amount">0</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p>Perfect for getting started</p>
+                    </div>
+                    <div class="pricing-features">
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Up to 100 transactions/month</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>5 budget categories</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Basic reports</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Email support</span></div>
+                    </div>
+                    <a href="/Account/Register" class="btn-pricing">Get Started</a>
+                </div>
+                <div class="pricing-card popular">
+                    <span class="popular-badge">Most Popular</span>
+                    <div class="pricing-header">
+                        <h3>Pro</h3>
+                        <div class="price">
+                            <span class="currency">₦</span>
+                            <span class="amount">2,500</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p>For serious budgeters</p>
+                    </div>
+                    <div class="pricing-features">
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Unlimited transactions</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Unlimited budget categories</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Advanced analytics & reports</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Export to CSV/Excel</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Priority support</span></div>
+                    </div>
+                    <a href="/Account/Register" class="btn-pricing-primary">Start Free Trial</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3>Family</h3>
+                        <div class="price">
+                            <span class="currency">₦</span>
+                            <span class="amount">4,500</span>
+                            <span class="period">/month</span>
+                        </div>
+                        <p>For families and households</p>
+                    </div>
+                    <div class="pricing-features">
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Everything in Pro</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Up to 5 family members</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Shared budgets</span></div>
+                        <div class="feature"><i class="bi bi-check-circle-fill"></i><span>Family insights</span></div>
+                    </div>
+                    <a href="/Account/Register" class="btn-pricing">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FAQ SECTION
+    ============================================ -->
+    <section class="faq-pro">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">FAQ</span>
+                <h2 class="section-title-pro">Frequently asked questions</h2>
+                <p class="section-subtitle">Got questions? We've got answers.</p>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Is SmartBudget really free?</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! SmartBudget offers a free plan that includes up to 100 transactions per month, 5 budget categories, and basic reports. You can upgrade to Pro for unlimited features anytime.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Is my financial data secure?</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Absolutely! We use bank-level encryption to protect your data. Your information is never shared with third parties, and we're fully compliant with data protection regulations.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Can I export my data?</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes! Pro users can export their financial data to CSV format for tax purposes or external analysis. Free users can upgrade anytime to access this feature.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Can I cancel my subscription?</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can cancel your Pro subscription at any time. Your account will revert to the Free plan, and you'll keep all your data.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CTA SECTION
+    ============================================ -->
+    <section class="cta-pro">
+        <div class="container">
+            <div class="cta-content-pro">
+                <h2>Ready to take control of your finances?</h2>
+                <p>Join thousands of Nigerians who trust SmartBudget with their money.</p>
+                @if (_isLoggedIn)
+                {
+                    <a href="/dashboard" class="btn-gradient">Go to Dashboard →</a>
+                }
+                else
+                {
+                    <div class="cta-buttons">
+                        <a href="/Account/Register" class="btn-gradient btn-lg">Get Started Free →</a>
+                        <a href="#features" class="btn-outline-pro btn-lg">Learn More</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="footer-pro">
+        <div class="container">
+            <div class="footer-grid-pro">
+                <div class="footer-logo-pro">
+                    <i class="bi bi-piggy-bank"></i>
+                    <h3>SmartBudget</h3>
+                    <p>Take control of your financial future with SmartBudget.</p>
+                    <div class="footer-social">
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                        <a href="#"><i class="bi bi-linkedin"></i></a>
+                        <a href="#"><i class="bi bi-github"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links-pro">
+                    <h4>Product</h4>
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#features">Demo</a>
+                    <a href="/dashboard">Dashboard</a>
+                </div>
+                <div class="footer-links-pro">
+                    <h4>Company</h4>
+                    <a href="/about">About Us</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/careers">Careers</a>
+                    <a href="/press">Press</a>
+                </div>
+                <div class="footer-links-pro">
+                    <h4>Resources</h4>
+                    <a href="/help">Help Center</a>
+                    <a href="/guides">Guides</a>
+                    <a href="/api">API</a>
+                    <a href="/status">Status</a>
+                </div>
+                <div class="footer-links-pro">
+                    <h4>Legal</h4>
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
+                    <a href="/cookies">Cookie Policy</a>
+                    <a href="/security">Security</a>
+                </div>
+            </div>
+            <div class="footer-bottom-pro">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+    private bool _isLoggedIn = false;
+    private string _firstName = "";
+    private string _initials = "";
+    private string _userEmail = "";
+    private string _fullName = "";
+    private HubConnection? _hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Get auth state
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                _isLoggedIn = true;
+                _userEmail = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+                _fullName = user.FindFirst("FullName")?.Value ?? _userEmail.Split('@')[0];
+                _firstName = _fullName.Split(' ')[0];
+                _initials = _firstName.Length >= 2 ? _firstName.Substring(0, 2).ToUpper() : _firstName.ToUpper();
+                Console.WriteLine($"SmartBudget: User authenticated - {_fullName}");
+            }
+            else
+            {
+                Console.WriteLine("SmartBudget: User not authenticated");
+            }
+
+            // Initialize SignalR connection for real-time updates
+            if (_isLoggedIn)
+            {
+                _hubConnection = new HubConnectionBuilder()
+                    .WithUrl(Nav.ToAbsoluteUri("/budgetHub"))
+                    .WithAutomaticReconnect()
+                    .Build();
+
+                _hubConnection.On("DashboardUpdated", async () =>
+                {
+                    // 🔥 FIX: Force reset counters on SignalR update
+                    await InvokeAsync(() =>
+                    {
+                        Console.WriteLine("SmartBudget: Dashboard update received via SignalR");
+                        JS.InvokeVoidAsync("resetAndInitializeCounters");
+                    });
+                });
+
+                await _hubConnection.StartAsync();
+                Console.WriteLine("SmartBudget: SignalR connected");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SmartBudget: Error - {ex.Message}");
+            _isLoggedIn = false;
+        }
+        await base.OnInitializedAsync();
+    }
+
+    // 🔥 FIX 1: Run JS EVERY TIME, not just firstRender
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JS.InvokeVoidAsync("initializeMarketingPage");
+        await JS.InvokeVoidAsync("resetAndInitializeCounters");
+    }
+
+    // 🔥 FIX 2: Force re-render on navigation
+    protected override void OnParametersSet()
+    {
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection != null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+}
