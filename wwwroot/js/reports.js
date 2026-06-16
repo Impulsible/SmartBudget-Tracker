@@ -593,3 +593,24 @@ window.initReportsPage = function() {
 };
 
 window.loadReportData = loadReportData;
+
+// ============================================
+// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initReportsPage = function() {
+    console.log('🔄 reports: init called from Blazor');
+    
+    // Setup sidebar
+    if (typeof setupReportsSidebar === 'function') {
+        setupReportsSidebar();
+    }
+    
+    // Load report data after a short delay
+    setTimeout(function() {
+        if (typeof loadReportData === 'function') {
+            loadReportData();
+        }
+    }, 300);
+    
+    console.log('✅ reports: initialized');
+};

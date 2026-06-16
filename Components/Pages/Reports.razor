@@ -1,6 +1,7 @@
 @page "/reports"
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize]
+@inherits BasePage
 @inject IJSRuntime JS
 
 <PageTitle>SmartBudget - Reports</PageTitle>
@@ -58,10 +59,10 @@
         <div class="tx-body">
             <!-- Period Selector -->
             <div class="report-periods">
-                <button class="report-period active" onclick="changeReportPeriod('month', this)">This Month</button>
-                <button class="report-period" onclick="changeReportPeriod('quarter', this)">Last 3 Months</button>
-                <button class="report-period" onclick="changeReportPeriod('year', this)">This Year</button>
-                <button class="report-period" onclick="changeReportPeriod('all', this)">All Time</button>
+                <button class="report-period active" data-period="month" onclick="changeReportPeriod('month', this)">This Month</button>
+                <button class="report-period" data-period="quarter" onclick="changeReportPeriod('quarter', this)">Last 3 Months</button>
+                <button class="report-period" data-period="year" onclick="changeReportPeriod('year', this)">This Year</button>
+                <button class="report-period" data-period="all" onclick="changeReportPeriod('all', this)">All Time</button>
             </div>
 
             <!-- Summary Stats -->
@@ -462,7 +463,7 @@
     .chart-container {
         width: 100%;
         position: relative;
-        min-height: 250px;
+        min-height: 280px;
     }
     
     .chart-container canvas { width: 100% !important; height: 100% !important; }
@@ -643,19 +644,19 @@
 <script src="/js/reports.js"></script>
 
 @code {
+    // ✅ Set page name for BasePage initialization
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "reports";
+        await base.OnInitializedAsync();
+    }
+
+    // ✅ Call JavaScript initialization
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("eval", @"
-                if (typeof setupReportsSidebar === 'function') {
-                    console.log('Reports: Blazor init - starting...');
-                    setupReportsSidebar();
-                    setTimeout(function() {
-                        loadReportData();
-                    }, 300);
-                }
-            ");
+            await JS.InvokeVoidAsync("initReportsPage");
         }
     }
 }
