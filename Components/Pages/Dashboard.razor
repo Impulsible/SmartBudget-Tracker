@@ -11,6 +11,7 @@
 <PageTitle>SmartBudget - Dashboard</PageTitle>
 
 <div class="dashboard-layout">
+    <!-- ===== YOUR EXISTING HTML CONTENT ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="/" class="sidebar-logo">
@@ -66,7 +67,6 @@
         <div class="dashboard-body">
             <!-- STATS ROW -->
             <div class="stats-row">
-                <!-- Income Card -->
                 <div class="stat-card income-card">
                     <div class="stat-card-header">
                         <div class="stat-icon income-icon"><i class="bi bi-arrow-down-circle-fill"></i></div>
@@ -78,8 +78,6 @@
                     </div>
                     <div class="stat-card-footer"><span>vs last month</span></div>
                 </div>
-
-                <!-- Expenses Card -->
                 <div class="stat-card expense-card">
                     <div class="stat-card-header">
                         <div class="stat-icon expense-icon"><i class="bi bi-arrow-up-circle-fill"></i></div>
@@ -91,8 +89,6 @@
                     </div>
                     <div class="stat-card-footer"><span>vs last month</span></div>
                 </div>
-
-                <!-- Savings Card -->
                 <div class="stat-card savings-card">
                     <div class="stat-card-header">
                         <div class="stat-icon savings-icon"><i class="bi bi-piggy-bank-fill"></i></div>
@@ -104,8 +100,6 @@
                     </div>
                     <div class="stat-card-footer"><span>vs last month</span></div>
                 </div>
-
-                <!-- Budget Card -->
                 <div class="stat-card budget-card">
                     <div class="stat-card-header">
                         <div class="stat-icon budget-icon"><i class="bi bi-wallet-fill"></i></div>
@@ -200,6 +194,7 @@
 </div>
 
 <style>
+    /* ===== YOUR EXISTING CSS ===== */
     :root{--sidebar-width:260px;--header-height:70px;--brand:#10B981;--brand-dark:#059669;--bg-dashboard:#0F172A;--bg-sidebar:#0B1120;--bg-card:#1E293B;--text-primary:#F1F5F9;--text-secondary:#94A3B8;--text-muted:#64748B;--border-color:rgba(148,163,184,0.1);--income-color:#10B981;--expense-color:#EF4444;--savings-color:#3B82F6;--budget-color:#F59E0B}
     *{margin:0;padding:0;box-sizing:border-box}html,body{width:100%;overflow-x:hidden}
     .dashboard-layout{display:flex;min-height:100vh;background:var(--bg-dashboard);font-family:'Inter',sans-serif;color:var(--text-primary)}
@@ -253,11 +248,7 @@
     .stat-card-body .stat-value{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;line-height:1.2;overflow-wrap:anywhere;color:var(--text-primary)}
     .stat-card-footer{margin-top:0.75rem;font-size:0.75rem;color:var(--text-muted)}
     .progress-bar{height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;margin-top:0.5rem}
-    
-    /* ===== PROGRESS BAR ANIMATION ===== */
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--budget-color),#FBBF24);border-radius:3px;animation:pulseProgress 2s infinite ease-in-out;transition:width 1s ease}
-    
-    @@keyframes pulseProgress{0%{transform:scaleY(1);opacity:0.9}50%{transform:scaleY(1.3);opacity:1}100%{transform:scaleY(1);opacity:0.9}}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--budget-color),#FBBF24);border-radius:3px;transition:width 1s ease}
     
     /* ===== CHARTS ===== */
     .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
@@ -307,7 +298,7 @@
     .btn-cancel{padding:0.625rem 1.25rem;background:none;border:1px solid var(--border-color);border-radius:8px;color:var(--text-secondary);cursor:pointer;font-size:0.875rem;font-weight:500;font-family:'Inter',sans-serif}
     .btn-save{padding:0.625rem 1.5rem;background:var(--brand);border:none;border-radius:8px;color:white;cursor:pointer;font-size:0.875rem;font-weight:600;font-family:'Inter',sans-serif}.btn-save:hover{background:var(--brand-dark)}
     
-    /* ===== RESPONSIVE BREAKPOINTS ===== */
+    /* ===== RESPONSIVE ===== */
     @@media (max-width: 1200px){.dashboard-body{padding:1rem}.stats-row{grid-template-columns:repeat(2,minmax(0,1fr))}.charts-row{grid-template-columns:1fr}.header-right{gap:.75rem}}
     @@media (max-width: 992px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.sidebar-close-btn,.sidebar-toggle-btn{display:flex}.main-content{margin-left:0!important;width:100%}.dashboard-header{padding:0 1rem}.header-date{display:none}.header-greeting h2{font-size:1.1rem}.stats-row{grid-template-columns:repeat(2,1fr)}.chart-container{height:280px}}
     @@media (max-width: 768px){.dashboard-body{padding:.75rem}.dashboard-header{flex-wrap:wrap;height:auto;min-height:70px;padding:.75rem 1rem}.header-left,.header-right{width:100%}.header-right{justify-content:flex-end}.stats-row{grid-template-columns:1fr;gap:1rem}.stat-card{padding:1rem}.stat-card-body .stat-value{font-size:clamp(1.6rem,5vw,2rem);word-break:break-word}.charts-row{grid-template-columns:1fr}.chart-card-header{flex-direction:column;align-items:flex-start;gap:.75rem}.chart-container{height:250px}.transactions-header{flex-direction:column;align-items:flex-start}.transactions-actions{width:100%;justify-content:space-between}.btn-add-transaction,.btn-clear-all,.btn-view-all{width:100%;justify-content:center}.transactions-table{min-width:700px}.modal-content{max-width:100%;margin:0}}
@@ -317,23 +308,113 @@
 <script src="/js/dashboard.js"></script>
 
 @code {
-    // 🔥 FIX: Run EVERY time, not just firstRender
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // ============================================
+    // EXISTING CODE VARIABLES
+    // ============================================
+    private bool sidebarOpen = false;
+    private bool showAddModal = false;
+    private bool showCategoryModal = false;
+    private string _userName = "User";
+    private string _userEmail = "";
+    private string _userInitials = "U";
+    
+    // Transaction form fields
+    private string newTransactionDescription = "";
+    private string newTransactionAmount = "";
+    private string newTransactionCategory = "";
+    private string newTransactionType = "expense";
+    
+    // Category form fields
+    private string newCategoryName = "";
+    private string newCategoryAmount = "";
+    private string newCategoryColor = "#10B981";
+
+    // Sample transactions
+    private List<Transaction> recentTransactions = new()
     {
-        await JS.InvokeVoidAsync("initDashboardPage");
+        new() { Description = "Grocery Shopping", Category = "Food", Date = DateTime.Now.AddDays(-1), Amount = 15000, Type = "expense", Status = "Completed" },
+        new() { Description = "Monthly Salary", Category = "Salary", Date = DateTime.Now.AddDays(-2), Amount = 350000, Type = "income", Status = "Completed" },
+        new() { Description = "Uber Ride", Category = "Transport", Date = DateTime.Now.AddDays(-2), Amount = 3500, Type = "expense", Status = "Completed" },
+        new() { Description = "Netflix Subscription", Category = "Entertainment", Date = DateTime.Now.AddDays(-3), Amount = 4500, Type = "expense", Status = "Completed" },
+        new() { Description = "Freelance Payment", Category = "Salary", Date = DateTime.Now.AddDays(-4), Amount = 50000, Type = "income", Status = "Pending" },
+        new() { Description = "Electricity Bill", Category = "Bills", Date = DateTime.Now.AddDays(-5), Amount = 12000, Type = "expense", Status = "Completed" },
+        new() { Description = "Shopping Mall", Category = "Shopping", Date = DateTime.Now.AddDays(-6), Amount = 25000, Type = "expense", Status = "Completed" },
+    };
+
+    public class Transaction
+    {
+        public string Description { get; set; } = "";
+        public string Category { get; set; } = "";
+        public DateTime Date { get; set; }
+        public decimal Amount { get; set; }
+        public string Type { get; set; } = "expense";
+        public string Status { get; set; } = "Completed";
     }
 
-    // 🔥 FIX: Force re-render on navigation
-    protected override void OnParametersSet()
-    {
-        StateHasChanged();
-    }
-
-    @code {
+    // ============================================
+    // PAGE INITIALIZATION - FIXED
+    // ============================================
     protected override async Task OnInitializedAsync()
     {
         PageName = "dashboard";
         await base.OnInitializedAsync();
+        
+        // Load user info
+        try
+        {
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            
+            if (user.Identity?.IsAuthenticated == true)
+            {
+                _userEmail = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+                var fullNameClaim = user.FindFirst("FullName")?.Value;
+                _userName = fullNameClaim ?? _userEmail.Split('@')[0];
+                _userInitials = _userName.Length > 0 ? _userName.Substring(0, 2).ToUpper() : "U";
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading user: {ex.Message}");
+        }
     }
-}
+
+    // ============================================
+    // EXISTING METHODS
+    // ============================================
+    private void ToggleSidebar()
+    {
+        sidebarOpen = !sidebarOpen;
+    }
+
+    private void AddTransaction()
+    {
+        if (string.IsNullOrWhiteSpace(newTransactionDescription) || string.IsNullOrWhiteSpace(newTransactionAmount))
+            return;
+
+        if (decimal.TryParse(newTransactionAmount, out var amount))
+        {
+            recentTransactions.Insert(0, new Transaction
+            {
+                Description = newTransactionDescription,
+                Category = string.IsNullOrWhiteSpace(newTransactionCategory) ? "Other" : newTransactionCategory,
+                Date = DateTime.Now,
+                Amount = amount,
+                Type = newTransactionType,
+                Status = "Completed"
+            });
+
+            newTransactionDescription = "";
+            newTransactionAmount = "";
+            newTransactionCategory = "";
+            newTransactionType = "expense";
+            showAddModal = false;
+            StateHasChanged();
+        }
+    }
+
+    private void AddCategory()
+    {
+        // This will be handled by JavaScript/API
+    }
 }

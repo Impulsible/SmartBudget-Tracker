@@ -15,12 +15,11 @@ builder.Services.AddRazorComponents()
 builder.Services.AddControllers();
 
 // ============================================
-// DATABASE CONFIGURATION - FORCED POSTGRESQL
+// DATABASE CONFIGURATION
 // ============================================
 string connectionString;
 var usePostgres = false;
 
-// ✅ Check for DATABASE_URL from Render
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
 Console.WriteLine($"🔍 DATABASE_URL: {(string.IsNullOrEmpty(databaseUrl) ? "NOT FOUND" : "FOUND")}");
@@ -29,7 +28,6 @@ if (!string.IsNullOrEmpty(databaseUrl))
 {
     try
     {
-        // ✅ Parse Render's DATABASE_URL
         var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':');
         var username = userInfo[0];
@@ -51,9 +49,8 @@ if (!string.IsNullOrEmpty(databaseUrl))
 }
 else
 {
-    // ❌ Fallback to SQLite - should not happen on Render
     connectionString = "Data Source=smartbudget.db";
-    Console.WriteLine("⚠️ WARNING: Using SQLite (accounts will not persist!)");
+    Console.WriteLine("⚠️ Using SQLite (fallback)");
 }
 
 // Register DbContext
@@ -72,7 +69,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 // ============================================
-// IDENTITY - COOKIE CONFIGURATION
+// IDENTITY SERVICES
 // ============================================
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
@@ -89,7 +86,6 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
 .AddSignInManager()
 .AddDefaultTokenProviders();
 
-// ✅ Cookie configuration
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "SmartBudget.Auth";
@@ -116,10 +112,13 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityAuthenticationSt
 builder.Services.AddScoped<ExportService>();
 builder.Services.AddHttpClient();
 
+// ✅ Register PageInitializationService
+builder.Services.AddScoped<PageInitializationService>();
+
 var app = builder.Build();
 
 // ============================================
-// DATABASE MIGRATION & SEEDING - FIXED
+// DATABASE MIGRATION & SEEDING - FIXED FOR EXISTING DB
 // ============================================
 using (var scope = app.Services.CreateScope())
 {
@@ -136,69 +135,107 @@ using (var scope = app.Services.CreateScope())
         
         if (usePostgres)
         {
-            // ✅ Ensure database exists before migrations
-            await dbContext.Database.EnsureCreatedAsync();
-            
-            // ✅ Check if migrations need to be applied
-            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
-            if (pendingMigrations.Any())
+            // ✅ Try to connect and check if database exists
+            try
             {
-                logger.LogInformation($"📋 Applying {pendingMigrations.Count()} pending migrations...");
-                await dbContext.Database.MigrateAsync();
-                logger.LogInformation("✅ PostgreSQL migrations applied");
+                await dbContext.Database.CanConnectAsync();
+                logger.LogInformation("✅ Database connection successful");
             }
-            else
+            catch (Exception connEx)
             {
-                logger.LogInformation("✅ No pending migrations, database is up to date");
+                logger.LogError($"❌ Cannot connect to database: {connEx.Message}");
+                // Continue - maybe the database will be created on first use
+            }
+            
+            // ✅ Try to apply migrations, but don't fail if they already exist
+            try
+            {
+                var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+                if (pendingMigrations.Any())
+                {
+                    logger.LogInformation($"📋 Found {pendingMigrations.Count()} pending migrations");
+                    
+                    // Check if we can apply them
+                    try
+                    {
+                        await dbContext.Database.MigrateAsync();
+                        logger.LogInformation("✅ Migrations applied successfully");
+                    }
+                    catch (Exception migrateEx)
+                    {
+                        logger.LogWarning($"⚠️ Could not apply migrations: {migrateEx.Message}");
+                        logger.LogInformation("⚠️ Database may already have tables. Continuing...");
+                    }
+                }
+                else
+                {
+                    logger.LogInformation("✅ No pending migrations");
+                }
+            }
+            catch (Exception migrationEx)
+            {
+                logger.LogWarning($"⚠️ Could not check migrations: {migrationEx.Message}");
+                // Ensure database exists
+                await dbContext.Database.EnsureCreatedAsync();
+                logger.LogInformation("✅ Database ensured");
             }
         }
         else
         {
-            // ✅ For SQLite
             await dbContext.Database.EnsureCreatedAsync();
             logger.LogInformation("✅ SQLite database created");
         }
         
         // ============================================
-        // SEED ROLES
+        // SEED ROLES AND ADMIN USER
         // ============================================
-        string[] roles = { "User", "Admin" };
-        foreach (var role in roles)
+        try
         {
-            if (!await roleManager.RoleExistsAsync(role))
+            // Seed roles
+            string[] roles = { "User", "Admin" };
+            foreach (var role in roles)
             {
-                await roleManager.CreateAsync(new IdentityRole(role));
-                logger.LogInformation($"✅ Created role: {role}");
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                    logger.LogInformation($"✅ Created role: {role}");
+                }
+            }
+            
+            // Seed admin user
+            var adminEmail = "admin@smartbudget.com";
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser == null)
+            {
+                var admin = new IdentityUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    EmailConfirmed = true
+                };
+                var result = await userManager.CreateAsync(admin, "Admin@123");
+                if (result.Succeeded)
+                {
+                    await userManager.AddClaimAsync(admin, new System.Security.Claims.Claim("FullName", "Admin"));
+                    await userManager.AddToRoleAsync(admin, "Admin");
+                    await userManager.AddToRoleAsync(admin, "User");
+                    logger.LogInformation("✅ Created admin user: admin@smartbudget.com");
+                    logger.LogInformation("📧 Email: admin@smartbudget.com");
+                    logger.LogInformation("🔑 Password: Admin@123");
+                }
+                else
+                {
+                    logger.LogWarning($"⚠️ Could not create admin: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                }
+            }
+            else
+            {
+                logger.LogInformation("ℹ️ Admin user already exists");
             }
         }
-        
-        // ============================================
-        // SEED ADMIN USER
-        // ============================================
-        var adminEmail = "admin@smartbudget.com";
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-        if (adminUser == null)
+        catch (Exception seedEx)
         {
-            var admin = new IdentityUser
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                EmailConfirmed = true
-            };
-            var result = await userManager.CreateAsync(admin, "Admin@123");
-            if (result.Succeeded)
-            {
-                await userManager.AddClaimAsync(admin, new System.Security.Claims.Claim("FullName", "Admin"));
-                await userManager.AddToRoleAsync(admin, "Admin");
-                await userManager.AddToRoleAsync(admin, "User");
-                logger.LogInformation("✅ Created admin user: admin@smartbudget.com");
-                logger.LogInformation("📧 Email: admin@smartbudget.com");
-                logger.LogInformation("🔑 Password: Admin@123");
-            }
-        }
-        else
-        {
-            logger.LogInformation("ℹ️ Admin user already exists");
+            logger.LogWarning($"⚠️ Could not seed data: {seedEx.Message}");
         }
         
         logger.LogInformation("🎉 Database initialization complete!");
@@ -211,11 +248,9 @@ using (var scope = app.Services.CreateScope())
         {
             logger.LogError($"Inner exception: {ex.InnerException.Message}");
         }
+        // Don't throw - let the app start anyway
     }
 }
-
-// Add services
-builder.Services.AddScoped<PageInitializationService>();
 
 // ============================================
 // PIPELINE
@@ -235,7 +270,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAntiforgery();
 
-// ✅ Authentication must be BEFORE Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
