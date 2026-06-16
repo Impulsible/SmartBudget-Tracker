@@ -89,11 +89,11 @@
             <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-card-header"><h3>Income vs Expenses Trend</h3></div>
-                    <div class="chart-container" style="height:350px;"><canvas id="reportTrendChart"></canvas></div>
+                    <div class="chart-container" style="height:320px;width:100%;"><canvas id="reportTrendChart"></canvas></div>
                 </div>
                 <div class="chart-card">
                     <div class="chart-card-header"><h3>Expense Breakdown</h3></div>
-                    <div class="chart-container" style="height:350px;"><canvas id="reportExpenseChart"></canvas></div>
+                    <div class="chart-container" style="height:320px;width:100%;"><canvas id="reportExpenseChart"></canvas></div>
                 </div>
             </div>
 
@@ -101,7 +101,7 @@
             <div class="charts-row">
                 <div class="chart-card">
                     <div class="chart-card-header"><h3>Savings Rate</h3></div>
-                    <div class="chart-container" style="height:300px;"><canvas id="reportSavingsChart"></canvas></div>
+                    <div class="chart-container" style="height:280px;width:100%;"><canvas id="reportSavingsChart"></canvas></div>
                 </div>
                 <div class="chart-card">
                     <div class="chart-card-header"><h3>Top Spending Categories</h3></div>
@@ -651,12 +651,10 @@
         await base.OnInitializedAsync();
     }
 
-    // ✅ Call JavaScript initialization
+    // ✅ Call JavaScript initialization on EVERY render, not just first
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await JS.InvokeVoidAsync("initReportsPage");
-        }
+        // ✅ Call on every render to ensure charts load on navigation
+        await JS.InvokeVoidAsync("initReportsPage");
     }
 }

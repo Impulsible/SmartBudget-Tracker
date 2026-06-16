@@ -73,7 +73,6 @@ function getDemoTransactions() {
     var now = new Date();
     var categories = ['Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Salary', 'Other'];
     
-    // Generate realistic demo data
     for (var i = 0; i < 30; i++) {
         var date = new Date();
         date.setDate(date.getDate() - i);
@@ -97,12 +96,10 @@ function getDemoTransactions() {
 // AUTO-REFRESH SETUP
 // ============================================
 function startAutoRefresh() {
-    // Clear any existing interval
     if (refreshInterval) {
         clearInterval(refreshInterval);
     }
     
-    // Refresh every 60 seconds
     refreshInterval = setInterval(function() {
         console.log('Reports: Auto-refreshing data...');
         loadReportData();
@@ -120,13 +117,13 @@ function stopAutoRefresh() {
 // LOAD REPORT DATA
 // ============================================
 async function loadReportData() {
+    console.log('📊 Loading report data for period:', currentPeriod);
+    
     var periodSelect = document.querySelector('.report-period.active');
     if (periodSelect) {
         var period = periodSelect.getAttribute('data-period');
         if (period) currentPeriod = period;
     }
-    
-    console.log('Reports: Loading data for period:', currentPeriod);
     
     var transactions = await fetchReportTransactions(currentPeriod);
     
@@ -141,7 +138,7 @@ async function loadReportData() {
     var totalExpenses = transactions.filter(function(t) { return t.type === 'expense'; }).reduce(function(s, t) { return s + t.amount; }, 0);
     var netSavings = totalIncome - totalExpenses;
     
-    // Update stat cards with animation
+    // Update stat cards
     animateStatValue('rptIncome', '₦' + totalIncome.toLocaleString());
     animateStatValue('rptExpenses', '₦' + totalExpenses.toLocaleString());
     animateStatValue('rptSavings', '₦' + netSavings.toLocaleString());
@@ -183,7 +180,6 @@ function setEmptyState() {
     if (rptSavings) rptSavings.textContent = '₦0';
     if (rptCount) rptCount.textContent = '0';
     
-    // Show empty state in charts
     var ctx1 = document.getElementById('reportTrendChart');
     var ctx2 = document.getElementById('reportExpenseChart');
     var ctx3 = document.getElementById('reportSavingsChart');
@@ -210,7 +206,6 @@ function animateStatValue(elementId, newValue) {
     var currentValue = element.textContent;
     if (currentValue === newValue) return;
     
-    // Simple fade animation
     element.style.transition = 'opacity 0.3s';
     element.style.opacity = '0';
     
@@ -225,11 +220,16 @@ function animateStatValue(elementId, newValue) {
 // ============================================
 function updateTrendChart(transactions) {
     var ctx = document.getElementById('reportTrendChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('❌ reportTrendChart canvas not found');
+        return;
+    }
     
-    if (reportTrendChart) reportTrendChart.destroy();
+    if (reportTrendChart) {
+        reportTrendChart.destroy();
+        reportTrendChart = null;
+    }
     
-    // Group by date
     var grouped = {};
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
@@ -315,12 +315,13 @@ function updateTrendChart(transactions) {
             },
             scales: {
                 x: { 
-                    ticks: { color: '#64748B' }, 
+                    ticks: { color: '#64748B', font: { size: 11 } }, 
                     grid: { color: 'rgba(148,163,184,0.06)' } 
                 },
                 y: { 
                     ticks: { 
                         color: '#64748B', 
+                        font: { size: 11 },
                         callback: function(v) { return '₦' + v.toLocaleString(); } 
                     }, 
                     grid: { color: 'rgba(148,163,184,0.06)' },
@@ -333,9 +334,15 @@ function updateTrendChart(transactions) {
 
 function updateExpenseChart(transactions) {
     var ctx = document.getElementById('reportExpenseChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('❌ reportExpenseChart canvas not found');
+        return;
+    }
     
-    if (reportExpenseChart) reportExpenseChart.destroy();
+    if (reportExpenseChart) {
+        reportExpenseChart.destroy();
+        reportExpenseChart = null;
+    }
     
     var expenses = transactions.filter(function(t) { return t.type === 'expense'; });
     if (expenses.length === 0) {
@@ -404,9 +411,15 @@ function updateExpenseChart(transactions) {
 
 function updateSavingsChart(transactions) {
     var ctx = document.getElementById('reportSavingsChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('❌ reportSavingsChart canvas not found');
+        return;
+    }
     
-    if (reportSavingsChart) reportSavingsChart.destroy();
+    if (reportSavingsChart) {
+        reportSavingsChart.destroy();
+        reportSavingsChart = null;
+    }
     
     var totalIncome = transactions.filter(function(t) { return t.type === 'income'; }).reduce(function(s, t) { return s + t.amount; }, 0);
     var totalExpenses = transactions.filter(function(t) { return t.type === 'expense'; }).reduce(function(s, t) { return s + t.amount; }, 0);
@@ -506,13 +519,13 @@ function updateTopCategories(transactions) {
         return '<div class="top-cat-item" style="display:flex;align-items:center;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:0.5rem;">' +
             '<div class="top-cat-rank" style="width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:white;background:' + colors[index % colors.length] + ';flex-shrink:0;">' + (index + 1) + '</div>' +
             '<div class="top-cat-info" style="flex:1;">' +
-                '<div class="top-cat-name" style="font-size:0.875rem;font-weight:600;color:var(--text-primary);">' + cat.name + '</div>' +
-                '<div class="top-cat-amount" style="font-size:0.75rem;color:var(--text-muted);">₦' + cat.amount.toLocaleString() + '</div>' +
+                '<div class="top-cat-name" style="font-size:0.875rem;font-weight:600;color:#F1F5F9;">' + cat.name + '</div>' +
+                '<div class="top-cat-amount" style="font-size:0.75rem;color:#64748B;">₦' + cat.amount.toLocaleString() + '</div>' +
             '</div>' +
             '<div class="top-cat-bar" style="width:80px;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;flex-shrink:0;">' +
                 '<div class="top-cat-fill" style="width:' + cat.percent + '%;height:100%;border-radius:3px;background:' + colors[index % colors.length] + ';"></div>' +
             '</div>' +
-            '<div class="top-cat-percent" style="font-size:0.75rem;font-weight:600;color:var(--text-secondary);width:50px;text-align:right;flex-shrink:0;">' + cat.percent.toFixed(0) + '%</div>' +
+            '<div class="top-cat-percent" style="font-size:0.75rem;font-weight:600;color:#94A3B8;width:50px;text-align:right;flex-shrink:0;">' + cat.percent.toFixed(0) + '%</div>' +
         '</div>';
     }).join('');
 }
@@ -529,10 +542,7 @@ window.changeReportPeriod = function(period, element) {
     });
     if (element) element.classList.add('active');
     
-    // Show loading state
     showToast('Loading ' + period + ' data...', 'info');
-    
-    // Reload data
     loadReportData();
 };
 
@@ -561,41 +571,7 @@ function showToast(message, type) {
 }
 
 // ============================================
-// INITIALIZATION
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Reports page initializing...');
-    setupReportsSidebar();
-    
-    setTimeout(function() {
-        loadReportData();
-        startAutoRefresh(); // Start auto-refresh
-        console.log('Reports page initialized with auto-refresh');
-    }, 200);
-    
-    console.log('Reports page initialized');
-});
-
-// Make functions global
-window.changeReportPeriod = changeReportPeriod;
-window.loadReportData = loadReportData;
-window.startAutoRefresh = startAutoRefresh;
-window.stopAutoRefresh = stopAutoRefresh;
-
-// ============================================
-// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
-// ============================================
-window.initReportsPage = function() {
-    console.log('🔄 reports: init called from Blazor');
-    setupReportsSidebar();
-    loadReportData();
-    console.log('✅ reports: initialized');
-};
-
-window.loadReportData = loadReportData;
-
-// ============================================
-// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
+// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR (SINGLE DECLARATION)
 // ============================================
 window.initReportsPage = function() {
     console.log('🔄 reports: init called from Blazor');
@@ -610,7 +586,37 @@ window.initReportsPage = function() {
         if (typeof loadReportData === 'function') {
             loadReportData();
         }
-    }, 300);
+        // Start auto-refresh after data loads
+        startAutoRefresh();
+    }, 500);
     
     console.log('✅ reports: initialized');
 };
+
+// ============================================
+// AUTO-INIT ON PAGE LOAD (Fallback)
+// ============================================
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📄 Reports: DOM ready (fallback)');
+        setTimeout(function() {
+            setupReportsSidebar();
+            loadReportData();
+            startAutoRefresh();
+        }, 300);
+    });
+} else {
+    console.log('📄 Reports: DOM already loaded (fallback)');
+    setTimeout(function() {
+        setupReportsSidebar();
+        loadReportData();
+        startAutoRefresh();
+    }, 300);
+}
+
+// Make functions global
+window.changeReportPeriod = changeReportPeriod;
+window.loadReportData = loadReportData;
+window.startAutoRefresh = startAutoRefresh;
+window.stopAutoRefresh = stopAutoRefresh;
+window.initReportsPage = initReportsPage;
