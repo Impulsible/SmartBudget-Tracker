@@ -219,3 +219,5 @@ C:\Users\IMPULSE\Documents\SmartBudget\obj\Debug\net9.0\compressed\py8vo35l7n-c8
 C:\Users\IMPULSE\Documents\SmartBudget\obj\Debug\net9.0\compressed\dm28wzyd4u-4dff1noolk.gz
 C:\Users\IMPULSE\Documents\SmartBudget\obj\Debug\net9.0\compressed\el1k52usip-0z0imgcuxl.gz
 C:\Users\IMPULSE\Documents\SmartBudget\obj\Debug\net9.0\compressed\5nlzqfh4w4-5pjph1ha43.gz
+C:\Users\IMPULSE\Documents\SmartBudget\bin\Debug\net9.0\Npgsql.dll
+C:\Users\IMPULSE\Documents\SmartBudget\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll

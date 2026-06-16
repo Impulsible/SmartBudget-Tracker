@@ -5,6 +5,7 @@ using SmartBudget.Components;
 using SmartBudget.Data;
 using SmartBudget.Services;
 using SmartBudget.Components.Account;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,14 +16,75 @@ builder.Services.AddRazorComponents()
 // Add API controllers
 builder.Services.AddControllers();
 
-// Add database context with SQLite (persistent file database)
+// ============================================
+// DATABASE CONFIGURATION
+// ============================================
+string? connectionString = null;
+var usePostgres = false;
+
+// Check for DATABASE_URL from Render
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+// If DATABASE_URL is not set, use the connection string from appsettings
+if (string.IsNullOrEmpty(databaseUrl))
+{
+    databaseUrl = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    try
+    {
+        // Check if it's a PostgreSQL connection string (starts with postgresql://)
+        if (databaseUrl.StartsWith("postgresql://"))
+        {
+            // Parse Render's DATABASE_URL
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo[0];
+            var password = userInfo[1];
+            connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
+            usePostgres = true;
+            Console.WriteLine("✅ Using PostgreSQL database (Render)");
+        }
+        else
+        {
+            // It's a SQLite connection string
+            connectionString = databaseUrl;
+            Console.WriteLine("✅ Using SQLite database");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Error parsing DATABASE_URL: {ex.Message}");
+        // Fallback to SQLite
+        connectionString = "Data Source=smartbudget.db";
+    }
+}
+else
+{
+    // Fallback to SQLite
+    connectionString = "Data Source=smartbudget.db";
+    Console.WriteLine("✅ Using SQLite database (fallback)");
+}
+
+// Register DbContext with the appropriate provider
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=smartbudget.db"));
+{
+    if (usePostgres)
+    {
+        options.UseNpgsql(connectionString);
+    }
+    else
+    {
+        options.UseSqlite(connectionString);
+    }
+});
 
 // Add Identity services
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
-    // Password settings - relaxed for easier registration
+    // Password settings
     options.Password.RequireDigit = true;
     options.Password.RequiredLength = 6;
     options.Password.RequireNonAlphanumeric = false;
@@ -35,7 +97,7 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
     options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
     
     // Sign-in settings
-    options.SignIn.RequireConfirmedAccount = false; // No email confirmation needed
+    options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
     
@@ -44,7 +106,7 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 })
-.AddRoles<IdentityRole>() // Add role support
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddSignInManager()
 .AddDefaultTokenProviders();
@@ -57,14 +119,13 @@ builder.Services.AddAuthentication(options =>
 })
 .AddIdentityCookies(options =>
 {
-    // Configure cookie settings for persistent login
     options.ApplicationCookie?.Configure(cookie =>
     {
         cookie.Cookie.Name = "SmartBudget.Auth";
         cookie.Cookie.HttpOnly = true;
         cookie.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         cookie.Cookie.SameSite = SameSiteMode.Lax;
-        cookie.ExpireTimeSpan = TimeSpan.FromDays(30); // Stay logged in for 30 days
+        cookie.ExpireTimeSpan = TimeSpan.FromDays(30);
         cookie.SlidingExpiration = true;
         cookie.LoginPath = "/Account/Login";
         cookie.LogoutPath = "/Account/Logout";
@@ -89,8 +150,7 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // ============================================
-// ENSURE DATABASE IS CREATED AND SEEDED
-// This runs on every deployment/startup
+// DATABASE MIGRATION & SEEDING
 // ============================================
 using (var scope = app.Services.CreateScope())
 {
@@ -105,13 +165,17 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
         
-        // Create the database if it doesn't exist
-        // This is what makes accounts persist on deployment
-        await dbContext.Database.EnsureCreatedAsync();
-        logger.LogInformation("✅ Database exists and is ready");
-        
-        // Apply any pending migrations if using migrations
-        // await dbContext.Database.MigrateAsync();
+        // Apply migrations for PostgreSQL, or ensure created for SQLite
+        if (usePostgres)
+        {
+            await dbContext.Database.MigrateAsync();
+            logger.LogInformation("✅ PostgreSQL database migrated successfully");
+        }
+        else
+        {
+            await dbContext.Database.EnsureCreatedAsync();
+            logger.LogInformation("✅ SQLite database created and ready");
+        }
         
         // ============================================
         // SEED ROLES
@@ -139,7 +203,7 @@ using (var scope = app.Services.CreateScope())
         }
         
         // ============================================
-        // SEED ADMIN USER (Optional)
+        // SEED ADMIN USER
         // ============================================
         var adminEmail = "admin@smartbudget.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
@@ -170,7 +234,6 @@ using (var scope = app.Services.CreateScope())
         {
             logger.LogInformation("ℹ️ Admin user already exists");
             
-            // Ensure admin has roles
             if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
             {
                 await userManager.AddToRoleAsync(adminUser, "Admin");
@@ -184,7 +247,6 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogError(ex, "❌ An error occurred while initializing the database");
         
-        // Log the inner exception for more details
         if (ex.InnerException != null)
         {
             logger.LogError($"Inner exception: {ex.InnerException.Message}");
@@ -198,12 +260,10 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production.
     app.UseHsts();
 }
 else
 {
-    // Show detailed errors in development
     app.UseDeveloperExceptionPage();
 }
 
@@ -224,6 +284,7 @@ app.MapRazorComponents<App>()
 
 // Log that the app is starting
 app.Logger.LogInformation("🚀 SmartBudget application starting...");
-app.Logger.LogInformation($"📁 Database location: {builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=smartbudget.db"}");
+app.Logger.LogInformation($"📁 Database: {(usePostgres ? "PostgreSQL (Render)" : "SQLite")}");
+app.Logger.LogInformation($"📊 Connection: {connectionString}");
 
 app.Run();
