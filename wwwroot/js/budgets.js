@@ -1,5 +1,5 @@
 // ============================================
-// SMARTBUDGET BUDGETS PAGE - FIXED FOR RENDER
+// SMARTBUDGET BUDGETS PAGE - PERSISTENT DATA
 // ============================================
 console.log('Budgets JS: Loaded');
 
@@ -43,11 +43,11 @@ function closeBudgetsSidebar() {
 }
 
 // ============================================
-// API CALLS
+// API CALLS - PERSISTENT DATA
 // ============================================
 async function fetchBudgets() {
     try {
-        console.log('🔍 Fetching budgets...');
+        console.log('🔍 Fetching budgets from API...');
         var response = await fetch('/api/budgets', {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -56,9 +56,16 @@ async function fetchBudgets() {
         
         console.log('📡 Response status:', response.status);
         
+        if (response.status === 401) {
+            console.log('❌ Not authenticated');
+            allBudgets = [];
+            return allBudgets;
+        }
+        
         if (!response.ok) {
             console.log('❌ Budgets API returned:', response.status);
-            return getDemoBudgets();
+            allBudgets = [];
+            return allBudgets;
         }
         
         var data = await response.json();
@@ -66,24 +73,17 @@ async function fetchBudgets() {
         
         if (data.success && data.budgets && data.budgets.length > 0) {
             allBudgets = data.budgets;
-            return allBudgets;
+            console.log('✅ Loaded ' + allBudgets.length + ' budgets from API');
+        } else {
+            allBudgets = [];
+            console.log('ℹ️ No budgets found in API');
         }
-        return getDemoBudgets();
+        return allBudgets;
     } catch (e) {
         console.error('❌ Error fetching budgets:', e);
-        return getDemoBudgets();
+        allBudgets = [];
+        return allBudgets;
     }
-}
-
-function getDemoBudgets() {
-    return [
-        { id: 1, name: "Food", amount: 65000, color: "#10B981", spent: 42000 },
-        { id: 2, name: "Transport", amount: 35000, color: "#3B82F6", spent: 28000 },
-        { id: 3, name: "Shopping", amount: 45000, color: "#F59E0B", spent: 31000 },
-        { id: 4, name: "Bills", amount: 30000, color: "#EF4444", spent: 29000 },
-        { id: 5, name: "Entertainment", amount: 20000, color: "#8B5CF6", spent: 15000 },
-        { id: 6, name: "Other", amount: 15000, color: "#64748B", spent: 5000 }
-    ];
 }
 
 async function saveBudgetToApi(budget) {
@@ -223,7 +223,7 @@ async function openEditBudgetModal(id) {
 }
 
 // ============================================
-// SAVE BUDGET - FIXED
+// SAVE BUDGET - PERSISTENT
 // ============================================
 async function saveBudget() {
     console.log('📝 saveBudget called');
@@ -271,9 +271,8 @@ async function saveBudget() {
     
     if (success) {
         closeBudgetModal();
+        // ✅ Reload from API to get fresh data
         await renderAllBudgets();
-        // ✅ FIX: Update the chart after saving
-        updateBudgetChart();
         showToast(id ? 'Budget updated successfully!' : 'Budget created successfully!', 'success');
     } else {
         alert('Failed to save budget. Please check console for errors.');
@@ -281,15 +280,14 @@ async function saveBudget() {
 }
 
 // ============================================
-// DELETE BUDGET
+// DELETE BUDGET - PERSISTENT
 // ============================================
 async function deleteBudget(id) {
     if (confirm('Are you sure you want to delete this budget category?')) {
         var success = await deleteBudgetFromApi(id);
         if (success) {
+            // ✅ Reload from API to get fresh data
             await renderAllBudgets();
-            // ✅ FIX: Update the chart after deleting
-            updateBudgetChart();
             showToast('Budget deleted successfully!', 'success');
         } else {
             alert('Failed to delete budget.');
@@ -300,12 +298,26 @@ async function deleteBudget(id) {
 // ============================================
 // RESET BUDGET CATEGORIES
 // ============================================
-function resetBudgetCategories() {
+async function resetBudgetCategories() {
     console.log('📝 resetBudgetCategories called');
     if (confirm('Reset budget categories to default?')) {
-        // ✅ FIX: Update the chart after resetting
-        updateBudgetChart();
-        renderAllBudgets();
+        // ✅ Reset to default demo data
+        var defaultBudgets = [
+            { name: "Food", amount: 65000, color: "#10B981" },
+            { name: "Transport", amount: 35000, color: "#3B82F6" },
+            { name: "Shopping", amount: 45000, color: "#F59E0B" },
+            { name: "Bills", amount: 30000, color: "#EF4444" },
+            { name: "Entertainment", amount: 20000, color: "#8B5CF6" },
+            { name: "Other", amount: 15000, color: "#64748B" }
+        ];
+        
+        // Save each default budget to API
+        for (var i = 0; i < defaultBudgets.length; i++) {
+            await saveBudgetToApi(defaultBudgets[i]);
+        }
+        
+        // ✅ Reload from API to get fresh data
+        await renderAllBudgets();
         showToast('Budget categories reset to default!', 'success');
     }
 }
@@ -335,7 +347,7 @@ function showToast(message, type) {
 }
 
 // ============================================
-// UPDATE BUDGET CHART - FIXED
+// UPDATE BUDGET CHART - PERSISTENT DATA
 // ============================================
 function updateBudgetChart() {
     console.log('📊 Updating budget chart with:', allBudgets);
@@ -352,17 +364,52 @@ function updateBudgetChart() {
         budgetChart = null;
     }
     
-    // Get budget data
-    var budgets = allBudgets.length > 0 ? allBudgets : getDemoBudgets();
-    var total = budgets.reduce(function(s, c) { return s + c.amount; }, 0);
+    // ✅ Use real data from allBudgets
+    var budgets = allBudgets;
     
-    // Create new chart
+    // If no budgets, show empty state
+    if (!budgets || budgets.length === 0) {
+        console.log('📊 No budgets found, showing empty chart');
+        budgetChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['No Budgets'],
+                datasets: [{
+                    data: [1],
+                    backgroundColor: ['#64748B'],
+                    borderWidth: 2,
+                    borderColor: '#1E293B'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#94A3B8',
+                            usePointStyle: true,
+                            padding: 14,
+                            font: { size: 11 }
+                        }
+                    }
+                }
+            }
+        });
+        return;
+    }
+    
+    var total = budgets.reduce(function(s, c) { return s + (c.amount || 0); }, 0);
+    
+    // Create new chart with REAL data
     budgetChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: budgets.map(function(c) { return c.name; }),
             datasets: [{
-                data: budgets.map(function(c) { return c.amount; }),
+                data: budgets.map(function(c) { return c.amount || 0; }),
                 backgroundColor: budgets.map(function(c) { return c.color || '#10B981'; }),
                 borderWidth: 2,
                 borderColor: '#1E293B'
@@ -435,13 +482,14 @@ function updateBudgetChart() {
         }
     });
     
-    console.log('✅ Budget chart updated successfully');
+    console.log('✅ Budget chart updated with real data');
 }
 
 // ============================================
-// RENDER ALL BUDGETS
+// RENDER ALL BUDGETS - PERSISTENT
 // ============================================
 async function renderAllBudgets() {
+    // ✅ Always fetch fresh data from API
     var budgets = await fetchBudgets();
     allBudgets = budgets;
     
@@ -467,6 +515,8 @@ async function renderAllBudgets() {
     
     if (budgets.length === 0) {
         grid.innerHTML = '<div class="no-data" style="text-align:center;padding:3rem;color:#64748B;grid-column:span 3;"><i class="bi bi-pie-chart" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>No budget categories yet.<br>Click "Add Budget" to create your first budget.</div>';
+        // ✅ Update chart with empty data
+        updateBudgetChart();
         return;
     }
     
@@ -497,7 +547,7 @@ async function renderAllBudgets() {
         `;
     }).join('');
     
-    // ✅ FIX: Update the chart after rendering
+    // ✅ Update chart after rendering
     updateBudgetChart();
 }
 
@@ -531,7 +581,7 @@ window.resetBudgetCategories = resetBudgetCategories;
 window.updateBudgetChart = updateBudgetChart;
 
 // ============================================
-// INITIALIZATION
+// INITIALIZATION - PERSISTENT
 // ============================================
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Budgets page initializing...');
@@ -543,10 +593,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         await new Promise(resolve => setTimeout(resolve, 100));
     }
     
-    setTimeout(async function() {
-        await renderAllBudgets();
-        console.log('Budgets page initialized');
-    }, 200);
+    // ✅ Load budgets from API
+    await renderAllBudgets();
+    console.log('Budgets page initialized with ' + allBudgets.length + ' budgets');
 
     var budgetModal = document.getElementById('budgetModal');
     if (budgetModal) {
