@@ -15,20 +15,17 @@ builder.Services.AddRazorComponents()
 builder.Services.AddControllers();
 
 // ============================================
-// DATABASE CONFIGURATION - FIXED
+// DATABASE CONFIGURATION
 // ============================================
 string connectionString;
 var usePostgres = false;
 
-// Check for DATABASE_URL from Render
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 
 if (!string.IsNullOrEmpty(databaseUrl))
 {
     try
     {
-        // Parse Render's DATABASE_URL
-        // Format: postgresql://username:password@host:port/database
         var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':');
         var username = userInfo[0];
@@ -37,7 +34,6 @@ if (!string.IsNullOrEmpty(databaseUrl))
         var port = uri.Port > 0 ? uri.Port : 5432;
         var database = uri.AbsolutePath.TrimStart('/');
 
-        // Build Npgsql-compatible connection string
         connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
         usePostgres = true;
         Console.WriteLine($"✅ Using PostgreSQL database on {host}:{port}/{database}");
@@ -46,17 +42,13 @@ if (!string.IsNullOrEmpty(databaseUrl))
     {
         Console.WriteLine($"⚠️ Error parsing DATABASE_URL: {ex.Message}");
         connectionString = "Data Source=smartbudget.db";
-        usePostgres = false;
     }
 }
 else
 {
-    // Fallback to SQLite
     connectionString = "Data Source=smartbudget.db";
-    Console.WriteLine("✅ Using SQLite database (fallback)");
 }
 
-// Register DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (usePostgres)
@@ -65,7 +57,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlite(connectionString);
 });
 
-// Identity
+// ============================================
+// IDENTITY WITH COOKIE CONFIGURATION - FIXED
+// ============================================
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
     options.Password.RequireDigit = true;
@@ -79,6 +73,20 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddSignInManager()
 .AddDefaultTokenProviders();
+
+// ✅ FIX: Proper cookie configuration for Render
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "SmartBudget.Auth";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.SlidingExpiration = true;
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -95,9 +103,7 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// ============================================
-// DATABASE MIGRATION & SEEDING
-// ============================================
+// Database migration
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -114,7 +120,6 @@ using (var scope = app.Services.CreateScope())
         else
             await dbContext.Database.EnsureCreatedAsync();
         
-        // Seed roles
         string[] roles = { "User", "Admin" };
         foreach (var role in roles)
         {
@@ -122,7 +127,6 @@ using (var scope = app.Services.CreateScope())
                 await roleManager.CreateAsync(new IdentityRole(role));
         }
         
-        // Seed admin user
         var adminEmail = "admin@smartbudget.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
@@ -151,9 +155,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// ============================================
-// CONFIGURE HTTP PIPELINE
-// ============================================
+// Pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -172,10 +174,7 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map API controllers
 app.MapControllers();
-
-// Map Blazor components
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

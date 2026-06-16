@@ -1,6 +1,5 @@
 // ============================================
-// SMARTBUDGET BUDGETS PAGE
-// Full CRUD with Database Persistence via API
+// SMARTBUDGET BUDGETS PAGE - FIXED FOR RENDER
 // ============================================
 console.log('Budgets JS: Loaded');
 
@@ -43,23 +42,43 @@ function closeBudgetsSidebar() {
 }
 
 // ============================================
-// API CALLS
+// API CALLS - WITH CREDENTIALS
 // ============================================
 async function fetchBudgets() {
     try {
-        var response = await fetch('/api/budgets');
-        if (!response.ok) {
-            console.log('Budgets API not available, using demo data');
+        console.log('🔍 Fetching budgets...');
+        var response = await fetch('/api/budgets', {
+            method: 'GET',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include'  // ✅ Important for Render
+        });
+        
+        console.log('📡 Response status:', response.status);
+        
+        if (response.status === 401) {
+            console.log('❌ Not authenticated');
+            // Don't redirect, just show demo data
             return getDemoBudgets();
         }
+        
+        if (!response.ok) {
+            console.log('❌ Budgets API returned:', response.status);
+            return getDemoBudgets();
+        }
+        
         var data = await response.json();
+        console.log('✅ Budgets response:', data);
+        
         if (data.success && data.budgets && data.budgets.length > 0) {
             allBudgets = data.budgets;
             return allBudgets;
         }
         return getDemoBudgets();
     } catch (e) {
-        console.error('Error fetching budgets:', e);
+        console.error('❌ Error fetching budgets:', e);
         return getDemoBudgets();
     }
 }
@@ -77,51 +96,114 @@ function getDemoBudgets() {
 
 async function saveBudgetToApi(budget) {
     try {
+        var body = {
+            name: budget.name,
+            amount: budget.amount,
+            color: budget.color,
+            month: new Date().getMonth() + 1,
+            year: new Date().getFullYear()
+        };
+        
+        console.log('📤 Saving budget to API:', body);
+        
         var response = await fetch('/api/budgets', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: budget.name,
-                amount: budget.amount,
-                color: budget.color,
-                month: new Date().getMonth() + 1,
-                year: new Date().getFullYear()
-            })
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',  // ✅ Important for Render
+            body: JSON.stringify(body)
         });
+        
+        console.log('📡 Response status:', response.status);
+        
+        if (response.status === 401) {
+            console.log('❌ Not authenticated - redirecting to login');
+            alert('Please log in again.');
+            window.location.href = '/Account/Login';
+            return false;
+        }
+        
         var data = await response.json();
+        console.log('✅ Response data:', data);
+        
+        if (!data.success) {
+            console.error('❌ API error:', data.message);
+            alert('Error: ' + (data.message || 'Failed to save budget'));
+            return false;
+        }
+        
         return data.success === true;
     } catch (e) {
-        console.error('Error saving budget:', e);
+        console.error('❌ Error saving budget:', e);
+        alert('Network error. Please check your connection.');
         return false;
     }
 }
 
 async function updateBudgetInApi(id, budget) {
     try {
+        var body = {
+            name: budget.name,
+            amount: budget.amount,
+            color: budget.color
+        };
+        
+        console.log('📤 Updating budget in API:', id, body);
+        
         var response = await fetch('/api/budgets/' + id, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                name: budget.name,
-                amount: budget.amount,
-                color: budget.color
-            })
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify(body)
         });
+        
+        if (response.status === 401) {
+            console.log('❌ Not authenticated');
+            alert('Please log in again.');
+            window.location.href = '/Account/Login';
+            return false;
+        }
+        
         var data = await response.json();
+        console.log('✅ Update response:', data);
+        
+        if (!data.success) {
+            console.error('❌ API error:', data.message);
+            alert('Error: ' + (data.message || 'Failed to update budget'));
+            return false;
+        }
+        
         return data.success === true;
     } catch (e) {
-        console.error('Error updating budget:', e);
+        console.error('❌ Error updating budget:', e);
+        alert('Network error. Please check your connection.');
         return false;
     }
 }
 
 async function deleteBudgetFromApi(id) {
     try {
-        var response = await fetch('/api/budgets/' + id, { method: 'DELETE' });
+        var response = await fetch('/api/budgets/' + id, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        
+        if (response.status === 401) {
+            console.log('❌ Not authenticated');
+            alert('Please log in again.');
+            window.location.href = '/Account/Login';
+            return false;
+        }
+        
         var data = await response.json();
         return data.success === true;
     } catch (e) {
-        console.error('Error deleting budget:', e);
+        console.error('❌ Error deleting budget:', e);
         return false;
     }
 }
@@ -189,9 +271,11 @@ async function openEditBudgetModal(id) {
 }
 
 // ============================================
-// SAVE BUDGET
+// SAVE BUDGET - FIXED
 // ============================================
 async function saveBudget() {
+    console.log('📝 saveBudget called');
+    
     var idInput = document.getElementById('budgetId');
     var nameInput = document.getElementById('budgetName');
     var amountInput = document.getElementById('budgetAmount');
@@ -201,6 +285,8 @@ async function saveBudget() {
     var name = nameInput ? nameInput.value.trim() : '';
     var amount = amountInput ? parseFloat(amountInput.value) : 0;
     var color = colorInput ? colorInput.value : '#10B981';
+    
+    console.log('📝 Form values:', { id, name, amount, color });
     
     if (!name) {
         alert('Please enter a category name.');
@@ -236,7 +322,7 @@ async function saveBudget() {
         await renderAllBudgets();
         showToast(id ? 'Budget updated successfully!' : 'Budget created successfully!', 'success');
     } else {
-        alert('Failed to save budget. Please try again.');
+        alert('Failed to save budget. Please check console for errors.');
     }
 }
 
@@ -285,12 +371,10 @@ function showToast(message, type) {
 async function renderAllBudgets() {
     var budgets = await fetchBudgets();
     
-    // Calculate stats - Check if elements exist before setting
     var totalBudget = budgets.reduce(function(sum, b) { return sum + (b.amount || 0); }, 0);
     var totalSpent = budgets.reduce(function(sum, b) { return sum + (b.spent || 0); }, 0);
     var totalRemaining = totalBudget - totalSpent;
     
-    // Safely get elements and set values
     var budgetTotalEl = document.getElementById('budgetTotal');
     var budgetSpentEl = document.getElementById('budgetSpent');
     var budgetRemainingEl = document.getElementById('budgetRemaining');
@@ -301,7 +385,6 @@ async function renderAllBudgets() {
     if (budgetRemainingEl) budgetRemainingEl.textContent = '₦' + totalRemaining.toLocaleString();
     if (budgetCountEl) budgetCountEl.textContent = budgets.length;
     
-    // Render budget grid
     var grid = document.getElementById('budgetGrid');
     if (!grid) {
         console.log('Budget grid element not found');
@@ -366,13 +449,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('Budgets page initializing...');
     setupBudgetsSidebar();
     
-    // Small delay to ensure DOM is ready
     setTimeout(async function() {
         await renderAllBudgets();
         console.log('Budgets page initialized');
     }, 200);
 
-    // Close modal on overlay click
     var budgetModal = document.getElementById('budgetModal');
     if (budgetModal) {
         budgetModal.addEventListener('click', function(e) {
@@ -380,7 +461,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Close modal on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeBudgetModal();
