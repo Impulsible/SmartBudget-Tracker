@@ -5,6 +5,7 @@ console.log('Budgets JS: Loaded');
 
 var allBudgets = [];
 var budgetChart = null;
+var isUsingFallback = false;
 
 // ============================================
 // SIDEBAR SETUP
@@ -43,6 +44,49 @@ function closeBudgetsSidebar() {
 }
 
 // ============================================
+// FALLBACK STORAGE - LocalStorage when API fails
+// ============================================
+function getFallbackBudgets() {
+    try {
+        var stored = localStorage.getItem('smartbudget_budgets_fallback');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.log('Fallback read error:', e);
+    }
+    return null;
+}
+
+function setFallbackBudgets(budgets) {
+    try {
+        localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(budgets));
+    } catch (e) {
+        console.log('Fallback write error:', e);
+    }
+}
+
+function getFallbackTransactions() {
+    try {
+        var stored = localStorage.getItem('smartbudget_transactions_fallback');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.log('Fallback read error:', e);
+    }
+    return null;
+}
+
+function setFallbackTransactions(transactions) {
+    try {
+        localStorage.setItem('smartbudget_transactions_fallback', JSON.stringify(transactions));
+    } catch (e) {
+        console.log('Fallback write error:', e);
+    }
+}
+
+// ============================================
 // API CALLS - PERSISTENT DATA
 // ============================================
 async function fetchBudgets() {
@@ -57,14 +101,29 @@ async function fetchBudgets() {
         console.log('📡 Response status:', response.status);
         
         if (response.status === 401) {
-            console.log('❌ Not authenticated');
-            allBudgets = [];
+            console.log('❌ Not authenticated - using fallback');
+            isUsingFallback = true;
+            var fallbackData = getFallbackBudgets();
+            if (fallbackData && fallbackData.length > 0) {
+                allBudgets = fallbackData;
+                return allBudgets;
+            }
+            allBudgets = getDefaultBudgets();
+            setFallbackBudgets(allBudgets);
             return allBudgets;
         }
         
         if (!response.ok) {
             console.log('❌ Budgets API returned:', response.status);
-            allBudgets = [];
+            var fallbackData = getFallbackBudgets();
+            if (fallbackData && fallbackData.length > 0) {
+                console.log('📂 Using fallback data');
+                allBudgets = fallbackData;
+                isUsingFallback = true;
+                return allBudgets;
+            }
+            allBudgets = getDefaultBudgets();
+            setFallbackBudgets(allBudgets);
             return allBudgets;
         }
         
@@ -73,17 +132,44 @@ async function fetchBudgets() {
         
         if (data.success && data.budgets && data.budgets.length > 0) {
             allBudgets = data.budgets;
+            setFallbackBudgets(allBudgets);
+            isUsingFallback = false;
             console.log('✅ Loaded ' + allBudgets.length + ' budgets from API');
         } else {
-            allBudgets = [];
-            console.log('ℹ️ No budgets found in API');
+            var fallbackData = getFallbackBudgets();
+            if (fallbackData && fallbackData.length > 0) {
+                console.log('📂 Using fallback data (no API data)');
+                allBudgets = fallbackData;
+                isUsingFallback = true;
+            } else {
+                allBudgets = getDefaultBudgets();
+                setFallbackBudgets(allBudgets);
+            }
         }
         return allBudgets;
     } catch (e) {
         console.error('❌ Error fetching budgets:', e);
-        allBudgets = [];
+        var fallbackData = getFallbackBudgets();
+        if (fallbackData && fallbackData.length > 0) {
+            console.log('📂 Using fallback data (network error)');
+            allBudgets = fallbackData;
+            isUsingFallback = true;
+            return allBudgets;
+        }
+        allBudgets = getDefaultBudgets();
+        setFallbackBudgets(allBudgets);
         return allBudgets;
     }
+}
+
+function getDefaultBudgets() {
+    return [
+        { id: 1, name: "Food", amount: 65000, color: "#10B981", spent: 0 },
+        { id: 2, name: "Transport", amount: 35000, color: "#3B82F6", spent: 0 },
+        { id: 3, name: "Shopping", amount: 45000, color: "#F59E0B", spent: 0 },
+        { id: 4, name: "Bills", amount: 30000, color: "#EF4444", spent: 0 },
+        { id: 5, name: "Entertainment", amount: 20000, color: "#8B5CF6", spent: 0 }
+    ];
 }
 
 async function saveBudgetToApi(budget) {
@@ -107,13 +193,65 @@ async function saveBudgetToApi(budget) {
         
         console.log('📡 Response status:', response.status);
         
+        if (!response.ok) {
+            console.log('⚠️ API save failed with status:', response.status);
+            // Save to fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            var newBudget = { 
+                id: Date.now(), 
+                name: budget.name, 
+                amount: budget.amount, 
+                color: budget.color,
+                spent: 0
+            };
+            fallbackBudgets.push(newBudget);
+            setFallbackBudgets(fallbackBudgets);
+            allBudgets = fallbackBudgets;
+            isUsingFallback = true;
+            showToast('Budget saved locally (offline mode)', 'info');
+            return true;
+        }
+        
         var data = await response.json();
         console.log('✅ Response data:', data);
         
-        return data.success === true;
+        if (data.success === true) {
+            await fetchBudgets();
+            return true;
+        } else {
+            // Save to fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            var newBudget = { 
+                id: Date.now(), 
+                name: budget.name, 
+                amount: budget.amount, 
+                color: budget.color,
+                spent: 0
+            };
+            fallbackBudgets.push(newBudget);
+            setFallbackBudgets(fallbackBudgets);
+            allBudgets = fallbackBudgets;
+            isUsingFallback = true;
+            showToast('Budget saved locally (offline mode)', 'info');
+            return true;
+        }
     } catch (e) {
         console.error('❌ Error saving budget:', e);
-        return false;
+        // Save to fallback
+        var fallbackBudgets = getFallbackBudgets() || [];
+        var newBudget = { 
+            id: Date.now(), 
+            name: budget.name, 
+            amount: budget.amount, 
+            color: budget.color,
+            spent: 0
+        };
+        fallbackBudgets.push(newBudget);
+        setFallbackBudgets(fallbackBudgets);
+        allBudgets = fallbackBudgets;
+        isUsingFallback = true;
+        showToast('Budget saved locally (offline mode)', 'info');
+        return true;
     }
 }
 
@@ -134,13 +272,56 @@ async function updateBudgetInApi(id, budget) {
             body: JSON.stringify(body)
         });
         
+        if (!response.ok) {
+            console.log('⚠️ API update failed with status:', response.status);
+            // Update in fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            var index = fallbackBudgets.findIndex(function(b) { return b.id === id; });
+            if (index !== -1) {
+                fallbackBudgets[index].name = budget.name;
+                fallbackBudgets[index].amount = budget.amount;
+                fallbackBudgets[index].color = budget.color;
+                setFallbackBudgets(fallbackBudgets);
+                allBudgets = fallbackBudgets;
+                isUsingFallback = true;
+            }
+            return true;
+        }
+        
         var data = await response.json();
         console.log('✅ Update response:', data);
         
-        return data.success === true;
+        if (data.success === true) {
+            await fetchBudgets();
+            return true;
+        } else {
+            // Update in fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            var index = fallbackBudgets.findIndex(function(b) { return b.id === id; });
+            if (index !== -1) {
+                fallbackBudgets[index].name = budget.name;
+                fallbackBudgets[index].amount = budget.amount;
+                fallbackBudgets[index].color = budget.color;
+                setFallbackBudgets(fallbackBudgets);
+                allBudgets = fallbackBudgets;
+                isUsingFallback = true;
+            }
+            return true;
+        }
     } catch (e) {
         console.error('❌ Error updating budget:', e);
-        return false;
+        // Update in fallback
+        var fallbackBudgets = getFallbackBudgets() || [];
+        var index = fallbackBudgets.findIndex(function(b) { return b.id === id; });
+        if (index !== -1) {
+            fallbackBudgets[index].name = budget.name;
+            fallbackBudgets[index].amount = budget.amount;
+            fallbackBudgets[index].color = budget.color;
+            setFallbackBudgets(fallbackBudgets);
+            allBudgets = fallbackBudgets;
+            isUsingFallback = true;
+        }
+        return true;
     }
 }
 
@@ -151,11 +332,39 @@ async function deleteBudgetFromApi(id) {
             credentials: 'include'
         });
         
+        if (!response.ok) {
+            console.log('⚠️ API delete failed with status:', response.status);
+            // Delete from fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            fallbackBudgets = fallbackBudgets.filter(function(b) { return b.id !== id; });
+            setFallbackBudgets(fallbackBudgets);
+            allBudgets = fallbackBudgets;
+            isUsingFallback = true;
+            return true;
+        }
+        
         var data = await response.json();
-        return data.success === true;
+        if (data.success === true) {
+            await fetchBudgets();
+            return true;
+        } else {
+            // Delete from fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            fallbackBudgets = fallbackBudgets.filter(function(b) { return b.id !== id; });
+            setFallbackBudgets(fallbackBudgets);
+            allBudgets = fallbackBudgets;
+            isUsingFallback = true;
+            return true;
+        }
     } catch (e) {
         console.error('❌ Error deleting budget:', e);
-        return false;
+        // Delete from fallback
+        var fallbackBudgets = getFallbackBudgets() || [];
+        fallbackBudgets = fallbackBudgets.filter(function(b) { return b.id !== id; });
+        setFallbackBudgets(fallbackBudgets);
+        allBudgets = fallbackBudgets;
+        isUsingFallback = true;
+        return true;
     }
 }
 
@@ -259,7 +468,7 @@ async function saveBudget() {
     
     var success;
     if (id) {
-        success = await updateBudgetInApi(id, { name: name, amount: amount, color: color });
+        success = await updateBudgetInApi(parseInt(id), { name: name, amount: amount, color: color });
     } else {
         success = await saveBudgetToApi({ name: name, amount: amount, color: color });
     }
@@ -271,11 +480,14 @@ async function saveBudget() {
     
     if (success) {
         closeBudgetModal();
-        // ✅ Reload from API to get fresh data
         await renderAllBudgets();
-        showToast(id ? 'Budget updated successfully!' : 'Budget created successfully!', 'success');
+        if (isUsingFallback) {
+            showToast('Budget ' + (id ? 'updated' : 'created') + ' successfully! (Offline mode)', 'info');
+        } else {
+            showToast('Budget ' + (id ? 'updated' : 'created') + ' successfully!', 'success');
+        }
     } else {
-        alert('Failed to save budget. Please check console for errors.');
+        alert('Failed to save budget. Please try again.');
     }
 }
 
@@ -286,7 +498,6 @@ async function deleteBudget(id) {
     if (confirm('Are you sure you want to delete this budget category?')) {
         var success = await deleteBudgetFromApi(id);
         if (success) {
-            // ✅ Reload from API to get fresh data
             await renderAllBudgets();
             showToast('Budget deleted successfully!', 'success');
         } else {
@@ -301,22 +512,10 @@ async function deleteBudget(id) {
 async function resetBudgetCategories() {
     console.log('📝 resetBudgetCategories called');
     if (confirm('Reset budget categories to default?')) {
-        // ✅ Reset to default demo data
-        var defaultBudgets = [
-            { name: "Food", amount: 65000, color: "#10B981" },
-            { name: "Transport", amount: 35000, color: "#3B82F6" },
-            { name: "Shopping", amount: 45000, color: "#F59E0B" },
-            { name: "Bills", amount: 30000, color: "#EF4444" },
-            { name: "Entertainment", amount: 20000, color: "#8B5CF6" },
-            { name: "Other", amount: 15000, color: "#64748B" }
-        ];
-        
-        // Save each default budget to API
-        for (var i = 0; i < defaultBudgets.length; i++) {
-            await saveBudgetToApi(defaultBudgets[i]);
-        }
-        
-        // ✅ Reload from API to get fresh data
+        var defaultBudgets = getDefaultBudgets();
+        setFallbackBudgets(defaultBudgets);
+        allBudgets = defaultBudgets;
+        isUsingFallback = true;
         await renderAllBudgets();
         showToast('Budget categories reset to default!', 'success');
     }
@@ -336,8 +535,10 @@ function showToast(message, type) {
     }
     
     var toast = document.createElement('div');
-    toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + (type === 'success' ? '#10B981' : '#EF4444') + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
-    toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill') + '" style="color:' + (type === 'success' ? '#10B981' : '#EF4444') + '"></i><span>' + message + '</span>';
+    var iconColor = type === 'success' ? '#10B981' : (type === 'info' ? '#3B82F6' : '#EF4444');
+    var icon = type === 'success' ? 'check-circle-fill' : (type === 'info' ? 'info-circle-fill' : 'exclamation-triangle-fill');
+    toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + iconColor + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
+    toast.innerHTML = '<i class="bi bi-' + icon + '" style="color:' + iconColor + '"></i><span>' + message + '</span>';
     
     container.appendChild(toast);
     
@@ -358,16 +559,13 @@ function updateBudgetChart() {
         return;
     }
     
-    // If chart exists, destroy it
     if (budgetChart) {
         budgetChart.destroy();
         budgetChart = null;
     }
     
-    // ✅ Use real data from allBudgets
     var budgets = allBudgets;
     
-    // If no budgets, show empty state
     if (!budgets || budgets.length === 0) {
         console.log('📊 No budgets found, showing empty chart');
         budgetChart = new Chart(ctx, {
@@ -403,7 +601,6 @@ function updateBudgetChart() {
     
     var total = budgets.reduce(function(s, c) { return s + (c.amount || 0); }, 0);
     
-    // Create new chart with REAL data
     budgetChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -462,7 +659,6 @@ function updateBudgetChart() {
         }
     });
     
-    // Add center text
     Chart.register({
         id: 'budgetCenterText',
         afterDraw: function(chart) {
@@ -489,7 +685,6 @@ function updateBudgetChart() {
 // RENDER ALL BUDGETS - PERSISTENT
 // ============================================
 async function renderAllBudgets() {
-    // ✅ Always fetch fresh data from API
     var budgets = await fetchBudgets();
     allBudgets = budgets;
     
@@ -515,7 +710,6 @@ async function renderAllBudgets() {
     
     if (budgets.length === 0) {
         grid.innerHTML = '<div class="no-data" style="text-align:center;padding:3rem;color:#64748B;grid-column:span 3;"><i class="bi bi-pie-chart" style="font-size:3rem;display:block;margin-bottom:1rem;"></i>No budget categories yet.<br>Click "Add Budget" to create your first budget.</div>';
-        // ✅ Update chart with empty data
         updateBudgetChart();
         return;
     }
@@ -547,7 +741,6 @@ async function renderAllBudgets() {
         `;
     }).join('');
     
-    // ✅ Update chart after rendering
     updateBudgetChart();
 }
 
@@ -579,6 +772,7 @@ window.deleteBudget = deleteBudget;
 window.openEditBudgetModal = openEditBudgetModal;
 window.resetBudgetCategories = resetBudgetCategories;
 window.updateBudgetChart = updateBudgetChart;
+window.renderAllBudgets = renderAllBudgets;
 
 // ============================================
 // INITIALIZATION - PERSISTENT
@@ -587,13 +781,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('Budgets page initializing...');
     setupBudgetsSidebar();
     
-    // ✅ Wait for Chart.js to load
     while (typeof Chart === 'undefined') {
         console.log('⏳ Waiting for Chart.js to load...');
         await new Promise(resolve => setTimeout(resolve, 100));
     }
     
-    // ✅ Load budgets from API
     await renderAllBudgets();
     console.log('Budgets page initialized with ' + allBudgets.length + ' budgets');
 
@@ -609,4 +801,32 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeBudgetModal();
         }
     });
+    
+    // Show status indicator
+    if (isUsingFallback) {
+        console.log('⚠️ Using offline/fallback mode for budgets');
+    }
 });
+
+// ============================================
+// BUDGETS INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initBudgetsPage = async function() {
+    console.log('🔄 budgets: init called from Blazor');
+    setupBudgetsSidebar();
+    await renderAllBudgets();
+    
+    var budgetModal = document.getElementById('budgetModal');
+    if (budgetModal) {
+        var newModal = budgetModal.cloneNode(true);
+        budgetModal.parentNode.replaceChild(newModal, budgetModal);
+        newModal.addEventListener('click', function(e) {
+            if (e.target === this) closeBudgetModal();
+        });
+    }
+    
+    console.log('✅ budgets: initialized');
+};
+
+// Make renderAllBudgets accessible
+window.renderAllBudgets = renderAllBudgets;

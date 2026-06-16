@@ -751,3 +751,16 @@ document.addEventListener('visibilitychange', function() {
         }
     }
 });
+
+// ============================================
+// TRANSACTIONS INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initTransactionsPage = async function() {
+    console.log('🔄 transactions: init called from Blazor');
+    setupTxSidebar();
+    await renderCategoryDropdowns();
+    await renderAllTransactions();
+    console.log('✅ transactions: initialized');
+};
+
+window.renderAllTransactions = renderAllTransactions;

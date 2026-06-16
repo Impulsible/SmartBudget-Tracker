@@ -1,0 +1,25 @@
+@using SmartBudget.Services
+@inject PageInitializationService PageInitService
+@inject IJSRuntime JSRuntime
+
+@* This is a base component - no HTML content *@
+
+@code {
+    [Parameter] public string PageName { get; set; } = "";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrEmpty(PageName))
+        {
+            // Wait a bit for DOM to be ready
+            await Task.Delay(100);
+            await PageInitService.InitializePage(PageName);
+        }
+        else if (!firstRender)
+        {
+            // Re-initialize on navigation (back/forward)
+            await Task.Delay(50);
+            await PageInitService.ResetPage(PageName);
+        }
+    }
+}

@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @attribute [Authorize]
+@inherits BasePage
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<IdentityUser> UserManager
 @inject NavigationManager Navigation
@@ -327,4 +328,12 @@
     {
         StateHasChanged();
     }
+
+    @code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "dashboard";
+        await base.OnInitializedAsync();
+    }
+}
 }

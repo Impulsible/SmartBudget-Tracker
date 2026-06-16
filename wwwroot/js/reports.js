@@ -581,3 +581,15 @@ window.changeReportPeriod = changeReportPeriod;
 window.loadReportData = loadReportData;
 window.startAutoRefresh = startAutoRefresh;
 window.stopAutoRefresh = stopAutoRefresh;
+
+// ============================================
+// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initReportsPage = function() {
+    console.log('🔄 reports: init called from Blazor');
+    setupReportsSidebar();
+    loadReportData();
+    console.log('✅ reports: initialized');
+};
+
+window.loadReportData = loadReportData;

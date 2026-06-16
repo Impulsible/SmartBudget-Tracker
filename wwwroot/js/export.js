@@ -291,3 +291,12 @@ if (!document.querySelector('#spinnerStyle')) {
 }
 
 console.log('Export JS: Initialized');
+
+// ============================================
+// EXPORT INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initExportPage = function() {
+    console.log('🔄 export: init called from Blazor');
+    initSidebar();
+    console.log('✅ export: initialized');
+};

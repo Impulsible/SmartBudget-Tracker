@@ -379,3 +379,14 @@ window.viewSessions = viewSessions;
 window.showDeleteConfirm = showDeleteConfirm;
 window.closeDeleteModal = closeDeleteModal;
 window.deleteAccount = deleteAccount;
+
+// ============================================
+// SETTINGS INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initSettingsPage = function() {
+    console.log('🔄 settings: init called from Blazor');
+    initSidebar();
+    initTabs();
+    loadUserData();
+    console.log('✅ settings: initialized');
+};

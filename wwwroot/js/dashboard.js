@@ -10,12 +10,8 @@ var nextId = 1;
 var isLiveDashboardRunning = false;
 var liveSpendingData = null;
 var chartAnimationInterval = null;
-
-// ============================================
-// EMPTY INITIAL STATE - No demo data
-// ============================================
-var budgetCategories = [];
-var transactions = [];
+var dashboardBudgets = [];
+var dashboardTransactions = [];
 
 // Predefined colors for common categories
 var categoryColors = {
@@ -40,6 +36,41 @@ var defaultCategories = [
 ];
 
 // ============================================
+// FALLBACK STORAGE
+// ============================================
+function getFallbackBudgets() {
+    try {
+        var stored = localStorage.getItem('smartbudget_budgets_fallback');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.log('Fallback read error:', e);
+    }
+    return null;
+}
+
+function getFallbackTransactions() {
+    try {
+        var stored = localStorage.getItem('smartbudget_transactions_fallback');
+        if (stored) {
+            return JSON.parse(stored);
+        }
+    } catch (e) {
+        console.log('Fallback read error:', e);
+    }
+    return null;
+}
+
+function setFallbackTransactions(transactions) {
+    try {
+        localStorage.setItem('smartbudget_transactions_fallback', JSON.stringify(transactions));
+    } catch (e) {
+        console.log('Fallback write error:', e);
+    }
+}
+
+// ============================================
 // RENDER CATEGORY OPTIONS - FIXED
 // ============================================
 function renderCategoryOptions() {
@@ -50,26 +81,22 @@ function renderCategoryOptions() {
     }
     
     console.log('Dashboard: Rendering category options...');
-    console.log('Dashboard: budgetCategories:', budgetCategories.length);
-    console.log('Dashboard: transactions:', transactions.length);
+    console.log('Dashboard: dashboardBudgets:', dashboardBudgets.length);
+    console.log('Dashboard: dashboardTransactions:', dashboardTransactions.length);
     
-    // Collect all unique categories
     var allCategories = {};
     
-    // Always include defaults first
     defaultCategories.forEach(function(cat) {
         allCategories[cat] = true;
     });
     
-    // Add categories from budgetCategories
-    budgetCategories.forEach(function(c) {
+    dashboardBudgets.forEach(function(c) {
         if (c.name && c.name !== "No Expenses" && c.name !== "No Data") {
             allCategories[c.name] = true;
         }
     });
     
-    // Add categories from transactions
-    transactions.forEach(function(t) {
+    dashboardTransactions.forEach(function(t) {
         if (t.cat) {
             allCategories[t.cat] = true;
         }
@@ -95,7 +122,7 @@ function getCategoryColor(categoryName) {
         return categoryColors[categoryName];
     }
     
-    var existing = budgetCategories.find(function(c) { return c.name === categoryName; });
+    var existing = dashboardBudgets.find(function(c) { return c.name === categoryName; });
     if (existing) {
         categoryColors[categoryName] = existing.color;
         return existing.color;
@@ -116,7 +143,7 @@ function getCategoryColor(categoryName) {
 function updateBudgetCategoriesFromTransactions() {
     var categoryTotals = {};
     
-    transactions.forEach(function(t) {
+    dashboardTransactions.forEach(function(t) {
         if (t.type === 'expense') {
             var cat = t.cat || 'Other';
             if (categoryTotals[cat]) {
@@ -129,7 +156,7 @@ function updateBudgetCategoriesFromTransactions() {
     
     var mergedCategories = {};
     
-    budgetCategories.forEach(function(c) {
+    dashboardBudgets.forEach(function(c) {
         if (c.name && c.name !== "No Expenses" && c.name !== "No Data") {
             mergedCategories[c.name] = {
                 name: c.name,
@@ -156,11 +183,11 @@ function updateBudgetCategoriesFromTransactions() {
     });
     
     if (newCategories.length === 0) {
-        budgetCategories = [
+        dashboardBudgets = [
             { name: "No Expenses", amount: 1, color: "#64748B" }
         ];
     } else {
-        budgetCategories = newCategories;
+        dashboardBudgets = newCategories;
     }
 }
 
@@ -170,11 +197,25 @@ function updateBudgetCategoriesFromTransactions() {
 async function loadTransactionsFromApi() {
     try {
         console.log('Dashboard: Fetching transactions...');
-        var response = await fetch('/api/transactions?pageSize=100');
+        var response = await fetch('/api/transactions?pageSize=100', {
+            credentials: 'include'
+        });
+        
+        if (response.status === 401) {
+            console.log('Dashboard: Not authenticated - using fallback');
+            var fallbackData = getFallbackTransactions();
+            if (fallbackData && fallbackData.length > 0) {
+                dashboardTransactions = fallbackData;
+                return true;
+            }
+            dashboardTransactions = [];
+            return false;
+        }
+        
         if (response.ok) {
             var data = await response.json();
             if (data.success && data.transactions && data.transactions.length > 0) {
-                transactions = data.transactions.map(function(t) {
+                dashboardTransactions = data.transactions.map(function(t) {
                     return {
                         id: t.id,
                         desc: t.title || t.description || 'Unknown',
@@ -185,24 +226,40 @@ async function loadTransactionsFromApi() {
                         status: t.status || 'Completed'
                     };
                 });
-                var ids = transactions.map(function(t) { return t.id; });
+                setFallbackTransactions(dashboardTransactions);
+                var ids = dashboardTransactions.map(function(t) { return t.id; });
                 if (ids.length > 0) {
                     nextId = Math.max.apply(null, ids) + 1;
                 }
-                console.log('Dashboard: Loaded', transactions.length, 'transactions');
+                console.log('Dashboard: Loaded', dashboardTransactions.length, 'transactions');
                 return true;
             } else {
                 console.log('Dashboard: No transactions found');
-                transactions = [];
+                var fallbackData = getFallbackTransactions();
+                if (fallbackData && fallbackData.length > 0) {
+                    dashboardTransactions = fallbackData;
+                    return true;
+                }
+                dashboardTransactions = [];
                 return false;
             }
         }
         console.log('Dashboard: API error');
-        transactions = [];
+        var fallbackData = getFallbackTransactions();
+        if (fallbackData && fallbackData.length > 0) {
+            dashboardTransactions = fallbackData;
+            return true;
+        }
+        dashboardTransactions = [];
         return false;
     } catch (e) {
         console.log('Dashboard: Network error:', e.message);
-        transactions = [];
+        var fallbackData = getFallbackTransactions();
+        if (fallbackData && fallbackData.length > 0) {
+            dashboardTransactions = fallbackData;
+            return true;
+        }
+        dashboardTransactions = [];
         return false;
     }
 }
@@ -210,11 +267,15 @@ async function loadTransactionsFromApi() {
 async function loadBudgetsFromApi() {
     try {
         console.log('Dashboard: Fetching budgets...');
-        var response = await fetch('/api/budgets');
-        if (response.ok) {
-            var data = await response.json();
-            if (data.success && data.budgets && data.budgets.length > 0) {
-                budgetCategories = data.budgets.map(function(b) {
+        var response = await fetch('/api/budgets', {
+            credentials: 'include'
+        });
+        
+        if (response.status === 401) {
+            console.log('Dashboard: Not authenticated - using fallback');
+            var fallbackData = getFallbackBudgets();
+            if (fallbackData && fallbackData.length > 0) {
+                dashboardBudgets = fallbackData.map(function(b) {
                     if (b.color) categoryColors[b.name] = b.color;
                     return { 
                         name: b.name, 
@@ -222,20 +283,73 @@ async function loadBudgetsFromApi() {
                         color: b.color || getCategoryColor(b.name)
                     };
                 });
-                console.log('Dashboard: Loaded', budgetCategories.length, 'budgets');
+                return true;
+            }
+            dashboardBudgets = [];
+            return false;
+        }
+        
+        if (response.ok) {
+            var data = await response.json();
+            if (data.success && data.budgets && data.budgets.length > 0) {
+                dashboardBudgets = data.budgets.map(function(b) {
+                    if (b.color) categoryColors[b.name] = b.color;
+                    return { 
+                        name: b.name, 
+                        amount: b.amount || 0, 
+                        color: b.color || getCategoryColor(b.name)
+                    };
+                });
+                console.log('Dashboard: Loaded', dashboardBudgets.length, 'budgets');
                 return true;
             } else {
                 console.log('Dashboard: No budgets found');
-                budgetCategories = [];
+                var fallbackData = getFallbackBudgets();
+                if (fallbackData && fallbackData.length > 0) {
+                    dashboardBudgets = fallbackData.map(function(b) {
+                        if (b.color) categoryColors[b.name] = b.color;
+                        return { 
+                            name: b.name, 
+                            amount: b.amount || 0, 
+                            color: b.color || getCategoryColor(b.name)
+                        };
+                    });
+                    return true;
+                }
+                dashboardBudgets = [];
                 return false;
             }
         }
         console.log('Dashboard: Budgets API error');
-        budgetCategories = [];
+        var fallbackData = getFallbackBudgets();
+        if (fallbackData && fallbackData.length > 0) {
+            dashboardBudgets = fallbackData.map(function(b) {
+                if (b.color) categoryColors[b.name] = b.color;
+                return { 
+                    name: b.name, 
+                    amount: b.amount || 0, 
+                    color: b.color || getCategoryColor(b.name)
+                };
+            });
+            return true;
+        }
+        dashboardBudgets = [];
         return false;
     } catch (e) {
         console.log('Dashboard: Network error:', e.message);
-        budgetCategories = [];
+        var fallbackData = getFallbackBudgets();
+        if (fallbackData && fallbackData.length > 0) {
+            dashboardBudgets = fallbackData.map(function(b) {
+                if (b.color) categoryColors[b.name] = b.color;
+                return { 
+                    name: b.name, 
+                    amount: b.amount || 0, 
+                    color: b.color || getCategoryColor(b.name)
+                };
+            });
+            return true;
+        }
+        dashboardBudgets = [];
         return false;
     }
 }
@@ -244,11 +358,11 @@ async function loadAllData() {
     console.log('Dashboard: Loading all data...');
     await Promise.all([loadTransactionsFromApi(), loadBudgetsFromApi()]);
     
-    if (transactions.length > 0 && budgetCategories.length === 0) {
+    if (dashboardTransactions.length > 0 && dashboardBudgets.length === 0) {
         updateBudgetCategoriesFromTransactions();
     }
     
-    console.log('Dashboard: Data loaded - Tx:', transactions.length, 'Budgets:', budgetCategories.length);
+    console.log('Dashboard: Data loaded - Tx:', dashboardTransactions.length, 'Budgets:', dashboardBudgets.length);
 }
 
 // ============================================
@@ -272,7 +386,6 @@ window.initDashboardPage = function() {
             console.log('Dashboard: Initialized successfully');
         });
     } else {
-        // Already running, just refresh dropdown
         renderCategoryOptions();
     }
 };
@@ -392,7 +505,7 @@ function generateSpendingData(period) {
         var w1i = 0, w2i = 0, w3i = 0, w4i = 0;
         var w1e = 0, w2e = 0, w3e = 0, w4e = 0;
         
-        transactions.forEach(function(t) {
+        dashboardTransactions.forEach(function(t) {
             var d = new Date(t.date);
             if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
                 var day = d.getDate();
@@ -426,7 +539,7 @@ function generateSpendingData(period) {
         startOfWeek.setDate(now.getDate() - now.getDay());
         startOfWeek.setHours(0,0,0,0);
         
-        transactions.forEach(function(t) {
+        dashboardTransactions.forEach(function(t) {
             var d = new Date(t.date);
             if (d >= startOfWeek && d <= now) {
                 var dayIndex = d.getDay();
@@ -461,6 +574,7 @@ window.addTransaction = async function() {
         var response = await fetch('/api/transactions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ 
                 title: desc, 
                 description: desc, 
@@ -469,6 +583,33 @@ window.addTransaction = async function() {
                 category: cat 
             })
         });
+        
+        if (!response.ok) {
+            // Save to fallback
+            var newTx = {
+                id: Date.now(),
+                desc: desc,
+                cat: cat,
+                date: new Date(),
+                amount: parseFloat(amount),
+                type: type,
+                status: 'Completed'
+            };
+            var fallbackTxs = getFallbackTransactions() || [];
+            fallbackTxs.push(newTx);
+            setFallbackTransactions(fallbackTxs);
+            dashboardTransactions = fallbackTxs;
+            closeModal('transactionModal');
+            await loadAllData();
+            renderTransactions();
+            renderCategoryOptions();
+            updateStatsFromTransactions();
+            updateSpendingChart();
+            updateBudgetChart();
+            showToast('Transaction saved locally (offline mode)', 'info');
+            return;
+        }
+        
         var data = await response.json();
         if (data.success) {
             closeModal('transactionModal');
@@ -478,11 +619,33 @@ window.addTransaction = async function() {
             updateStatsFromTransactions();
             updateSpendingChart();
             updateBudgetChart();
+            showToast('Transaction added successfully!', 'success');
         } else { 
-            alert('Failed to add transaction.'); 
+            alert('Failed to add transaction: ' + (data.message || 'Unknown error')); 
         }
     } catch (e) { 
-        alert('Network error.'); 
+        // Save to fallback on network error
+        var newTx = {
+            id: Date.now(),
+            desc: desc,
+            cat: cat,
+            date: new Date(),
+            amount: parseFloat(amount),
+            type: type,
+            status: 'Completed'
+        };
+        var fallbackTxs = getFallbackTransactions() || [];
+        fallbackTxs.push(newTx);
+        setFallbackTransactions(fallbackTxs);
+        dashboardTransactions = fallbackTxs;
+        closeModal('transactionModal');
+        await loadAllData();
+        renderTransactions();
+        renderCategoryOptions();
+        updateStatsFromTransactions();
+        updateSpendingChart();
+        updateBudgetChart();
+        showToast('Transaction saved locally (offline mode)', 'info');
     }
 };
 
@@ -499,6 +662,7 @@ window.addCategory = async function() {
         var response = await fetch('/api/categories', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ name: name, amount: amount, color: color })
         });
         var data = await response.json();
@@ -509,15 +673,59 @@ window.addCategory = async function() {
             updateBudgetChart();
             updateStatsFromTransactions();
             closeModal('categoryModal');
-            alert('Category "' + name + '" added successfully!');
+            showToast('Category "' + name + '" added successfully!', 'success');
         } else {
-            alert('Failed to add category: ' + (data.message || 'Unknown error'));
+            // Save to fallback
+            var fallbackBudgets = getFallbackBudgets() || [];
+            fallbackBudgets.push({ id: Date.now(), name: name, amount: amount, color: color, spent: 0 });
+            localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(fallbackBudgets));
+            dashboardBudgets = fallbackBudgets;
+            renderCategoryOptions();
+            updateBudgetChart();
+            updateStatsFromTransactions();
+            closeModal('categoryModal');
+            showToast('Category "' + name + '" saved locally (offline mode)', 'info');
         }
     } catch (e) {
         console.error('Error adding category:', e);
-        alert('Network error. Please try again.');
+        // Save to fallback
+        var fallbackBudgets = getFallbackBudgets() || [];
+        fallbackBudgets.push({ id: Date.now(), name: name, amount: amount, color: color, spent: 0 });
+        localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(fallbackBudgets));
+        dashboardBudgets = fallbackBudgets;
+        renderCategoryOptions();
+        updateBudgetChart();
+        updateStatsFromTransactions();
+        closeModal('categoryModal');
+        showToast('Category "' + name + '" saved locally (offline mode)', 'info');
     }
 };
+
+// ============================================
+// TOAST NOTIFICATIONS
+// ============================================
+function showToast(message, type) {
+    var container = document.getElementById('toastContainer');
+    if (!container) {
+        var newContainer = document.createElement('div');
+        newContainer.id = 'toastContainer';
+        newContainer.style.cssText = 'position:fixed;top:20px;right:20px;z-index:1000;';
+        document.body.appendChild(newContainer);
+        container = newContainer;
+    }
+    
+    var toast = document.createElement('div');
+    var iconColor = type === 'success' ? '#10B981' : (type === 'info' ? '#3B82F6' : '#EF4444');
+    var icon = type === 'success' ? 'check-circle-fill' : (type === 'info' ? 'info-circle-fill' : 'exclamation-triangle-fill');
+    toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + iconColor + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
+    toast.innerHTML = '<i class="bi bi-' + icon + '" style="color:' + iconColor + '"></i><span>' + message + '</span>';
+    
+    container.appendChild(toast);
+    
+    setTimeout(function() {
+        toast.remove();
+    }, 3000);
+}
 
 // ============================================
 // DELETE TRANSACTION
@@ -525,7 +733,26 @@ window.addCategory = async function() {
 window.deleteTransaction = async function(id) {
     if (confirm('Delete this transaction?')) {
         try {
-            var response = await fetch('/api/transactions/' + id, { method: 'DELETE' });
+            var response = await fetch('/api/transactions/' + id, { 
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                // Delete from fallback
+                var fallbackTxs = getFallbackTransactions() || [];
+                fallbackTxs = fallbackTxs.filter(function(t) { return t.id !== id; });
+                setFallbackTransactions(fallbackTxs);
+                dashboardTransactions = fallbackTxs;
+                await loadAllData();
+                renderTransactions();
+                renderCategoryOptions();
+                updateStatsFromTransactions();
+                updateSpendingChart();
+                updateBudgetChart();
+                return;
+            }
+            
             var data = await response.json();
             if (data.success) {
                 await loadAllData();
@@ -535,7 +762,19 @@ window.deleteTransaction = async function(id) {
                 updateSpendingChart();
                 updateBudgetChart();
             }
-        } catch (e) { alert('Network error.'); }
+        } catch (e) { 
+            // Delete from fallback on network error
+            var fallbackTxs = getFallbackTransactions() || [];
+            fallbackTxs = fallbackTxs.filter(function(t) { return t.id !== id; });
+            setFallbackTransactions(fallbackTxs);
+            dashboardTransactions = fallbackTxs;
+            await loadAllData();
+            renderTransactions();
+            renderCategoryOptions();
+            updateStatsFromTransactions();
+            updateSpendingChart();
+            updateBudgetChart();
+        }
     }
 };
 
@@ -544,7 +783,7 @@ window.deleteTransaction = async function(id) {
 // ============================================
 window.resetBudgetCategories = function() {
     if (confirm('Reset budget categories?')) {
-        budgetCategories = [];
+        dashboardBudgets = [];
         updateBudgetCategoriesFromTransactions();
         updateBudgetChart();
         renderCategoryOptions();
@@ -556,12 +795,30 @@ window.resetBudgetCategories = function() {
 // CLEAR ALL TRANSACTIONS
 // ============================================
 window.clearAllTransactions = async function() {
-    if (transactions.length === 0) { alert('No transactions to clear.'); return; }
+    if (dashboardTransactions.length === 0) { alert('No transactions to clear.'); return; }
     if (confirm('Delete ALL transactions? This cannot be undone.')) {
         try {
-            var response = await fetch('/api/transactions/clear', { method: 'DELETE' });
+            var response = await fetch('/api/transactions/clear', { 
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                // Clear fallback
+                setFallbackTransactions([]);
+                dashboardTransactions = [];
+                await loadAllData();
+                renderTransactions();
+                renderCategoryOptions();
+                updateStatsFromTransactions();
+                updateSpendingChart();
+                updateBudgetChart();
+                return;
+            }
+            
             var data = await response.json();
             if (data.success) {
+                setFallbackTransactions([]);
                 await loadAllData();
                 renderTransactions();
                 renderCategoryOptions();
@@ -569,7 +826,16 @@ window.clearAllTransactions = async function() {
                 updateSpendingChart();
                 updateBudgetChart();
             }
-        } catch (e) { alert('Network error.'); }
+        } catch (e) { 
+            setFallbackTransactions([]);
+            dashboardTransactions = [];
+            await loadAllData();
+            renderTransactions();
+            renderCategoryOptions();
+            updateStatsFromTransactions();
+            updateSpendingChart();
+            updateBudgetChart();
+        }
     }
 };
 
@@ -608,7 +874,9 @@ function closeSidebar() {
 // ============================================
 async function fetchUserProfile() {
     try {
-        var response = await fetch('/api/auth/profile');
+        var response = await fetch('/api/auth/profile', {
+            credentials: 'include'
+        });
         if (!response.ok) return;
         var data = await response.json();
         if (!data.success) return;
@@ -686,7 +954,6 @@ function openModal(id) {
     if (id === 'transactionModal') {
         document.getElementById('txDescription').value = '';
         document.getElementById('txAmount').value = '';
-        // IMPORTANT: Populate category dropdown when opening modal
         setTimeout(function() {
             renderCategoryOptions();
         }, 50);
@@ -776,9 +1043,9 @@ function startLiveChartMovement() {
             try {
                 updateBudgetCategoriesFromTransactions();
                 
-                budgetChart.data.labels = budgetCategories.map(function(c) { return c.name; });
-                budgetChart.data.datasets[0].data = budgetCategories.map(function(c) { return c.amount; });
-                budgetChart.data.datasets[0].backgroundColor = budgetCategories.map(function(c) { return c.color; });
+                budgetChart.data.labels = dashboardBudgets.map(function(c) { return c.name; });
+                budgetChart.data.datasets[0].data = dashboardBudgets.map(function(c) { return c.amount; });
+                budgetChart.data.datasets[0].backgroundColor = dashboardBudgets.map(function(c) { return c.color; });
                 
                 budgetChart.options.rotation = (budgetChart.options.rotation || 0) + 0.03;
                 budgetChart.update('none');
@@ -826,9 +1093,9 @@ function startLiveDashboard() {
         
         if (budgetChart) {
             try {
-                budgetChart.data.labels = budgetCategories.map(function(c) { return c.name; });
-                budgetChart.data.datasets[0].data = budgetCategories.map(function(c) { return c.amount; });
-                budgetChart.data.datasets[0].backgroundColor = budgetCategories.map(function(c) { return c.color; });
+                budgetChart.data.labels = dashboardBudgets.map(function(c) { return c.name; });
+                budgetChart.data.datasets[0].data = dashboardBudgets.map(function(c) { return c.amount; });
+                budgetChart.data.datasets[0].backgroundColor = dashboardBudgets.map(function(c) { return c.color; });
                 budgetChart.update('none');
             } catch(e) {}
         }
@@ -860,7 +1127,7 @@ function updateSpendingChart() {
     var w1i = 0, w2i = 0, w3i = 0, w4i = 0;
     var w1e = 0, w2e = 0, w3e = 0, w4e = 0;
 
-    transactions.forEach(function(t) {
+    dashboardTransactions.forEach(function(t) {
         var d = new Date(t.date);
         if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
             var day = d.getDate();
@@ -955,19 +1222,19 @@ function updateBudgetChart() {
 
     updateBudgetCategoriesFromTransactions();
 
-    var total = budgetCategories.reduce(function(s, c) { return s + c.amount; }, 0);
+    var total = dashboardBudgets.reduce(function(s, c) { return s + c.amount; }, 0);
 
-    if (budgetCategories.length === 0 || total === 0) {
-        budgetCategories = [{ name: "No Data", amount: 1, color: "#64748B" }];
+    if (dashboardBudgets.length === 0 || total === 0) {
+        dashboardBudgets = [{ name: "No Data", amount: 1, color: "#64748B" }];
     }
 
     budgetChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: budgetCategories.map(function(c) { return c.name; }),
+            labels: dashboardBudgets.map(function(c) { return c.name; }),
             datasets: [{
-                data: budgetCategories.map(function(c) { return c.amount; }),
-                backgroundColor: budgetCategories.map(function(c) { return c.color; }),
+                data: dashboardBudgets.map(function(c) { return c.amount; }),
+                backgroundColor: dashboardBudgets.map(function(c) { return c.color; }),
                 borderWidth: 2,
                 borderColor: '#1E293B'
             }]
@@ -1031,12 +1298,12 @@ Chart.register({
 // ============================================
 function updateStatsFromTransactions() {
     var totalIncome = 0, totalExpenses = 0;
-    transactions.forEach(function(t) {
+    dashboardTransactions.forEach(function(t) {
         if (t.type === 'income') totalIncome += t.amount;
         else totalExpenses += t.amount;
     });
     var totalSavings = Math.max(totalIncome - totalExpenses, 0);
-    var budgetTotal = budgetCategories.reduce(function(s, c) { return s + c.amount; }, 0);
+    var budgetTotal = dashboardBudgets.reduce(function(s, c) { return s + c.amount; }, 0);
     var budgetPercent = budgetTotal > 0 ? Math.round((totalExpenses / budgetTotal) * 100) : 0;
 
     animateStatValue('incomeValue', totalIncome);
@@ -1068,11 +1335,11 @@ function updateStatsFromTransactions() {
 function renderTransactions() {
     var tbody = document.getElementById('transactionsBody');
     if (!tbody) return;
-    if (transactions.length === 0) {
+    if (dashboardTransactions.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:3rem;color:#64748B;"><i class="bi bi-receipt" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>No transactions found.<br>Click "Add Transaction" to get started.</td></tr>';
         return;
     }
-    tbody.innerHTML = transactions.slice(0, 10).map(function(t) {
+    tbody.innerHTML = dashboardTransactions.slice(0, 10).map(function(t) {
         var icon = t.type === 'income' ? 'bi-arrow-down' : 'bi-arrow-up';
         var iconClass = t.type === 'income' ? 'income' : 'expense';
         var sign = t.type === 'income' ? '+' : '-';
@@ -1119,4 +1386,32 @@ window.cleanupDashboard = function() {
     }
     isLiveDashboardRunning = false;
     console.log('Dashboard: Cleanup complete');
+};
+
+
+// ============================================
+// DASHBOARD INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initDashboardPage = function() {
+    console.log('🔄 dashboard: init called from Blazor');
+    setupSidebar();
+    fetchUserProfile();
+    setupEventListeners();
+    animateCounters();
+    loadAllData().then(function() {
+        handleResponsiveCharts();
+    });
+    console.log('✅ dashboard: initialized');
+};
+
+window.resetDashboardPage = function() {
+    console.log('🔄 dashboard: reset');
+    if (spendingChart) {
+        spendingChart.destroy();
+        spendingChart = null;
+    }
+    if (budgetChart) {
+        budgetChart.destroy();
+        budgetChart = null;
+    }
 };

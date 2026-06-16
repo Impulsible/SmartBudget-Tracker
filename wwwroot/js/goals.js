@@ -452,3 +452,15 @@ window.saveGoal = saveGoal;
 window.deleteGoal = deleteGoal;
 window.openEditGoalModal = openEditGoalModal;
 window.addToGoal = addToGoal;
+
+// ============================================
+// GOALS INIT FUNCTION - EXPOSE FOR BLAZOR
+// ============================================
+window.initGoalsPage = async function() {
+    console.log('🔄 goals: init called from Blazor');
+    setupGoalsSidebar();
+    await renderAllGoals();
+    console.log('✅ goals: initialized');
+};
+
+window.renderAllGoals = renderAllGoals;

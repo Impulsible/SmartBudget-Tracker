@@ -214,6 +214,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Add services
+builder.Services.AddScoped<PageInitializationService>();
+
 // ============================================
 // PIPELINE
 // ============================================
