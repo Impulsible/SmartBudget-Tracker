@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace SmartBudget.Controllers;
@@ -157,10 +158,10 @@ public class AuthController : ControllerBase
     }
 
     // ============================================
-    // TEST ENDPOINT - Check if API is working
+    // TEST ENDPOINT - Check if API is working (FIXED - removed async)
     // ============================================
     [HttpGet("test")]
-    public IActionResult Test()
+    public IActionResult Test()  // ✅ No "async" keyword
     {
         return Ok(new { 
             success = true, 
@@ -225,7 +226,9 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var users = _userManager.Users.Select(u => new { u.Id, u.Email, u.UserName }).ToList();
+            var users = await _userManager.Users
+                .Select(u => new { u.Id, u.Email, u.UserName })
+                .ToListAsync();
             return Ok(new { 
                 success = true, 
                 count = users.Count,

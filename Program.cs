@@ -119,7 +119,7 @@ builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // ============================================
-// DATABASE MIGRATION & SEEDING
+// DATABASE MIGRATION & SEEDING - FIXED
 // ============================================
 using (var scope = app.Services.CreateScope())
 {
@@ -136,18 +136,32 @@ using (var scope = app.Services.CreateScope())
         
         if (usePostgres)
         {
-            // ✅ Apply migrations for PostgreSQL
-            await dbContext.Database.MigrateAsync();
-            logger.LogInformation("✅ PostgreSQL migrations applied");
+            // ✅ Ensure database exists before migrations
+            await dbContext.Database.EnsureCreatedAsync();
+            
+            // ✅ Check if migrations need to be applied
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                logger.LogInformation($"📋 Applying {pendingMigrations.Count()} pending migrations...");
+                await dbContext.Database.MigrateAsync();
+                logger.LogInformation("✅ PostgreSQL migrations applied");
+            }
+            else
+            {
+                logger.LogInformation("✅ No pending migrations, database is up to date");
+            }
         }
         else
         {
-            // ✅ Ensure SQLite database exists
+            // ✅ For SQLite
             await dbContext.Database.EnsureCreatedAsync();
             logger.LogInformation("✅ SQLite database created");
         }
         
-        // Seed roles
+        // ============================================
+        // SEED ROLES
+        // ============================================
         string[] roles = { "User", "Admin" };
         foreach (var role in roles)
         {
@@ -158,7 +172,9 @@ using (var scope = app.Services.CreateScope())
             }
         }
         
-        // Seed admin user
+        // ============================================
+        // SEED ADMIN USER
+        // ============================================
         var adminEmail = "admin@smartbudget.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
@@ -176,6 +192,8 @@ using (var scope = app.Services.CreateScope())
                 await userManager.AddToRoleAsync(admin, "Admin");
                 await userManager.AddToRoleAsync(admin, "User");
                 logger.LogInformation("✅ Created admin user: admin@smartbudget.com");
+                logger.LogInformation("📧 Email: admin@smartbudget.com");
+                logger.LogInformation("🔑 Password: Admin@123");
             }
         }
         else
@@ -189,7 +207,10 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         logger.LogError(ex, "❌ Database initialization failed");
-        logger.LogError($"Inner exception: {ex.InnerException?.Message}");
+        if (ex.InnerException != null)
+        {
+            logger.LogError($"Inner exception: {ex.InnerException.Message}");
+        }
     }
 }
 
