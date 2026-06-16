@@ -58,7 +58,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 // ============================================
-// IDENTITY WITH COOKIE CONFIGURATION - FIXED
+// IDENTITY - SIMPLIFIED AND WORKING
 // ============================================
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
@@ -68,13 +68,14 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
     options.Password.RequireUppercase = true;
     options.Password.RequireLowercase = true;
     options.SignIn.RequireConfirmedAccount = false;
+    options.User.RequireUniqueEmail = true;
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddSignInManager()
 .AddDefaultTokenProviders();
 
-// ✅ FIX: Proper cookie configuration for Render
+// ✅ Cookie configuration - simplified for Render
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "SmartBudget.Auth";
@@ -103,7 +104,9 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Database migration
+// ============================================
+// DATABASE MIGRATION & SEEDING
+// ============================================
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -120,6 +123,7 @@ using (var scope = app.Services.CreateScope())
         else
             await dbContext.Database.EnsureCreatedAsync();
         
+        // Seed roles
         string[] roles = { "User", "Admin" };
         foreach (var role in roles)
         {
@@ -127,6 +131,7 @@ using (var scope = app.Services.CreateScope())
                 await roleManager.CreateAsync(new IdentityRole(role));
         }
         
+        // Seed admin user
         var adminEmail = "admin@smartbudget.com";
         var adminUser = await userManager.FindByEmailAsync(adminEmail);
         if (adminUser == null)
@@ -146,6 +151,10 @@ using (var scope = app.Services.CreateScope())
                 logger.LogInformation("✅ Created admin user");
             }
         }
+        else
+        {
+            logger.LogInformation("ℹ️ Admin user already exists");
+        }
         
         logger.LogInformation("✅ Database initialized successfully");
     }
@@ -155,7 +164,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Pipeline
+// ============================================
+// PIPELINE
+// ============================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -171,6 +182,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAntiforgery();
 
+// ✅ Authentication must be BEFORE Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
