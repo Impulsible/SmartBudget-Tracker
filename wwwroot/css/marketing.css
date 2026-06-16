@@ -181,8 +181,8 @@ body {
     font-size: 1rem;
 }
 
-/* ============================================
-   NAVIGATION BAR - FIXED
+/* /* ============================================
+   NAVIGATION BAR - FULLY FIXED RESPONSIVE
    ============================================ */
 .marketing-page .navbar-pro {
     position: fixed;
@@ -191,13 +191,10 @@ body {
     width: 100%;
     min-height: 72px;
     z-index: 1000;
-
     background: rgba(11, 17, 32, 0.96);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
-
     border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-
     display: flex;
     align-items: center;
 }
@@ -261,10 +258,12 @@ body {
     color: #10B981;
 }
 
+/* === DESKTOP NAV - HIDDEN ON MOBILE === */
 .marketing-page .desktop-nav {
-    display: none;
+    display: none !important;
 }
 
+/* === NAV LINKS INSIDE DESKTOP NAV === */
 .marketing-page .nav-links-pro {
     display: flex;
     align-items: center;
@@ -293,6 +292,7 @@ body {
     font-weight: 600;
 }
 
+/* === BUTTON STYLES === */
 .marketing-page .btn-login-pro {
     display: inline-flex;
     align-items: center;
@@ -361,6 +361,53 @@ body {
 .marketing-page .btn-primary-pro,
 .marketing-page .user-greeting {
     white-space: nowrap;
+}
+
+/* === MOBILE MENU BUTTON - VISIBLE ONLY ON MOBILE === */
+.marketing-page .mobile-menu-btn {
+    display: flex !important;
+    align-items: center;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    gap: 0.4rem;
+    color: #F1F5F9;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.marketing-page .mobile-menu-btn:hover {
+    background: rgba(30, 41, 59, 1);
+    border-color: #10B981;
+}
+
+.marketing-page .mobile-menu-btn i {
+    font-size: 1.3rem;
+    pointer-events: none;
+}
+
+.marketing-page .menu-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+/* ============================================
+   TABLET/DESKTOP: 768px+
+   Show desktop nav, hide mobile menu button
+   ============================================ */
+@media (min-width: 768px) {
+    .marketing-page .desktop-nav {
+        display: flex !important;
+    }
+    
+    .marketing-page .mobile-menu-btn {
+        display: none !important;
+    }
 }
 
 /* ============================================

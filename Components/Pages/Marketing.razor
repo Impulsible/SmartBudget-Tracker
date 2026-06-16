@@ -23,22 +23,24 @@
                     <span class="logo-text">Smart<span>Budget</span></span>
                 </a>
             </div>
-            <div class="nav-links-pro desktop-nav">
-                @if (_isLoggedIn)
-                {
-                    <div class="user-greeting"><i class="bi bi-person-circle"></i><span>Welcome back, @_firstName! 👋</span></div>
-                    <div class="user-avatar-sm">@_initials</div>
-                    <a href="/dashboard" class="dashboard-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
-                    <a href="/Account/Logout" class="btn-primary-pro">Logout</a>
-                }
-                else
-                {
-                    <a href="#features" class="nav-link">Features</a>
-                    <a href="#pricing" class="nav-link">Pricing</a>
-                    <a href="#learn" class="nav-link">Learn</a>
-                    <a href="/Account/Login" class="btn-login-pro">Sign In</a>
-                    <a href="/Account/Register" class="btn-primary-pro">Get Started</a>
-                }
+            <div class="desktop-nav">
+                <div class="nav-links-pro">
+                    @if (_isLoggedIn)
+                    {
+                        <div class="user-greeting"><i class="bi bi-person-circle"></i><span>Welcome back, @_firstName! 👋</span></div>
+                        <div class="user-avatar-sm">@_initials</div>
+                        <a href="/dashboard" class="dashboard-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                        <a href="/Account/Logout" class="btn-primary-pro">Logout</a>
+                    }
+                    else
+                    {
+                        <a href="#features" class="nav-link">Features</a>
+                        <a href="#pricing" class="nav-link">Pricing</a>
+                        <a href="#learn" class="nav-link">Learn</a>
+                        <a href="/Account/Login" class="btn-login-pro">Sign In</a>
+                        <a href="/Account/Register" class="btn-primary-pro">Get Started</a>
+                    }
+                </div>
             </div>
         </div>
     </nav>
@@ -106,11 +108,11 @@
                         }
                     </div>
                     <div class="hero-stats">
-                        <div class="hero-stat"><span class="stat-number"><span class="counter" data-target="50000" data-prefix="" data-suffix="+">0</span></span><span class="stat-label">Active Users</span></div>
+                        <div class="hero-stat"><span class="stat-number"><span class="counter" data-target="50000" data-prefix="" data-suffix="+">50,000+</span></span><span class="stat-label">Active Users</span></div>
                         <div class="stat-divider"></div>
-                        <div class="hero-stat"><span class="stat-number"><span class="counter" data-target="20" data-prefix="₦" data-suffix="B+">0</span></span><span class="stat-label">Tracked</span></div>
+                        <div class="hero-stat"><span class="stat-number"><span class="counter" data-target="20" data-prefix="₦" data-suffix="B+">₦20B+</span></span><span class="stat-label">Tracked</span></div>
                         <div class="stat-divider"></div>
-                        <div class="hero-stat"><span class="stat-number"><span class="counter" data-target="95" data-prefix="" data-suffix="%">0</span></span><span class="stat-label">Satisfaction</span></div>
+                        <div class="hero-stat"><span class="stat-number"><span class="counter" data-target="95" data-prefix="" data-suffix="%">95%</span></span><span class="stat-label">Satisfaction</span></div>
                     </div>
                 </div>
                 <div class="hero-image">
@@ -121,15 +123,15 @@
                         </div>
                         <div class="mockup-content">
                             <div class="mockup-stats">
-                                <div class="mockup-stat"><span class="stat-label">Total Income</span><span class="stat-value counter" data-target="350000" data-prefix="₦" data-suffix="">0</span></div>
-                                <div class="mockup-stat"><span class="stat-label">Total Expenses</span><span class="stat-value counter" data-target="210000" data-prefix="₦" data-suffix="">0</span></div>
-                                <div class="mockup-stat"><span class="stat-label">Savings</span><span class="stat-value counter" data-target="140000" data-prefix="₦" data-suffix="">0</span></div>
+                                <div class="mockup-stat"><span class="stat-label">Total Income</span><span class="stat-value counter" data-target="350000" data-prefix="₦" data-suffix="">₦350,000</span></div>
+                                <div class="mockup-stat"><span class="stat-label">Total Expenses</span><span class="stat-value counter" data-target="210000" data-prefix="₦" data-suffix="">₦210,000</span></div>
+                                <div class="mockup-stat"><span class="stat-label">Savings</span><span class="stat-value counter" data-target="140000" data-prefix="₦" data-suffix="">₦140,000</span></div>
                             </div>
                             <div class="mockup-chart">
-                                <div class="chart-bar" data-width="75"></div>
-                                <div class="chart-bar" data-width="45"></div>
-                                <div class="chart-bar" data-width="60"></div>
-                                <div class="chart-bar" data-width="30"></div>
+                                <div class="chart-bar" data-width="75" style="width:75%"></div>
+                                <div class="chart-bar" data-width="45" style="width:45%"></div>
+                                <div class="chart-bar" data-width="60" style="width:60%"></div>
+                                <div class="chart-bar" data-width="30" style="width:30%"></div>
                             </div>
                         </div>
                     </div>
@@ -141,10 +143,10 @@
     <section class="stats-pro">
         <div class="container">
             <div class="stats-grid-pro">
-                <div class="stat-item-pro"><div class="stat-number-pro"><span class="counter" data-target="50000" data-prefix="" data-suffix="+">0</span></div><div class="stat-label-pro">Active Users</div><p>Trusted by thousands</p></div>
-                <div class="stat-item-pro"><div class="stat-number-pro"><span class="counter" data-target="20" data-prefix="₦" data-suffix="B+">0</span></div><div class="stat-label-pro">Money Tracked</div><p>And counting</p></div>
-                <div class="stat-item-pro"><div class="stat-number-pro"><span class="counter" data-target="95" data-prefix="" data-suffix="%">0</span></div><div class="stat-label-pro">User Satisfaction</div><p>Raving reviews</p></div>
-                <div class="stat-item-pro"><div class="stat-number-pro"><span class="counter" data-target="100000" data-prefix="" data-suffix="+">0</span></div><div class="stat-label-pro">Transactions</div><p>Processed daily</p></div>
+                <div class="stat-item-pro"><div class="stat-number-pro">50,000+</div><div class="stat-label-pro">Active Users</div><p>Trusted by thousands</p></div>
+                <div class="stat-item-pro"><div class="stat-number-pro">₦20B+</div><div class="stat-label-pro">Money Tracked</div><p>And counting</p></div>
+                <div class="stat-item-pro"><div class="stat-number-pro">95%</div><div class="stat-label-pro">User Satisfaction</div><p>Raving reviews</p></div>
+                <div class="stat-item-pro"><div class="stat-number-pro">100,000+</div><div class="stat-label-pro">Transactions</div><p>Processed daily</p></div>
             </div>
         </div>
     </section>
@@ -243,6 +245,18 @@
         </div>
     </footer>
 </div>
+
+<style>
+    /* Fix counter width to prevent shaking */
+    .marketing-page .counter {
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+    .marketing-page .stat-number-pro {
+        min-height: 2.5rem;
+    }
+</style>
 
 @code {
     private bool _isLoggedIn = false;
