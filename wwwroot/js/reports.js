@@ -9,6 +9,7 @@ var reportSavingsChart = null;
 var currentPeriod = 'month';
 var refreshInterval = null;
 var allTransactions = [];
+var isInitialized = false;
 
 // ============================================
 // SIDEBAR SETUP
@@ -21,14 +22,20 @@ function setupReportsSidebar() {
 
     if (!toggleBtn || !sidebar || !overlay) return;
 
-    toggleBtn.onclick = function() {
+    // Remove old event listeners by cloning
+    var newToggleBtn = toggleBtn.cloneNode(true);
+    toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+    
+    newToggleBtn.onclick = function() {
         sidebar.classList.add('open');
         overlay.classList.add('open');
         document.body.style.overflow = 'hidden';
     };
 
     if (closeBtn) {
-        closeBtn.onclick = function() {
+        var newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        newCloseBtn.onclick = function() {
             closeReportsSidebar();
         };
     }
@@ -430,10 +437,23 @@ function updateSavingsChart(transactions) {
         reportSavingsChart = new Chart(ctx, {
             type: 'doughnut',
             data: { labels: ['No Data'], datasets: [{ data: [1], backgroundColor: ['#64748B'] }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        labels: { color: '#94A3B8', usePointStyle: true, font: { size: 11 }, padding: 14 }
+                    }
+                }
+            }
         });
         return;
     }
+    
+    // Calculate percentage for center text
+    var total = savings + spent;
+    var percentage = total > 0 ? ((savings / total) * 100).toFixed(0) : 0;
     
     reportSavingsChart = new Chart(ctx, {
         type: 'doughnut',
@@ -451,6 +471,15 @@ function updateSavingsChart(transactions) {
             maintainAspectRatio: false,
             cutout: '70%',
             plugins: {
+                legend: { 
+                    position: 'bottom', 
+                    labels: { 
+                        color: '#94A3B8', 
+                        usePointStyle: true, 
+                        font: { size: 12 },
+                        padding: 16
+                    } 
+                },
                 tooltip: { 
                     backgroundColor: '#1E293B',
                     titleColor: '#F1F5F9',
@@ -472,19 +501,32 @@ function updateSavingsChart(transactions) {
             id: 'savingsCenterText',
             afterDraw: function(chart) {
                 if (chart.id !== reportSavingsChart?.id) return;
-                var ctx = chart.ctx, w = chart.width, h = chart.height;
-                var total = savings + spent;
-                var percentage = total > 0 ? ((savings / total) * 100).toFixed(0) : 0;
-                ctx.restore();
-                ctx.font = 'bold 1.2rem Inter, sans-serif';
-                ctx.fillStyle = '#F1F5F9';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(percentage + '%', w / 2, h / 2 - 8);
-                ctx.font = '0.7rem Inter, sans-serif';
-                ctx.fillStyle = '#94A3B8';
-                ctx.fillText('Savings Rate', w / 2, h / 2 + 16);
-                ctx.save();
+                var ctx2 = chart.ctx, w = chart.width, h = chart.height;
+                var total2 = savings + spent;
+                var pct = total2 > 0 ? ((savings / total2) * 100).toFixed(0) : 0;
+                
+                ctx2.restore();
+                
+                // Percentage - Large and clear
+                ctx2.font = 'bold 1.6rem Inter, "Segoe UI", sans-serif';
+                ctx2.fillStyle = '#F1F5F9';
+                ctx2.textAlign = 'center';
+                ctx2.textBaseline = 'middle';
+                ctx2.fillText(pct + '%', w / 2, h / 2 - 10);
+                
+                // Label - Smaller but readable
+                ctx2.font = '0.75rem Inter, "Segoe UI", sans-serif';
+                ctx2.fillStyle = '#94A3B8';
+                ctx2.textBaseline = 'middle';
+                ctx2.fillText('Savings Rate', w / 2, h / 2 + 22);
+                
+                // Sub text with actual values
+                ctx2.font = '0.6rem Inter, "Segoe UI", sans-serif';
+                ctx2.fillStyle = '#64748B';
+                ctx2.textBaseline = 'middle';
+                ctx2.fillText('₦' + savings.toLocaleString() + ' saved / ₦' + total2.toLocaleString() + ' total', w / 2, h / 2 + 44);
+                
+                ctx2.save();
             }
         }]
     });
@@ -571,10 +613,22 @@ function showToast(message, type) {
 }
 
 // ============================================
-// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR (SINGLE DECLARATION)
+// REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
 // ============================================
 window.initReportsPage = function() {
     console.log('🔄 reports: init called from Blazor');
+    
+    // Prevent multiple initializations
+    if (isInitialized) {
+        console.log('⚠️ reports: Already initialized, reloading data...');
+        // Still reload data but don't re-setup everything
+        setTimeout(function() {
+            if (typeof loadReportData === 'function') {
+                loadReportData();
+            }
+        }, 200);
+        return;
+    }
     
     // Setup sidebar
     if (typeof setupReportsSidebar === 'function') {
@@ -588,6 +642,7 @@ window.initReportsPage = function() {
         }
         // Start auto-refresh after data loads
         startAutoRefresh();
+        isInitialized = true;
     }, 500);
     
     console.log('✅ reports: initialized');
@@ -599,19 +654,25 @@ window.initReportsPage = function() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📄 Reports: DOM ready (fallback)');
+        if (!isInitialized) {
+            setTimeout(function() {
+                setupReportsSidebar();
+                loadReportData();
+                startAutoRefresh();
+                isInitialized = true;
+            }, 300);
+        }
+    });
+} else {
+    console.log('📄 Reports: DOM already loaded (fallback)');
+    if (!isInitialized) {
         setTimeout(function() {
             setupReportsSidebar();
             loadReportData();
             startAutoRefresh();
+            isInitialized = true;
         }, 300);
-    });
-} else {
-    console.log('📄 Reports: DOM already loaded (fallback)');
-    setTimeout(function() {
-        setupReportsSidebar();
-        loadReportData();
-        startAutoRefresh();
-    }, 300);
+    }
 }
 
 // Make functions global
