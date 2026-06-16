@@ -3,7 +3,7 @@
 // Animated Counters, Mobile Menu, FAQ, Active Nav, Smooth Scroll
 // LIVE DASHBOARD ANIMATION ENGINE INCLUDED
 // AUTO-START ON PAGE LOAD
-// FIXED: Removed DOM manipulation that conflicts with Blazor buttons
+// FIXED: FAQ Accordion now works properly
 // ============================================
 
 (function() {
@@ -402,7 +402,7 @@
     }
 
     // ============================================
-    // FAQ ACCORDION
+    // FAQ ACCORDION - FIXED VERSION
     // ============================================
     function initFaqAccordion() {
         const faqItems = document.querySelectorAll('.faq-item');
@@ -419,21 +419,32 @@
         console.log('SmartBudget: FAQ accordion initialized - ' + faqItems.length + ' items');
 
         faqItems.forEach((faqItem) => {
-            let question = faqItem.querySelector('.faq-question');
-            if (question) {
-                const newQuestion = question.cloneNode(true);
-                question.parentNode.replaceChild(newQuestion, question);
-                question = newQuestion;
+            // Find the question element
+            const question = faqItem.querySelector('.faq-question');
+            if (!question) return;
 
-                question.onclick = () => {
-                    faqItems.forEach((item) => {
-                        if (item !== faqItem) {
-                            item.classList.remove('open');
-                        }
-                    });
-                    faqItem.classList.toggle('open');
-                };
-            }
+            // Remove any existing click listeners by cloning
+            const newQuestion = question.cloneNode(true);
+            question.parentNode.replaceChild(newQuestion, question);
+
+            // Add click event to the new question
+            newQuestion.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Find the parent faq-item
+                const parentItem = this.closest('.faq-item');
+                if (!parentItem) return;
+                
+                // Close all other FAQ items
+                document.querySelectorAll('.faq-item').forEach((item) => {
+                    if (item !== parentItem) {
+                        item.classList.remove('open');
+                    }
+                });
+                
+                // Toggle this FAQ item
+                parentItem.classList.toggle('open');
+            });
         });
     }
 

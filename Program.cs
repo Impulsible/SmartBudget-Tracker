@@ -15,17 +15,21 @@ builder.Services.AddRazorComponents()
 builder.Services.AddControllers();
 
 // ============================================
-// DATABASE CONFIGURATION
+// DATABASE CONFIGURATION - FORCED POSTGRESQL
 // ============================================
 string connectionString;
 var usePostgres = false;
 
+// ✅ Check for DATABASE_URL from Render
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+Console.WriteLine($"🔍 DATABASE_URL: {(string.IsNullOrEmpty(databaseUrl) ? "NOT FOUND" : "FOUND")}");
 
 if (!string.IsNullOrEmpty(databaseUrl))
 {
     try
     {
+        // ✅ Parse Render's DATABASE_URL
         var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':');
         var username = userInfo[0];
@@ -36,29 +40,39 @@ if (!string.IsNullOrEmpty(databaseUrl))
 
         connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
         usePostgres = true;
-        Console.WriteLine($"✅ Using PostgreSQL database on {host}:{port}/{database}");
+        Console.WriteLine($"✅ Using PostgreSQL: {host}:{port}/{database}");
     }
     catch (Exception ex)
     {
         Console.WriteLine($"⚠️ Error parsing DATABASE_URL: {ex.Message}");
         connectionString = "Data Source=smartbudget.db";
+        usePostgres = false;
     }
 }
 else
 {
+    // ❌ Fallback to SQLite - should not happen on Render
     connectionString = "Data Source=smartbudget.db";
+    Console.WriteLine("⚠️ WARNING: Using SQLite (accounts will not persist!)");
 }
 
+// Register DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (usePostgres)
+    {
         options.UseNpgsql(connectionString);
+        Console.WriteLine("✅ PostgreSQL registered");
+    }
     else
+    {
         options.UseSqlite(connectionString);
+        Console.WriteLine("⚠️ SQLite registered");
+    }
 });
 
 // ============================================
-// IDENTITY - SIMPLIFIED AND WORKING
+// IDENTITY - COOKIE CONFIGURATION
 // ============================================
 builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
@@ -75,7 +89,7 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
 .AddSignInManager()
 .AddDefaultTokenProviders();
 
-// ✅ Cookie configuration - simplified for Render
+// ✅ Cookie configuration
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "SmartBudget.Auth";
@@ -118,17 +132,30 @@ using (var scope = app.Services.CreateScope())
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
         
+        logger.LogInformation("🔄 Checking database...");
+        
         if (usePostgres)
+        {
+            // ✅ Apply migrations for PostgreSQL
             await dbContext.Database.MigrateAsync();
+            logger.LogInformation("✅ PostgreSQL migrations applied");
+        }
         else
+        {
+            // ✅ Ensure SQLite database exists
             await dbContext.Database.EnsureCreatedAsync();
+            logger.LogInformation("✅ SQLite database created");
+        }
         
         // Seed roles
         string[] roles = { "User", "Admin" };
         foreach (var role in roles)
         {
             if (!await roleManager.RoleExistsAsync(role))
+            {
                 await roleManager.CreateAsync(new IdentityRole(role));
+                logger.LogInformation($"✅ Created role: {role}");
+            }
         }
         
         // Seed admin user
@@ -148,7 +175,7 @@ using (var scope = app.Services.CreateScope())
                 await userManager.AddClaimAsync(admin, new System.Security.Claims.Claim("FullName", "Admin"));
                 await userManager.AddToRoleAsync(admin, "Admin");
                 await userManager.AddToRoleAsync(admin, "User");
-                logger.LogInformation("✅ Created admin user");
+                logger.LogInformation("✅ Created admin user: admin@smartbudget.com");
             }
         }
         else
@@ -156,11 +183,13 @@ using (var scope = app.Services.CreateScope())
             logger.LogInformation("ℹ️ Admin user already exists");
         }
         
-        logger.LogInformation("✅ Database initialized successfully");
+        logger.LogInformation("🎉 Database initialization complete!");
+        logger.LogInformation($"📊 Database type: {(usePostgres ? "PostgreSQL" : "SQLite")}");
     }
     catch (Exception ex)
     {
-        logger.LogError(ex, "❌ Database error");
+        logger.LogError(ex, "❌ Database initialization failed");
+        logger.LogError($"Inner exception: {ex.InnerException?.Message}");
     }
 }
 
