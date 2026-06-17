@@ -195,7 +195,6 @@ async function saveBudgetToApi(budget) {
         
         if (!response.ok) {
             console.log('⚠️ API save failed with status:', response.status);
-            // Save to fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             var newBudget = { 
                 id: Date.now(), 
@@ -219,7 +218,6 @@ async function saveBudgetToApi(budget) {
             await fetchBudgets();
             return true;
         } else {
-            // Save to fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             var newBudget = { 
                 id: Date.now(), 
@@ -237,7 +235,6 @@ async function saveBudgetToApi(budget) {
         }
     } catch (e) {
         console.error('❌ Error saving budget:', e);
-        // Save to fallback
         var fallbackBudgets = getFallbackBudgets() || [];
         var newBudget = { 
             id: Date.now(), 
@@ -274,7 +271,6 @@ async function updateBudgetInApi(id, budget) {
         
         if (!response.ok) {
             console.log('⚠️ API update failed with status:', response.status);
-            // Update in fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             var index = fallbackBudgets.findIndex(function(b) { return b.id === id; });
             if (index !== -1) {
@@ -295,7 +291,6 @@ async function updateBudgetInApi(id, budget) {
             await fetchBudgets();
             return true;
         } else {
-            // Update in fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             var index = fallbackBudgets.findIndex(function(b) { return b.id === id; });
             if (index !== -1) {
@@ -310,7 +305,6 @@ async function updateBudgetInApi(id, budget) {
         }
     } catch (e) {
         console.error('❌ Error updating budget:', e);
-        // Update in fallback
         var fallbackBudgets = getFallbackBudgets() || [];
         var index = fallbackBudgets.findIndex(function(b) { return b.id === id; });
         if (index !== -1) {
@@ -334,7 +328,6 @@ async function deleteBudgetFromApi(id) {
         
         if (!response.ok) {
             console.log('⚠️ API delete failed with status:', response.status);
-            // Delete from fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             fallbackBudgets = fallbackBudgets.filter(function(b) { return b.id !== id; });
             setFallbackBudgets(fallbackBudgets);
@@ -348,7 +341,6 @@ async function deleteBudgetFromApi(id) {
             await fetchBudgets();
             return true;
         } else {
-            // Delete from fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             fallbackBudgets = fallbackBudgets.filter(function(b) { return b.id !== id; });
             setFallbackBudgets(fallbackBudgets);
@@ -358,7 +350,6 @@ async function deleteBudgetFromApi(id) {
         }
     } catch (e) {
         console.error('❌ Error deleting budget:', e);
-        // Delete from fallback
         var fallbackBudgets = getFallbackBudgets() || [];
         fallbackBudgets = fallbackBudgets.filter(function(b) { return b.id !== id; });
         setFallbackBudgets(fallbackBudgets);
@@ -447,7 +438,7 @@ async function saveBudget() {
     var amount = amountInput ? parseFloat(amountInput.value) : 0;
     var color = colorInput ? colorInput.value : '#10B981';
     
-    console.log('📝 Form values:', { id, name, amount, color });
+    console.log('📝 Form values:', { id: id, name: name, amount: amount, color: color });
     
     if (!name) {
         alert('Please enter a category name.');
@@ -714,33 +705,33 @@ async function renderAllBudgets() {
         return;
     }
     
-    grid.innerHTML = budgets.map(function(budget) {
+    var html = '';
+    for (var i = 0; i < budgets.length; i++) {
+        var budget = budgets[i];
         var spent = budget.spent || 0;
         var amount = budget.amount || 0;
         var percentage = amount > 0 ? (spent / amount) * 100 : 0;
         percentage = Math.min(percentage, 100);
         var isOver = spent > amount;
         
-        return `
-            <div class="budget-card" style="position:relative;overflow:hidden;">
-                <div class="budget-card-color" style="background:${budget.color || '#10B981'}"></div>
-                <div class="budget-card-header">
-                    <div class="budget-card-title">${escapeHtml(budget.name)}</div>
-                    <div class="budget-card-actions">
-                        <button class="btn-edit-budget" onclick="openEditBudgetModal(${budget.id})" title="Edit Budget"><i class="bi bi-pencil"></i></button>
-                        <button class="btn-delete-budget" onclick="deleteBudget(${budget.id})" title="Delete Budget"><i class="bi bi-trash"></i></button>
-                    </div>
-                </div>
-                <div class="budget-card-amount">₦${(amount).toLocaleString()}</div>
-                <div class="budget-card-spent">Spent: ₦${spent.toLocaleString()}</div>
-                <div class="budget-progress-bar">
-                    <div class="budget-progress-fill" style="width:${percentage}%;background:${budget.color || '#10B981'}"></div>
-                </div>
-                <div class="budget-progress-label ${isOver ? 'over' : ''}">${percentage.toFixed(0)}% used</div>
-            </div>
-        `;
-    }).join('');
+        html += '<div class="budget-card" style="position:relative;overflow:hidden;">';
+        html += '<div class="budget-card-color" style="background:' + (budget.color || '#10B981') + ';"></div>';
+        html += '<div class="budget-card-header">';
+        html += '<div class="budget-card-title">' + escapeHtml(budget.name) + '</div>';
+        html += '<div class="budget-card-actions">';
+        html += '<button class="btn-edit-budget" onclick="openEditBudgetModal(' + budget.id + ')" title="Edit Budget"><i class="bi bi-pencil"></i></button>';
+        html += '<button class="btn-delete-budget" onclick="deleteBudget(' + budget.id + ')" title="Delete Budget"><i class="bi bi-trash"></i></button>';
+        html += '</div></div>';
+        html += '<div class="budget-card-amount">₦' + amount.toLocaleString() + '</div>';
+        html += '<div class="budget-card-spent">Spent: ₦' + spent.toLocaleString() + '</div>';
+        html += '<div class="budget-progress-bar">';
+        html += '<div class="budget-progress-fill" style="width:' + percentage + '%;background:' + (budget.color || '#10B981') + ';"></div>';
+        html += '</div>';
+        html += '<div class="budget-progress-label ' + (isOver ? 'over' : '') + '">' + percentage.toFixed(0) + '% used</div>';
+        html += '</div>';
+    }
     
+    grid.innerHTML = html;
     updateBudgetChart();
 }
 
@@ -783,7 +774,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     while (typeof Chart === 'undefined') {
         console.log('⏳ Waiting for Chart.js to load...');
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(function(resolve) { setTimeout(resolve, 100); });
     }
     
     await renderAllBudgets();
@@ -802,7 +793,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
     
-    // Show status indicator
     if (isUsingFallback) {
         console.log('⚠️ Using offline/fallback mode for budgets');
     }
@@ -828,5 +818,4 @@ window.initBudgetsPage = async function() {
     console.log('✅ budgets: initialized');
 };
 
-// Make renderAllBudgets accessible
 window.renderAllBudgets = renderAllBudgets;

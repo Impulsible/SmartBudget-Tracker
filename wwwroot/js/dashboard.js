@@ -2,7 +2,7 @@
 // SMARTBUDGET DASHBOARD - Production Ready
 // FIXED: Category Dropdown Now Populates
 // ============================================
-console.log('Dashboard JS: Loaded (Fixed v2)');
+console.log('Dashboard JS: Loaded (Fixed v3)');
 
 var spendingChart = null;
 var budgetChart = null;
@@ -366,65 +366,53 @@ async function loadAllData() {
 }
 
 // ============================================
-// INIT - Called from Blazor
+// ANIMATE COUNTERS - FIXED (Added missing function)
 // ============================================
-window.initDashboardPage = function() {
-    console.log('Dashboard: Initializing...');
-    setupSidebar();
-    fetchUserProfile();
-    setupEventListeners();
-    handleResponsiveCharts();
-    
-    if (!isLiveDashboardRunning) {
-        loadAllData().then(function() {
-            renderTransactions();
-            renderCategoryOptions();
-            updateStatsFromTransactions();
-            updateSpendingChart();
-            updateBudgetChart();
-            startLiveDashboard();
-            console.log('Dashboard: Initialized successfully');
-        });
-    } else {
-        renderCategoryOptions();
-    }
-};
+function animateCounters() {
+    var counters = document.querySelectorAll('.stat-value');
+    counters.forEach(function(counter) {
+        var target = parseInt(counter.textContent.replace(/[₦,]/g, '')) || 0;
+        var current = 0;
+        var increment = Math.ceil(target / 60);
+        var duration = 1500;
+        var steps = 60;
+        var stepTime = duration / steps;
+        
+        var timer = setInterval(function() {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            counter.textContent = '₦' + current.toLocaleString();
+        }, stepTime);
+    });
+}
 
 // ============================================
-// AUTO-START
-// ============================================
-(function autoStartDashboard() {
-    console.log('Dashboard: Auto-starting...');
-    setTimeout(function() {
-        loadAllData().then(function() {
-            renderTransactions();
-            renderCategoryOptions();
-            updateStatsFromTransactions();
-            updateSpendingChart();
-            updateBudgetChart();
-            setupSidebar();
-            fetchUserProfile();
-            setupEventListeners();
-            handleResponsiveCharts();
-            startLiveDashboard();
-            console.log('Dashboard: Auto-started');
-        });
-    }, 100);
-})();
-
-// ============================================
-// EXPOSE FUNCTIONS GLOBALLY
+// UPDATE SPENDING PERIOD - FIXED (Added full implementation)
 // ============================================
 window.updateSpendingPeriod = function(period) {
-    console.log('updateSpendingPeriod:', period);
+    console.log('📊 updateSpendingPeriod:', period);
     var btns = document.querySelectorAll('.chart-period');
     btns.forEach(function(b) { b.classList.remove('active'); });
-    if (spendingChart) spendingChart.destroy();
+    
+    if (spendingChart) {
+        spendingChart.destroy();
+        spendingChart = null;
+    }
+    
     var ctx = document.getElementById('spendingChart');
-    if (!ctx) return;
+    if (!ctx) {
+        console.log('❌ Spending chart canvas not found');
+        return;
+    }
     
     var data = generateSpendingData(period);
-    btns[period === 'Monthly' ? 0 : 1].classList.add('active');
+    
+    // Set active button
+    var activeBtn = period === 'Monthly' ? btns[0] : btns[1];
+    if (activeBtn) activeBtn.classList.add('active');
     
     liveSpendingData = {
         income: data.income,
@@ -556,6 +544,51 @@ function generateSpendingData(period) {
     }
     
     return { labels: labels, income: income, expense: expense };
+}
+
+// ============================================
+// WINDOW.LOADUSERINFO - FIXED (Added missing function)
+// ============================================
+window.loadUserInfo = function(userInfo) {
+    console.log('👤 Loading user info from Blazor:', userInfo);
+    
+    if (!userInfo) {
+        console.warn('No user info provided');
+        return;
+    }
+    
+    var fullName = userInfo.name || 'User';
+    var email = userInfo.email || '';
+    var initials = userInfo.initials || 'U';
+    
+    // Update sidebar
+    var sidebarName = document.getElementById('sidebarFullName');
+    var sidebarEmail = document.getElementById('sidebarEmail');
+    var sidebarInitials = document.getElementById('sidebarInitials');
+    
+    if (sidebarName) sidebarName.textContent = fullName;
+    if (sidebarEmail) sidebarEmail.textContent = email;
+    if (sidebarInitials) sidebarInitials.textContent = initials;
+    
+    // Update header
+    var headerInitials = document.getElementById('headerInitials');
+    var headerGreeting = document.getElementById('headerGreeting');
+    
+    if (headerInitials) headerInitials.textContent = initials;
+    if (headerGreeting) {
+        var timeOfDay = getTimeOfDay();
+        var firstName = fullName.split(' ')[0];
+        headerGreeting.textContent = 'Good ' + timeOfDay + ', ' + firstName + '! 👋';
+    }
+    
+    console.log('✅ User info loaded successfully');
+};
+
+function getTimeOfDay() {
+    var hour = new Date().getHours();
+    if (hour < 12) return 'Morning';
+    if (hour < 17) return 'Afternoon';
+    return 'Evening';
 }
 
 // ============================================
@@ -870,7 +903,7 @@ function closeSidebar() {
 }
 
 // ============================================
-// USER INFO
+// USER INFO - FIXED (Combined fetch function)
 // ============================================
 async function fetchUserProfile() {
     try {
@@ -1388,9 +1421,8 @@ window.cleanupDashboard = function() {
     console.log('Dashboard: Cleanup complete');
 };
 
-
 // ============================================
-// DASHBOARD INIT FUNCTION - EXPOSE FOR BLAZOR
+// DASHBOARD INIT FUNCTION - EXPOSE FOR BLAZOR (SINGLE DEFINITION)
 // ============================================
 window.initDashboardPage = function() {
     console.log('🔄 dashboard: init called from Blazor');
@@ -1400,18 +1432,76 @@ window.initDashboardPage = function() {
     animateCounters();
     loadAllData().then(function() {
         handleResponsiveCharts();
+        renderTransactions();
+        renderCategoryOptions();
+        updateStatsFromTransactions();
+        updateSpendingChart();
+        updateBudgetChart();
+        startLiveDashboard();
     });
     console.log('✅ dashboard: initialized');
 };
 
-window.resetDashboardPage = function() {
-    console.log('🔄 dashboard: reset');
-    if (spendingChart) {
-        spendingChart.destroy();
-        spendingChart = null;
-    }
-    if (budgetChart) {
-        budgetChart.destroy();
-        budgetChart = null;
+// ============================================
+// DESTROY PAGE - REGISTER WITH PAGE REGISTRY
+// ============================================
+window.destroyPage = function(pageName) {
+    if (pageName === 'dashboard' || !pageName) {
+        window.cleanupDashboard();
     }
 };
+
+// ============================================
+// REGISTER WITH PAGE REGISTRY
+// ============================================
+if (window.pageRegistry) {
+    window.pageRegistry.register('dashboard', {
+        init: window.initDashboardPage,
+        destroy: window.cleanupDashboard,
+        refresh: function() {
+            console.log('🔄 Dashboard: Refreshing...');
+            loadAllData().then(function() {
+                renderTransactions();
+                renderCategoryOptions();
+                updateStatsFromTransactions();
+                updateSpendingChart();
+                updateBudgetChart();
+            });
+        }
+    });
+}
+
+// ============================================
+// MAKE FUNCTIONS GLOBALLY AVAILABLE
+// ============================================
+window.addTransaction = window.addTransaction;
+window.deleteTransaction = window.deleteTransaction;
+window.addCategory = window.addCategory;
+window.resetBudgetCategories = window.resetBudgetCategories;
+window.clearAllTransactions = window.clearAllTransactions;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.updateSpendingPeriod = window.updateSpendingPeriod;
+window.loadUserInfo = window.loadUserInfo;
+
+// ============================================
+// AUTO-START
+// ============================================
+(function autoStartDashboard() {
+    console.log('Dashboard: Auto-starting...');
+    setTimeout(function() {
+        loadAllData().then(function() {
+            renderTransactions();
+            renderCategoryOptions();
+            updateStatsFromTransactions();
+            updateSpendingChart();
+            updateBudgetChart();
+            setupSidebar();
+            fetchUserProfile();
+            setupEventListeners();
+            handleResponsiveCharts();
+            startLiveDashboard();
+            console.log('Dashboard: Auto-started');
+        });
+    }, 100);
+})();

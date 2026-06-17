@@ -1,6 +1,7 @@
 @page "/dashboard"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
 @attribute [Authorize]
 @inherits BasePage
 @inject AuthenticationStateProvider AuthProvider
@@ -11,7 +12,7 @@
 <PageTitle>SmartBudget - Dashboard</PageTitle>
 
 <div class="dashboard-layout">
-    <!-- ===== YOUR EXISTING HTML CONTENT ===== -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="/" class="sidebar-logo">
@@ -305,15 +306,13 @@
     @@media (max-width: 480px){.dashboard-header{padding:.75rem}.header-greeting h2{font-size:.95rem}.header-greeting p{font-size:.75rem}.stat-card{border-radius:14px}.stat-card-body .stat-value{font-size:1.8rem}.stat-icon{width:40px;height:40px}.transactions-actions{flex-direction:column;width:100%}.chart-container{height:220px}.modal-body,.modal-header,.modal-footer{padding:1rem}}
 </style>
 
+<script src="/js/app.js"></script>
 <script src="/js/dashboard.js"></script>
 
 @code {
     // ============================================
-    // EXISTING CODE VARIABLES
+    // USER INFO - PERSISTED ACROSS NAVIGATION
     // ============================================
-    private bool sidebarOpen = false;
-    private bool showAddModal = false;
-    private bool showCategoryModal = false;
     private string _userName = "User";
     private string _userEmail = "";
     private string _userInitials = "U";
@@ -352,14 +351,31 @@
     }
 
     // ============================================
-    // PAGE INITIALIZATION - FIXED
+    // PAGE INITIALIZATION - PERSISTENT USER INFO
     // ============================================
     protected override async Task OnInitializedAsync()
     {
         PageName = "dashboard";
         await base.OnInitializedAsync();
         
-        // Load user info
+        await LoadUserInfo();
+    }
+
+    // Called on every navigation - ensures user info is always current
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        
+        // Ensure user info is loaded on every render
+        if (string.IsNullOrEmpty(_userEmail))
+        {
+            await LoadUserInfo();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadUserInfo()
+    {
         try
         {
             var authState = await AuthProvider.GetAuthenticationStateAsync();
@@ -367,54 +383,83 @@
             
             if (user.Identity?.IsAuthenticated == true)
             {
-                _userEmail = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
-                var fullNameClaim = user.FindFirst("FullName")?.Value;
-                _userName = fullNameClaim ?? _userEmail.Split('@')[0];
-                _userInitials = _userName.Length > 0 ? _userName.Substring(0, 2).ToUpper() : "U";
+                // Get email - use null-coalescing operator to handle null
+                var emailClaim = user.FindFirst(ClaimTypes.Email);
+                _userEmail = emailClaim?.Value ?? string.Empty;
+                
+                // Get name - try multiple sources with null checking
+                var fullNameClaim = user.FindFirst("FullName");
+                var nameClaim = user.FindFirst(ClaimTypes.Name);
+                var givenNameClaim = user.FindFirst(ClaimTypes.GivenName);
+                
+                if (fullNameClaim != null && !string.IsNullOrEmpty(fullNameClaim.Value))
+                {
+                    _userName = fullNameClaim.Value;
+                }
+                else if (nameClaim != null && !string.IsNullOrEmpty(nameClaim.Value))
+                {
+                    _userName = nameClaim.Value;
+                }
+                else if (givenNameClaim != null && !string.IsNullOrEmpty(givenNameClaim.Value))
+                {
+                    _userName = givenNameClaim.Value;
+                }
+                else if (!string.IsNullOrEmpty(_userEmail))
+                {
+                    _userName = _userEmail.Split('@')[0];
+                }
+                else
+                {
+                    _userName = "User";
+                }
+                
+                // Get initials
+                _userInitials = GetInitials(_userName);
+                
+                // Send user info to JavaScript
+                await JS.InvokeVoidAsync("loadUserInfo", new { name = _userName, email = _userEmail, initials = _userInitials });
+                
+                Console.WriteLine($"✅ User info loaded: {_userName} ({_userEmail})");
+            }
+            else
+            {
+                Console.WriteLine("⚠️ User not authenticated");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading user: {ex.Message}");
+            Console.WriteLine($"❌ Error loading user: {ex.Message}");
         }
     }
 
-    // ============================================
-    // EXISTING METHODS
-    // ============================================
-    private void ToggleSidebar()
+    private string GetInitials(string name)
     {
-        sidebarOpen = !sidebarOpen;
-    }
-
-    private void AddTransaction()
-    {
-        if (string.IsNullOrWhiteSpace(newTransactionDescription) || string.IsNullOrWhiteSpace(newTransactionAmount))
-            return;
-
-        if (decimal.TryParse(newTransactionAmount, out var amount))
+        if (string.IsNullOrWhiteSpace(name)) return "U";
+        
+        var parts = name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
         {
-            recentTransactions.Insert(0, new Transaction
-            {
-                Description = newTransactionDescription,
-                Category = string.IsNullOrWhiteSpace(newTransactionCategory) ? "Other" : newTransactionCategory,
-                Date = DateTime.Now,
-                Amount = amount,
-                Type = newTransactionType,
-                Status = "Completed"
-            });
-
-            newTransactionDescription = "";
-            newTransactionAmount = "";
-            newTransactionCategory = "";
-            newTransactionType = "expense";
-            showAddModal = false;
-            StateHasChanged();
+            return (parts[0][0].ToString() + parts[1][0].ToString()).ToUpper();
         }
+        else if (parts.Length == 1 && parts[0].Length > 0)
+        {
+            return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+        }
+        return "U";
     }
 
-    private void AddCategory()
+    // ============================================
+    // CLEANUP
+    // ============================================
+    public void Dispose()
     {
-        // This will be handled by JavaScript/API
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "dashboard");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
     }
 }
