@@ -3,6 +3,7 @@
 @attribute [Authorize]
 @inherits BasePage
 @inject IJSRuntime JS
+@implements IDisposable
 
 <PageTitle>SmartBudget - Reports</PageTitle>
 
@@ -651,20 +652,25 @@
         await base.OnInitializedAsync();
     }
 
-    // ✅ Call JavaScript initialization with proper delay for navigation
+    // ✅ RECOMMENDED FINAL FIX: Use forceReportsReload on first render only
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Wait for DOM to be fully rendered
-        await Task.Delay(100);
-        
-        // Call init on every render to ensure charts load on navigation
-        await JS.InvokeVoidAsync("initReportsPage");
-        
-        // Force a second init after a longer delay for navigation scenarios
-        if (!firstRender)
+        if (firstRender)
         {
-            await Task.Delay(300);
-            await JS.InvokeVoidAsync("initReportsPage");
+            await JS.InvokeVoidAsync("forceReportsReload");
+        }
+    }
+
+    // ✅ Clean up when navigating away
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("stopAutoRefresh");
+        }
+        catch
+        {
+            // Ignore disposal errors
         }
     }
 }

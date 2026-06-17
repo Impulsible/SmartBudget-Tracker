@@ -10,6 +10,29 @@ var currentPeriod = 'month';
 var refreshInterval = null;
 var allTransactions = [];
 var isInitialized = false;
+var initCount = 0;
+
+// ============================================
+// DESTROY ALL CHARTS
+// ============================================
+window.destroyAllCharts = function() {
+    console.log('🗑️ Destroying all charts');
+    
+    if (reportTrendChart) {
+        reportTrendChart.destroy();
+        reportTrendChart = null;
+    }
+    if (reportExpenseChart) {
+        reportExpenseChart.destroy();
+        reportExpenseChart = null;
+    }
+    if (reportSavingsChart) {
+        reportSavingsChart.destroy();
+        reportSavingsChart = null;
+    }
+    
+    isInitialized = false;
+};
 
 // ============================================
 // SIDEBAR SETUP
@@ -121,6 +144,26 @@ function stopAutoRefresh() {
 }
 
 // ============================================
+// UPDATE SAVINGS RATE OVERLAY
+// ============================================
+function updateSavingsRateOverlay(savings, total) {
+    var percentEl = document.getElementById('savingsRatePercent');
+    var labelEl = document.getElementById('savingsRateLabel');
+    var detailsEl = document.getElementById('savingsRateDetails');
+    
+    if (percentEl) {
+        var pct = total > 0 ? ((savings / total) * 100).toFixed(0) : 0;
+        percentEl.textContent = pct + '%';
+    }
+    if (labelEl) {
+        labelEl.textContent = 'Savings Rate';
+    }
+    if (detailsEl) {
+        detailsEl.textContent = '₦' + savings.toLocaleString() + ' saved / ₦' + total.toLocaleString() + ' total';
+    }
+}
+
+// ============================================
 // LOAD REPORT DATA
 // ============================================
 async function loadReportData() {
@@ -169,7 +212,7 @@ async function loadReportData() {
         reportDate.textContent = dateText;
     }
     
-    // Update charts
+    // Update charts - destroy and recreate to ensure clean state
     updateTrendChart(transactions);
     updateExpenseChart(transactions);
     updateSavingsChart(transactions);
@@ -204,6 +247,9 @@ function setEmptyState() {
     if (container) {
         container.innerHTML = '<div style="text-align:center;padding:2rem;color:#64748B;">No expense data available</div>';
     }
+    
+    // Update savings overlay with zeros
+    updateSavingsRateOverlay(0, 0);
 }
 
 function animateStatValue(elementId, newValue) {
@@ -433,6 +479,10 @@ function updateSavingsChart(transactions) {
     var savings = Math.max(0, totalIncome - totalExpenses);
     var spent = totalExpenses;
     
+    // Update HTML overlay
+    var total = savings + spent;
+    updateSavingsRateOverlay(savings, total);
+    
     if (totalIncome === 0 && totalExpenses === 0) {
         reportSavingsChart = new Chart(ctx, {
             type: 'doughnut',
@@ -452,7 +502,6 @@ function updateSavingsChart(transactions) {
     }
     
     // Calculate percentage for center text
-    var total = savings + spent;
     var percentage = total > 0 ? ((savings / total) * 100).toFixed(0) : 0;
     
     reportSavingsChart = new Chart(ctx, {
@@ -496,39 +545,7 @@ function updateSavingsChart(transactions) {
                     } 
                 }
             }
-        },
-        plugins: [{
-            id: 'savingsCenterText',
-            afterDraw: function(chart) {
-                if (chart.id !== reportSavingsChart?.id) return;
-                var ctx2 = chart.ctx, w = chart.width, h = chart.height;
-                var total2 = savings + spent;
-                var pct = total2 > 0 ? ((savings / total2) * 100).toFixed(0) : 0;
-                
-                ctx2.restore();
-                
-                // Percentage - Large and clear
-                ctx2.font = 'bold 1.6rem Inter, "Segoe UI", sans-serif';
-                ctx2.fillStyle = '#F1F5F9';
-                ctx2.textAlign = 'center';
-                ctx2.textBaseline = 'middle';
-                ctx2.fillText(pct + '%', w / 2, h / 2 - 10);
-                
-                // Label - Smaller but readable
-                ctx2.font = '0.75rem Inter, "Segoe UI", sans-serif';
-                ctx2.fillStyle = '#94A3B8';
-                ctx2.textBaseline = 'middle';
-                ctx2.fillText('Savings Rate', w / 2, h / 2 + 22);
-                
-                // Sub text with actual values
-                ctx2.font = '0.6rem Inter, "Segoe UI", sans-serif';
-                ctx2.fillStyle = '#64748B';
-                ctx2.textBaseline = 'middle';
-                ctx2.fillText('₦' + savings.toLocaleString() + ' saved / ₦' + total2.toLocaleString() + ' total', w / 2, h / 2 + 44);
-                
-                ctx2.save();
-            }
-        }]
+        }
     });
 }
 
@@ -616,36 +633,53 @@ function showToast(message, type) {
 // REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
 // ============================================
 window.initReportsPage = function() {
-    console.log('🔄 reports: init called from Blazor');
+    initCount++;
+    console.log('🔄 reports: init called from Blazor (#' + initCount + ')');
     
-    // Prevent multiple initializations
-    if (isInitialized) {
-        console.log('⚠️ reports: Already initialized, reloading data...');
-        // Still reload data but don't re-setup everything
+    // Check if DOM elements exist
+    var trendCanvas = document.getElementById('reportTrendChart');
+    var expenseCanvas = document.getElementById('reportExpenseChart');
+    var savingsCanvas = document.getElementById('reportSavingsChart');
+    
+    if (!trendCanvas || !expenseCanvas || !savingsCanvas) {
+        console.log('⚠️ Canvas elements not ready, retrying...');
         setTimeout(function() {
-            if (typeof loadReportData === 'function') {
-                loadReportData();
-            }
+            window.initReportsPage();
         }, 200);
         return;
     }
     
-    // Setup sidebar
-    if (typeof setupReportsSidebar === 'function') {
-        setupReportsSidebar();
+    // If already initialized, destroy and reload
+    if (isInitialized) {
+        console.log('⚠️ Already initialized, destroying and reloading...');
+        
+        // Destroy existing charts
+        if (reportTrendChart) {
+            reportTrendChart.destroy();
+            reportTrendChart = null;
+        }
+        if (reportExpenseChart) {
+            reportExpenseChart.destroy();
+            reportExpenseChart = null;
+        }
+        if (reportSavingsChart) {
+            reportSavingsChart.destroy();
+            reportSavingsChart = null;
+        }
+        
+        isInitialized = false;
     }
     
-    // Load report data after a short delay
+    // Setup sidebar
+    setupReportsSidebar();
+    
+    // Load data and create charts
     setTimeout(function() {
-        if (typeof loadReportData === 'function') {
-            loadReportData();
-        }
-        // Start auto-refresh after data loads
+        loadReportData();
         startAutoRefresh();
         isInitialized = true;
-    }, 500);
-    
-    console.log('✅ reports: initialized');
+        console.log('✅ Reports initialized successfully (#' + initCount + ')');
+    }, 300);
 };
 
 // ============================================
@@ -655,23 +689,15 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         console.log('📄 Reports: DOM ready (fallback)');
         if (!isInitialized) {
-            setTimeout(function() {
-                setupReportsSidebar();
-                loadReportData();
-                startAutoRefresh();
-                isInitialized = true;
-            }, 300);
+            window.initReportsPage();
         }
     });
 } else {
     console.log('📄 Reports: DOM already loaded (fallback)');
     if (!isInitialized) {
         setTimeout(function() {
-            setupReportsSidebar();
-            loadReportData();
-            startAutoRefresh();
-            isInitialized = true;
-        }, 300);
+            window.initReportsPage();
+        }, 100);
     }
 }
 
@@ -681,3 +707,4 @@ window.loadReportData = loadReportData;
 window.startAutoRefresh = startAutoRefresh;
 window.stopAutoRefresh = stopAutoRefresh;
 window.initReportsPage = initReportsPage;
+window.destroyAllCharts = destroyAllCharts;
