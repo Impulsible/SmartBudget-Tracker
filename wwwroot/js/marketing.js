@@ -2,8 +2,7 @@
 // SMARTBUDGET - MARKETING PAGE JAVASCRIPT
 // Animated Counters, Mobile Menu, FAQ, Active Nav, Smooth Scroll
 // LIVE DASHBOARD ANIMATION ENGINE INCLUDED
-// AUTO-START ON PAGE LOAD
-// FIXED: FAQ Accordion now works properly
+// FIXED: FAQ Accordion now works properly with Blazor navigation
 // ============================================
 
 (function() {
@@ -402,7 +401,7 @@
     }
 
     // ============================================
-    // FAQ ACCORDION - FIXED VERSION
+    // FAQ ACCORDION - FULLY FIXED
     // ============================================
     function initFaqAccordion() {
         const faqItems = document.querySelectorAll('.faq-item');
@@ -418,32 +417,40 @@
         }
         console.log('SmartBudget: FAQ accordion initialized - ' + faqItems.length + ' items');
 
+        // Remove any existing click listeners by cloning ALL FAQ items
         faqItems.forEach((faqItem) => {
+            // Remove any existing classes that might be stuck
+            faqItem.classList.remove('open');
+            
             // Find the question element
             const question = faqItem.querySelector('.faq-question');
             if (!question) return;
 
-            // Remove any existing click listeners by cloning
+            // Remove all existing listeners by cloning the question
             const newQuestion = question.cloneNode(true);
             question.parentNode.replaceChild(newQuestion, question);
 
             // Add click event to the new question
             newQuestion.addEventListener('click', function(e) {
+                e.preventDefault();
                 e.stopPropagation();
                 
                 // Find the parent faq-item
                 const parentItem = this.closest('.faq-item');
                 if (!parentItem) return;
                 
-                // Close all other FAQ items
+                // Check if this FAQ is already open
+                const isOpen = parentItem.classList.contains('open');
+                
+                // Close all FAQ items
                 document.querySelectorAll('.faq-item').forEach((item) => {
-                    if (item !== parentItem) {
-                        item.classList.remove('open');
-                    }
+                    item.classList.remove('open');
                 });
                 
-                // Toggle this FAQ item
-                parentItem.classList.toggle('open');
+                // If it wasn't open, open it (toggle)
+                if (!isOpen) {
+                    parentItem.classList.add('open');
+                }
             });
         });
     }
@@ -663,6 +670,23 @@
     }
 
     // ============================================
+    // FULL REINITIALIZE - For Blazor navigation
+    // ============================================
+    function fullReinitialize() {
+        console.log('SmartBudget: Full reinitialize called');
+        cleanup();
+        isInitialized = false;
+        // Reset retry counters
+        mobileMenuRetries = 0;
+        faqRetries = 0;
+        activeNavRetries = 0;
+        // Reinitialize after a short delay
+        setTimeout(() => {
+            initializeAll();
+        }, 100);
+    }
+
+    // ============================================
     // INITIALIZE ALL FUNCTIONS
     // ============================================
     function initializeAll() {
@@ -709,9 +733,7 @@
     // ============================================
     window.initializeMarketingPage = function() {
         console.log('SmartBudget: Called from Blazor (First Load)');
-        cleanup();
-        isInitialized = false;
-        setTimeout(() => initializeAll(), 100);
+        fullReinitialize();
     };
 
     window.resetAndInitializeCounters = function() {
