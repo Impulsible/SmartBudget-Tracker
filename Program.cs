@@ -5,6 +5,7 @@ using SmartBudget.Components;
 using SmartBudget.Data;
 using SmartBudget.Services;
 using SmartBudget.Components.Account;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,8 +50,9 @@ if (!string.IsNullOrEmpty(databaseUrl))
 }
 else
 {
-    connectionString = "Data Source=smartbudget.db";
-    Console.WriteLine("⚠️ Using SQLite (fallback)");
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=smartbudget.db";
+    Console.WriteLine($"💾 Using SQLite (fallback)");
+    Console.WriteLine($"📁 Database file: {connectionString.Replace("Data Source=", "")}");
 }
 
 // Register DbContext
@@ -112,13 +114,13 @@ builder.Services.AddScoped<AuthenticationStateProvider, IdentityAuthenticationSt
 builder.Services.AddScoped<ExportService>();
 builder.Services.AddHttpClient();
 
-// ✅ Register PageInitializationService
+// Register PageInitializationService
 builder.Services.AddScoped<PageInitializationService>();
 
 var app = builder.Build();
 
 // ============================================
-// DATABASE MIGRATION & SEEDING - FIXED FOR EXISTING DB
+// DATABASE MIGRATION & SEEDING
 // ============================================
 using (var scope = app.Services.CreateScope())
 {
@@ -135,19 +137,25 @@ using (var scope = app.Services.CreateScope())
         
         if (usePostgres)
         {
-            // ✅ Try to connect and check if database exists
             try
             {
-                await dbContext.Database.CanConnectAsync();
-                logger.LogInformation("✅ Database connection successful");
+                var canConnect = await dbContext.Database.CanConnectAsync();
+                if (canConnect)
+                {
+                    logger.LogInformation("✅ Database connection successful");
+                }
+                else
+                {
+                    logger.LogWarning("⚠️ Cannot connect to database - creating...");
+                    await dbContext.Database.EnsureCreatedAsync();
+                    logger.LogInformation("✅ Database created");
+                }
             }
             catch (Exception connEx)
             {
                 logger.LogError($"❌ Cannot connect to database: {connEx.Message}");
-                // Continue - maybe the database will be created on first use
             }
             
-            // ✅ Try to apply migrations, but don't fail if they already exist
             try
             {
                 var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
@@ -155,7 +163,6 @@ using (var scope = app.Services.CreateScope())
                 {
                     logger.LogInformation($"📋 Found {pendingMigrations.Count()} pending migrations");
                     
-                    // Check if we can apply them
                     try
                     {
                         await dbContext.Database.MigrateAsync();
@@ -175,7 +182,6 @@ using (var scope = app.Services.CreateScope())
             catch (Exception migrationEx)
             {
                 logger.LogWarning($"⚠️ Could not check migrations: {migrationEx.Message}");
-                // Ensure database exists
                 await dbContext.Database.EnsureCreatedAsync();
                 logger.LogInformation("✅ Database ensured");
             }
@@ -205,8 +211,10 @@ using (var scope = app.Services.CreateScope())
             // Seed admin user
             var adminEmail = "admin@smartbudget.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            
             if (adminUser == null)
             {
+                // Create new admin user
                 var admin = new IdentityUser
                 {
                     UserName = adminEmail,
@@ -216,12 +224,13 @@ using (var scope = app.Services.CreateScope())
                 var result = await userManager.CreateAsync(admin, "Admin@123");
                 if (result.Succeeded)
                 {
-                    await userManager.AddClaimAsync(admin, new System.Security.Claims.Claim("FullName", "Admin"));
+                    await userManager.AddClaimAsync(admin, new Claim("FullName", "Admin User"));
                     await userManager.AddToRoleAsync(admin, "Admin");
                     await userManager.AddToRoleAsync(admin, "User");
                     logger.LogInformation("✅ Created admin user: admin@smartbudget.com");
                     logger.LogInformation("📧 Email: admin@smartbudget.com");
                     logger.LogInformation("🔑 Password: Admin@123");
+                    logger.LogInformation("✅ FullName claim: Admin User");
                 }
                 else
                 {
@@ -230,7 +239,40 @@ using (var scope = app.Services.CreateScope())
             }
             else
             {
+                // ============================================
+                // ✅ FIX: Update existing admin with FullName claim
+                // ============================================
                 logger.LogInformation("ℹ️ Admin user already exists");
+                
+                // Check if FullName claim exists
+                var claims = await userManager.GetClaimsAsync(adminUser);
+                var fullNameClaim = claims.FirstOrDefault(c => c.Type == "FullName");
+                
+                if (fullNameClaim == null)
+                {
+                    // Add FullName claim
+                    await userManager.AddClaimAsync(adminUser, new Claim("FullName", "Admin User"));
+                    logger.LogInformation("✅ Added FullName claim to existing admin user");
+                }
+                else if (fullNameClaim.Value == adminEmail || fullNameClaim.Value == "admin" || fullNameClaim.Value.Contains('@'))
+                {
+                    // Update if it's just the email or username
+                    await userManager.RemoveClaimAsync(adminUser, fullNameClaim);
+                    await userManager.AddClaimAsync(adminUser, new Claim("FullName", "Admin User"));
+                    logger.LogInformation("✅ Updated FullName claim for admin user");
+                }
+                else
+                {
+                    logger.LogInformation($"✅ FullName claim already exists: {fullNameClaim.Value}");
+                }
+                
+                // Ensure admin is in Admin role
+                var isInRole = await userManager.IsInRoleAsync(adminUser, "Admin");
+                if (!isInRole)
+                {
+                    await userManager.AddToRoleAsync(adminUser, "Admin");
+                    logger.LogInformation("✅ Added admin user to Admin role");
+                }
             }
         }
         catch (Exception seedEx)
@@ -248,7 +290,6 @@ using (var scope = app.Services.CreateScope())
         {
             logger.LogError($"Inner exception: {ex.InnerException.Message}");
         }
-        // Don't throw - let the app start anyway
     }
 }
 

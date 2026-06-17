@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
 @attribute [AllowAnonymous]
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<IdentityUser> UserManager
@@ -30,7 +31,7 @@
                 <div class="nav-links-pro">
                     @if (_isLoggedIn)
                     {
-                        <div class="user-greeting"><i class="bi bi-person-circle"></i><span>Welcome back, @_firstName! 👋</span></div>
+                        <div class="user-greeting"><i class="bi bi-person-circle"></i><span>Welcome back, <strong>@_firstName</strong>! 👋</span></div>
                         <div class="user-avatar-sm">@_initials</div>
                         <a href="/dashboard" class="dashboard-link"><i class="bi bi-speedometer2"></i> Dashboard</a>
                         <a href="/Account/Logout" class="btn-primary-pro">Logout</a>
@@ -185,13 +186,32 @@
     ============================================ -->
     <section id="learn" class="how-it-works-pro">
         <div class="container">
-            <div class="section-header"><span class="section-badge">Simple Process</span><h2 class="section-title-pro">Get started in 3 easy steps</h2><p class="section-subtitle">Join thousands of users who have taken control of their finances.</p></div>
+            <div class="section-header">
+                <span class="section-badge">Simple Process</span>
+                <h2 class="section-title-pro">Get started in 3 easy steps</h2>
+                <p class="section-subtitle">Join thousands of users who have taken control of their finances.</p>
+            </div>
             <div class="steps-grid">
-                <div class="step-card"><div class="step-number">01</div><div class="step-icon"><i class="bi bi-person-plus"></i></div><h3>Create Account</h3><p>Sign up for free in less than 2 minutes. No credit card required.</p></div>
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="bi bi-person-plus"></i></div>
+                    <h3>Create Account</h3>
+                    <p>Sign up for free in less than 2 minutes. No credit card required.</p>
+                </div>
                 <div class="step-arrow"><i class="bi bi-arrow-right"></i></div>
-                <div class="step-card"><div class="step-number">02</div><div class="step-icon"><i class="bi bi-receipt"></i></div><h3>Add Transactions</h3><p>Log your income and expenses quickly with our simple interface.</p></div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="bi bi-receipt"></i></div>
+                    <h3>Add Transactions</h3>
+                    <p>Log your income and expenses quickly with our simple interface.</p>
+                </div>
                 <div class="step-arrow"><i class="bi bi-arrow-right"></i></div>
-                <div class="step-card"><div class="step-number">03</div><div class="step-icon"><i class="bi bi-graph-up"></i></div><h3>Track & Save</h3><p>Watch your savings grow with insights and analytics that keep you motivated.</p></div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="bi bi-graph-up"></i></div>
+                    <h3>Track & Save</h3>
+                    <p>Watch your savings grow with insights and analytics that keep you motivated.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -263,12 +283,11 @@
     </section>
 
     <!-- ============================================
-    FOOTER - FIXED PROFESSIONAL VERSION
+    FOOTER
     ============================================ -->
     <footer class="footer-pro">
         <div class="container">
             <div class="footer-grid-pro">
-                <!-- Brand Column -->
                 <div class="footer-brand-col">
                     <div class="footer-logo-icon">
                         <i class="bi bi-piggy-bank"></i>
@@ -282,8 +301,6 @@
                         <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
                     </div>
                 </div>
-
-                <!-- Product Links -->
                 <div class="footer-links-col">
                     <h4>Product</h4>
                     <a href="#features">Features</a>
@@ -291,8 +308,6 @@
                     <a href="#learn">How It Works</a>
                     <a href="/dashboard">Dashboard</a>
                 </div>
-
-                <!-- Company Links -->
                 <div class="footer-links-col">
                     <h4>Company</h4>
                     <a href="/about">About Us</a>
@@ -300,8 +315,6 @@
                     <a href="/careers">Careers</a>
                     <a href="/contact">Contact</a>
                 </div>
-
-                <!-- Support Links -->
                 <div class="footer-links-col">
                     <h4>Support</h4>
                     <a href="/help">Help Center</a>
@@ -309,8 +322,6 @@
                     <a href="/api">API</a>
                     <a href="/status">Status</a>
                 </div>
-
-                <!-- Legal Links -->
                 <div class="footer-links-col">
                     <h4>Legal</h4>
                     <a href="/privacy">Privacy Policy</a>
@@ -319,7 +330,6 @@
                     <a href="/security">Security</a>
                 </div>
             </div>
-
             <div class="footer-bottom">
                 <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
                 <p class="footer-tagline">Know where every Naira goes</p>
@@ -341,18 +351,76 @@
         {
             var authState = await AuthProvider.GetAuthenticationStateAsync();
             var user = authState.User;
+            
             if (user.Identity?.IsAuthenticated == true)
             {
                 _isLoggedIn = true;
-                _userEmail = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
-                _fullName = user.FindFirst("FullName")?.Value ?? _userEmail.Split('@')[0];
+                
+                // Get email
+                _userEmail = user.FindFirst(ClaimTypes.Email)?.Value ?? "";
+                
+                // ✅ FIX: Get FullName claim
+                var fullNameClaim = user.FindFirst("FullName")?.Value;
+                var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value;
+                var givenNameClaim = user.FindFirst(ClaimTypes.GivenName)?.Value;
+                
+                // Debug: Log all claims
+                Console.WriteLine("🔍 === USER CLAIMS ===");
+                foreach (var claim in user.Claims)
+                {
+                    Console.WriteLine($"  {claim.Type} = {claim.Value}");
+                }
+                Console.WriteLine($"📌 FullName claim: '{fullNameClaim ?? "NULL"}'");
+                Console.WriteLine("🔍 ===================");
+                
+                // Priority: FullName > Name > GivenName > Email username
+                if (!string.IsNullOrEmpty(fullNameClaim))
+                {
+                    _fullName = fullNameClaim;
+                }
+                else if (!string.IsNullOrEmpty(nameClaim))
+                {
+                    _fullName = nameClaim;
+                }
+                else if (!string.IsNullOrEmpty(givenNameClaim))
+                {
+                    _fullName = givenNameClaim;
+                }
+                else if (!string.IsNullOrEmpty(_userEmail))
+                {
+                    // Use email username as fallback
+                    _fullName = _userEmail.Split('@')[0];
+                }
+                else
+                {
+                    _fullName = "User";
+                }
+                
+                // ✅ FIX: Extract first name
                 _firstName = _fullName.Split(' ')[0];
-                _initials = _firstName.Length >= 2 ? _firstName.Substring(0, 2).ToUpper() : _firstName.ToUpper();
+                
+                // ✅ FIX: If firstName is still the email, clean it up
+                if (_firstName.Contains('@') || _firstName.Length < 2)
+                {
+                    _firstName = _fullName;
+                }
+                
+                // ✅ FIX: Generate initials
+                if (_firstName.Length >= 2)
+                {
+                    _initials = _firstName.Substring(0, 2).ToUpper();
+                }
+                else
+                {
+                    _initials = _firstName.ToUpper();
+                }
+                
+                Console.WriteLine($"✅ User loaded: FullName='{_fullName}', FirstName='{_firstName}', Email='{_userEmail}'");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"SmartBudget: Auth error - {ex.Message}");
+            Console.WriteLine($"❌ Auth error: {ex.Message}");
             _isLoggedIn = false;
         }
     }

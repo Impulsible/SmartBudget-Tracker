@@ -3,7 +3,10 @@
 // ============================================
 console.log('Forgot Password JS: Loaded');
 
-function showError(msg) {
+// ============================================
+// SHOW ERROR MESSAGE
+// ============================================
+window.showError = function(msg) {
     var errorDiv = document.getElementById('errorMessageDiv');
     var errorText = document.getElementById('errorText');
     var successDiv = document.getElementById('successMessageDiv');
@@ -12,9 +15,12 @@ function showError(msg) {
         errorText.innerText = msg;
         errorDiv.style.display = 'flex';
     }
-}
+};
 
-function showSuccess(msg) {
+// ============================================
+// SHOW SUCCESS MESSAGE
+// ============================================
+window.showSuccess = function(msg) {
     var successDiv = document.getElementById('successMessageDiv');
     var successText = document.getElementById('successText');
     var errorDiv = document.getElementById('errorMessageDiv');
@@ -23,14 +29,21 @@ function showSuccess(msg) {
         successText.innerText = msg;
         successDiv.style.display = 'flex';
     }
-}
+};
 
-function showStep1() {
+// ============================================
+// SHOW STEP 1 (Email Form)
+// ============================================
+window.showStep1 = function() {
     document.getElementById('step1').style.display = 'block';
     document.getElementById('step2').style.display = 'none';
-}
+    document.getElementById('forgotEmail').focus();
+};
 
-async function sendResetLink() {
+// ============================================
+// SEND RESET LINK
+// ============================================
+window.sendResetLink = async function() {
     var email = document.getElementById('forgotEmail').value.trim();
     var btn = document.getElementById('sendResetBtn');
     
@@ -68,19 +81,46 @@ async function sendResetLink() {
         btn.disabled = false;
         btn.innerHTML = originalHTML;
     }
-}
+};
 
+// ============================================
+// INITIALIZE EVENT LISTENERS
+// ============================================
 document.addEventListener('DOMContentLoaded', function() {
     var sendBtn = document.getElementById('sendResetBtn');
     if (sendBtn) {
-        sendBtn.onclick = sendResetLink;
+        sendBtn.onclick = window.sendResetLink;
     }
     
     var emailInput = document.getElementById('forgotEmail');
     if (emailInput) {
         emailInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendResetLink();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                window.sendResetLink();
+            }
         });
-        setTimeout(function() { emailInput.focus(); }, 300);
+        setTimeout(function() { 
+            emailInput.focus(); 
+        }, 300);
     }
 });
+
+// ============================================
+// REGISTER WITH PAGE REGISTRY
+// ============================================
+if (window.pageRegistry) {
+    window.pageRegistry.register('forgotpassword', {
+        init: function() {
+            console.log('🔐 Forgot Password page initialized');
+        },
+        destroy: function() {
+            console.log('🗑️ Forgot Password: Cleanup');
+        },
+        refresh: function() {
+            console.log('🔄 Forgot Password: Refresh');
+        }
+    });
+}
+
+console.log('✅ Forgot Password JS: Loaded');

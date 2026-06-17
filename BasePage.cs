@@ -5,10 +5,10 @@ namespace SmartBudget.Pages
 {
     public class BasePage : ComponentBase, IDisposable
     {
-        [Inject] protected IJSRuntime? JS { get; set; }
+        [Inject] 
+        protected IJSRuntime JS { get; set; } = null!;  // ✅ Non-nullable with null-forgiving operator
         
         protected string PageName { get; set; } = "";
-        private bool _initialized = false;
         
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -21,9 +21,7 @@ namespace SmartBudget.Pages
                 }
 
                 // Always call initPage - the registry handles duplicates
-#pragma warning disable CS8604 // Possible null reference argument.
                 await JS.InvokeVoidAsync("initPage", PageName);
-#pragma warning restore CS8604 // Possible null reference argument.
             }
         }
         
@@ -33,9 +31,7 @@ namespace SmartBudget.Pages
             {
                 try
                 {
-#pragma warning disable CS8604 // Possible null reference argument.
-                    _ = JS.InvokeVoidAsync("destroyPage", PageName);
-#pragma warning restore CS8604 // Possible null reference argument.
+                    JS.InvokeVoidAsync("destroyPage", PageName);
                 }
                 catch
                 {

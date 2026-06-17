@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="smartbudget.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="3554"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="AspNetRoleClaims" custom_title="0" dock_id="2" table="4,16:mainAspNetRoleClaims"/><dock_state state="000000ff00000000fd0000000100000002000002480000020cfc0100000002fb000000160064006f0063006b00420072006f00770073006500310100000000000002480000000000000000fb000000160064006f0063006b00420072006f00770073006500320100000000000002480000011e00ffffff000002480000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="AspNetRoleClaims" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="35"/><column index="2" value="47"/><column index="3" value="67"/><column index="4" value="70"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- Check if your user exists
+SELECT Id, Email, UserName 
+FROM AspNetUsers 
+WHERE Email = 'henryosuagwu22@gmail.com';
+
+-- Check if you already have a FullName claim
+SELECT u.Email, c.ClaimType, c.ClaimValue 
+FROM AspNetUsers u
+LEFT JOIN AspNetUserClaims c ON u.Id = c.UserId
+WHERE u.Email = 'henryosuagwu22@gmail.com';
+
+-- Delete any existing FullName claim for your user
+DELETE FROM AspNetUserClaims 
+WHERE UserId = (SELECT Id FROM AspNetUsers WHERE Email = 'henryosuagwu22@gmail.com')
+AND ClaimType = 'FullName';
+
+-- Insert correct FullName claim for your user
+INSERT INTO AspNetUserClaims (UserId, ClaimType, ClaimValue)
+SELECT Id, 'FullName', 'Henry Osuagwu'
+FROM AspNetUsers
+WHERE Email = 'henryosuagwu22@gmail.com';
+
+-- Verify
+SELECT u.Email, c.ClaimType, c.ClaimValue 
+FROM AspNetUsers u
+LEFT JOIN AspNetUserClaims c ON u.Id = c.UserId
+WHERE u.Email = 'henryosuagwu22@gmail.com';</sql><sql name="SQL 2*">-- Add FullName claim for ALL users who don't have one
+INSERT INTO AspNetUserClaims (UserId, ClaimType, ClaimValue)
+SELECT 
+    u.Id,
+    'FullName',
+    CASE 
+        -- If email contains username, use that
+        WHEN instr(u.Email, '@') &gt; 0 THEN substr(u.Email, 1, instr(u.Email, '@') - 1)
+        ELSE u.Email
+    END
+FROM AspNetUsers u
+WHERE NOT EXISTS (
+    SELECT 1 FROM AspNetUserClaims c 
+    WHERE c.UserId = u.Id 
+    AND c.ClaimType = 'FullName'
+);</sql><sql name="SQL 3*">-- Delete any existing FullName claim for your user
+DELETE FROM AspNetUserClaims 
+WHERE UserId = (SELECT Id FROM AspNetUsers WHERE Email = 'henryosuagwu22@gmail.com')
+AND ClaimType = 'FullName';
+
+-- Insert correct FullName claim
+INSERT INTO AspNetUserClaims (UserId, ClaimType, ClaimValue)
+SELECT Id, 'FullName', 'Henry'
+FROM AspNetUsers
+WHERE Email = 'henryosuagwu22@gmail.com';
+
+-- Verify
+SELECT u.Email, c.ClaimType, c.ClaimValue 
+FROM AspNetUsers u
+LEFT JOIN AspNetUserClaims c ON u.Id = c.UserId
+WHERE u.Email = 'henryosuagwu22@gmail.com';</sql><current_tab id="2"/></tab_sql></sqlb_project>

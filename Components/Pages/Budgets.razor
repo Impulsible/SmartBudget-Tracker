@@ -1,5 +1,6 @@
 @page "/budgets"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
 @attribute [Authorize]
 @inherits BasePage
 @implements IDisposable
@@ -822,13 +823,62 @@
 <script src="/js/budgets.js"></script>
 
 @code {
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
     protected override async Task OnInitializedAsync()
     {
         PageName = "budgets";
         await base.OnInitializedAsync();
     }
 
-    // Clean up when navigating away
+    // ============================================
+    // TOAST HELPERS - For showing notifications
+    // ============================================
+    
+    private async Task ShowSuccessToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "success");
+    }
+    
+    private async Task ShowErrorToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "error");
+    }
+    
+    private async Task ShowInfoToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "info");
+    }
+    
+    private async Task ShowWarningToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "warning");
+    }
+
+    // ============================================
+    // EXAMPLE: Using Toasts in Blazor Code
+    // ============================================
+    
+    private async Task ExampleBudgetOperation()
+    {
+        try
+        {
+            await ShowInfoToast("Creating budget...");
+            // Your budget creation logic here
+            await ShowSuccessToast("Budget created successfully! 📊");
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorToast($"Error: {ex.Message}");
+        }
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
     public void Dispose()
     {
         try

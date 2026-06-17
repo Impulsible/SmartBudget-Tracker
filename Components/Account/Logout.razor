@@ -1,5 +1,9 @@
 @page "/Account/Logout"
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
@@ -289,13 +293,22 @@
     }
 </style>
 
+<script src="/js/logout.js"></script>
+
 @code {
     private bool isLoggingOut = true;
     private string message = "";
-    private int countdown = 5;
+    private int countdown = 5;  // ✅ KEPT - Used in the HTML
 
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
     protected override async Task OnInitializedAsync()
     {
+        PageName = "logout";
+        await base.OnInitializedAsync();
+        
         try
         {
             // Perform logout - clears all authentication cookies
@@ -308,9 +321,6 @@
             isLoggingOut = false;
             message = "You have been successfully logged out.";
             StateHasChanged();
-            
-            // Start JavaScript countdown
-            await Task.Delay(100);
         }
         catch (Exception ex)
         {
@@ -321,12 +331,34 @@
         }
     }
 
+    // ============================================
+    // START COUNTDOWN AFTER RENDER
+    // ============================================
+    
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!isLoggingOut)
+        await base.OnAfterRenderAsync(firstRender);
+        
+        if (!isLoggingOut && firstRender)
         {
-            // Start the countdown using JavaScript for smoother animation
+            // Start the countdown using JavaScript
             await JS.InvokeVoidAsync("startLogoutCountdown", 5);
+        }
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "logout");
+        }
+        catch
+        {
+            // Ignore disposal errors
         }
     }
 }

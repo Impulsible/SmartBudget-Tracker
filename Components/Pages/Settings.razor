@@ -1,7 +1,10 @@
 @page "/settings"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
 @attribute [Authorize]
+@inherits BasePage
+@implements IDisposable
 @inject UserManager<IdentityUser> UserManager
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager Navigation
@@ -59,10 +62,10 @@
         <div class="tx-body">
             <!-- Settings Tabs -->
             <div class="settings-tabs">
-                <button class="tab-btn active" data-tab="profile" onclick="switchTab('profile', this)">Profile</button>
-                <button class="tab-btn" data-tab="preferences" onclick="switchTab('preferences', this)">Preferences</button>
-                <button class="tab-btn" data-tab="security" onclick="switchTab('security', this)">Security</button>
-                <button class="tab-btn" data-tab="data" onclick="switchTab('data', this)">Data Management</button>
+                <button class="tab-btn active" data-tab="profile" onclick="window.switchTab('profile', this)">Profile</button>
+                <button class="tab-btn" data-tab="preferences" onclick="window.switchTab('preferences', this)">Preferences</button>
+                <button class="tab-btn" data-tab="security" onclick="window.switchTab('security', this)">Security</button>
+                <button class="tab-btn" data-tab="data" onclick="window.switchTab('data', this)">Data Management</button>
             </div>
 
             <!-- Profile Settings -->
@@ -92,7 +95,7 @@
                                 <option value="GBP">🇬🇧 British Pound (£)</option>
                             </select>
                         </div>
-                        <button class="btn-save" onclick="saveProfile()">💾 Save Changes</button>
+                        <button class="btn-save" onclick="window.saveProfile()">💾 Save Changes</button>
                     </div>
                 </div>
             </div>
@@ -138,7 +141,7 @@
                                 <span>⚠️ Receive budget limit alerts</span>
                             </label>
                         </div>
-                        <button class="btn-save" onclick="savePreferences()">💾 Save Preferences</button>
+                        <button class="btn-save" onclick="window.savePreferences()">💾 Save Preferences</button>
                     </div>
                 </div>
             </div>
@@ -160,7 +163,7 @@
                             <label>Confirm New Password</label>
                             <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password" />
                         </div>
-                        <button class="btn-save" onclick="changePassword()">🔒 Update Password</button>
+                        <button class="btn-save" onclick="window.changePassword()">🔒 Update Password</button>
                     </div>
                 </div>
 
@@ -168,7 +171,7 @@
                     <h3><i class="bi bi-shield-check"></i> Two-Factor Authentication</h3>
                     <div class="settings-form">
                         <p class="form-text">Add an extra layer of security to your account by enabling two-factor authentication.</p>
-                        <button class="btn-secondary" onclick="setup2FA()">Setup 2FA</button>
+                        <button class="btn-secondary" onclick="window.setup2FA()">Setup 2FA</button>
                     </div>
                 </div>
 
@@ -176,7 +179,7 @@
                     <h3><i class="bi bi-devices"></i> Sessions</h3>
                     <div class="settings-form">
                         <p class="form-text">Manage active sessions and devices logged into your account.</p>
-                        <button class="btn-secondary" onclick="viewSessions()">View Active Sessions</button>
+                        <button class="btn-secondary" onclick="window.viewSessions()">View Active Sessions</button>
                     </div>
                 </div>
             </div>
@@ -195,7 +198,7 @@
                     <h3><i class="bi bi-exclamation-triangle"></i> Delete Account</h3>
                     <div class="settings-form">
                         <p class="form-text text-danger">Permanently delete your account and all associated data. This action cannot be undone.</p>
-                        <button class="btn-danger" onclick="showDeleteConfirm()">Delete Account</button>
+                        <button class="btn-danger" onclick="window.showDeleteConfirm()">Delete Account</button>
                     </div>
                 </div>
             </div>
@@ -220,7 +223,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>⚠️ Delete Account</h3>
-            <button class="modal-close" onclick="closeDeleteModal()"><i class="bi bi-x-lg"></i></button>
+            <button class="modal-close" onclick="window.closeDeleteModal()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
             <div class="alert alert-danger" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);padding:1rem;border-radius:8px;margin-bottom:0.5rem;">
@@ -233,8 +236,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-            <button class="btn-danger" id="btnDeleteConfirm" disabled onclick="deleteAccount()">Delete My Account</button>
+            <button class="btn-cancel" onclick="window.closeDeleteModal()">Cancel</button>
+            <button class="btn-danger" id="btnDeleteConfirm" disabled onclick="window.deleteAccount()">Delete My Account</button>
         </div>
     </div>
 </div>
@@ -904,23 +907,75 @@
     }
 </style>
 
-<!-- Script already loaded in App.razor -->
+<script src="/js/app.js"></script>
+<script src="/js/settings.js"></script>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        PageName = "settings";
+        await base.OnInitializedAsync();
+    }
+
+    // ============================================
+    // TOAST HELPERS - For showing notifications
+    // ============================================
+    
+    private async Task ShowSuccessToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "success");
+    }
+    
+    private async Task ShowErrorToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "error");
+    }
+    
+    private async Task ShowInfoToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "info");
+    }
+    
+    private async Task ShowWarningToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "warning");
+    }
+
+    // ============================================
+    // EXAMPLE: Using Toasts in Blazor Code
+    // ============================================
+    
+    private async Task ExampleSettingsOperation()
+    {
+        try
         {
-            await JS.InvokeVoidAsync("eval", @"
-                console.log('Settings: Blazor render complete');
-                if (typeof setupSettingsSidebar === 'function') {
-                    setupSettingsSidebar();
-                    loadUserProfile();
-                    setupDeleteConfirmListener();
-                } else {
-                    console.error('Settings: setupSettingsSidebar not found! Check if settings.js is loaded.');
-                }
-            ");
+            await ShowInfoToast("Saving settings...");
+            // Your settings save logic here
+            await ShowSuccessToast("Settings saved successfully! ⚙️");
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorToast($"Error: {ex.Message}");
+        }
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "settings");
+        }
+        catch
+        {
+            // Ignore disposal errors
         }
     }
 }

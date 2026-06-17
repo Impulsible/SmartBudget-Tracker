@@ -1,6 +1,9 @@
 @page "/goals"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
 @attribute [Authorize]
+@inherits BasePage
+@implements IDisposable
 @inject IJSRuntime JS
 
 <PageTitle>SmartBudget - Savings Goals</PageTitle>
@@ -51,7 +54,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-add-transaction" onclick="openGoalModal()">
+                <button class="btn-add-transaction" onclick="window.openGoalModal()">
                     <i class="bi bi-plus-lg"></i> Add Goal
                 </button>
             </div>
@@ -101,7 +104,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="goalModalTitle">Add Savings Goal</h3>
-            <button class="modal-close" onclick="closeGoalModal()"><i class="bi bi-x-lg"></i></button>
+            <button class="modal-close" onclick="window.closeGoalModal()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
             <input type="hidden" id="goalId" />
@@ -149,8 +152,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeGoalModal()">Cancel</button>
-            <button class="btn-save" onclick="saveGoal()">Save Goal</button>
+            <button class="btn-cancel" onclick="window.closeGoalModal()">Cancel</button>
+            <button class="btn-save" onclick="window.saveGoal()">Save Goal</button>
         </div>
     </div>
 </div>
@@ -160,7 +163,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add Savings</h3>
-            <button class="modal-close" onclick="closeSavingModal()"><i class="bi bi-x-lg"></i></button>
+            <button class="modal-close" onclick="window.closeSavingModal()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
             <input type="hidden" id="savingGoalId" />
@@ -174,8 +177,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeSavingModal()">Cancel</button>
-            <button class="btn-save" onclick="addSaving()">Add Savings</button>
+            <button class="btn-cancel" onclick="window.closeSavingModal()">Cancel</button>
+            <button class="btn-save" onclick="window.addSaving()">Add Savings</button>
         </div>
     </div>
 </div>
@@ -918,22 +921,75 @@
     }
 </style>
 
-<!-- Script already loaded in App.razor -->
+<script src="/js/app.js"></script>
+<script src="/js/goals.js"></script>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        PageName = "goals";
+        await base.OnInitializedAsync();
+    }
+
+    // ============================================
+    // TOAST HELPERS - For showing notifications
+    // ============================================
+    
+    private async Task ShowSuccessToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "success");
+    }
+    
+    private async Task ShowErrorToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "error");
+    }
+    
+    private async Task ShowInfoToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "info");
+    }
+    
+    private async Task ShowWarningToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "warning");
+    }
+
+    // ============================================
+    // EXAMPLE: Using Toasts in Blazor Code
+    // ============================================
+    
+    private async Task ExampleGoalOperation()
+    {
+        try
         {
-            await JS.InvokeVoidAsync("eval", @"
-                console.log('Goals: Blazor render complete');
-                if (typeof setupGoalsSidebar === 'function') {
-                    setupGoalsSidebar();
-                    setTimeout(function() { loadGoals(); }, 300);
-                } else {
-                    console.error('Goals: setupGoalsSidebar not found! Check if goals.js is loaded.');
-                }
-            ");
+            await ShowInfoToast("Creating savings goal...");
+            // Your goal creation logic here
+            await ShowSuccessToast("Goal created successfully! 🎯");
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorToast($"Error: {ex.Message}");
+        }
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "goals");
+        }
+        catch
+        {
+            // Ignore disposal errors
         }
     }
 }

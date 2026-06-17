@@ -1,7 +1,10 @@
 @page "/export"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
 @attribute [Authorize]
+@inherits BasePage
+@implements IDisposable
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<IdentityUser> UserManager
 @inject IJSRuntime JS
@@ -85,7 +88,7 @@
                             </select>
                         </div>
                     </div>
-                    <button class="export-btn" onclick="exportTransactionsCSV()">
+                    <button class="export-btn" onclick="window.exportTransactionsCSV()">
                         <i class="bi bi-download"></i> Export CSV
                     </button>
                 </div>
@@ -106,7 +109,7 @@
                             </select>
                         </div>
                     </div>
-                    <button class="export-btn" onclick="exportBudgetsCSV()">
+                    <button class="export-btn" onclick="window.exportBudgetsCSV()">
                         <i class="bi bi-download"></i> Export CSV
                     </button>
                 </div>
@@ -128,7 +131,7 @@
                             </select>
                         </div>
                     </div>
-                    <button class="export-btn" onclick="exportGoalsCSV()">
+                    <button class="export-btn" onclick="window.exportGoalsCSV()">
                         <i class="bi bi-download"></i> Export CSV
                     </button>
                 </div>
@@ -140,7 +143,7 @@
                     </div>
                     <h3>Complete Data Export</h3>
                     <p>Download all your financial data in a single JSON file including transactions, budgets, and goals.</p>
-                    <button class="export-btn export-all-btn" onclick="exportAllDataJSON()">
+                    <button class="export-btn export-all-btn" onclick="window.exportAllDataJSON()">
                         <i class="bi bi-file-earmark-code"></i> Export All Data (JSON)
                     </button>
                 </div>
@@ -737,21 +740,57 @@
     }
 </style>
 
-<!-- Script already loaded in App.razor -->
+<script src="/js/app.js"></script>
+<script src="/js/export.js"></script>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        PageName = "export";
+        await base.OnInitializedAsync();
+    }
+
+    // ============================================
+    // TOAST HELPERS - For showing notifications
+    // ============================================
+    
+    private async Task ShowSuccessToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "success");
+    }
+    
+    private async Task ShowErrorToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "error");
+    }
+    
+    private async Task ShowInfoToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "info");
+    }
+    
+    private async Task ShowWarningToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "warning");
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
         {
-            await JS.InvokeVoidAsync("eval", @"
-                console.log('Export: Blazor render complete');
-                if (typeof setupExportSidebar === 'function') {
-                    setupExportSidebar();
-                } else {
-                    console.error('Export: setupExportSidebar not found! Check if export.js is loaded.');
-                }
-            ");
+            JS.InvokeVoidAsync("destroyPage", "export");
+        }
+        catch
+        {
+            // Ignore disposal errors
         }
     }
 }

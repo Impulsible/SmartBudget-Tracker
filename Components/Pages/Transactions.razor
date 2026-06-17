@@ -1,6 +1,9 @@
 @page "/transactions"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
 @attribute [Authorize]
+@inherits BasePage
+@implements IDisposable
 @inject IJSRuntime JS
 
 <PageTitle>SmartBudget - Transactions</PageTitle>
@@ -52,7 +55,7 @@
                 </div>
             </div>
             <div class="header-right">
-                <button class="btn-add-transaction" onclick="openTxModal()">
+                <button class="btn-add-transaction" onclick="window.openTxModal()">
                     <i class="bi bi-plus-lg"></i> Add Transaction
                 </button>
             </div>
@@ -82,19 +85,19 @@
 
             <!-- Filters -->
             <div class="tx-filters">
-                <input type="text" class="tx-search" id="txSearch" placeholder="Search transactions..." />
-                <select class="tx-filter" id="txFilterType">
+                <input type="text" class="tx-search" id="txSearch" placeholder="Search transactions..." oninput="window.filterTransactions()" />
+                <select class="tx-filter" id="txFilterType" onchange="window.filterTransactions()">
                     <option value="all">All Types</option>
                     <option value="income">Income</option>
                     <option value="expense">Expense</option>
                 </select>
-                <select class="tx-filter" id="txFilterCategory">
+                <select class="tx-filter" id="txFilterCategory" onchange="window.filterTransactions()">
                     <option value="all">All Categories</option>
                 </select>
-                <button class="btn-clear-all" onclick="clearAllTransactionsFull()">
+                <button class="btn-clear-all" onclick="window.clearAllTransactionsFull()">
                     <i class="bi bi-trash"></i> Clear All
                 </button>
-                <button class="btn-export" onclick="exportTransactions()">
+                <button class="btn-export" onclick="window.exportTransactions()">
                     <i class="bi bi-download"></i> Export CSV
                 </button>
             </div>
@@ -140,7 +143,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Add Transaction</h3>
-            <button class="modal-close" onclick="closeTxModal()"><i class="bi bi-x-lg"></i></button>
+            <button class="modal-close" onclick="window.closeTxModal()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
             <div class="form-group">
@@ -168,8 +171,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeTxModal()">Cancel</button>
-            <button class="btn-save" onclick="addTransactionFull()">Save Transaction</button>
+            <button class="btn-cancel" onclick="window.closeTxModal()">Cancel</button>
+            <button class="btn-save" onclick="window.addTransactionFull()">Save Transaction</button>
         </div>
     </div>
 </div>
@@ -179,7 +182,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3>Edit Transaction</h3>
-            <button class="modal-close" onclick="closeEditTxModal()"><i class="bi bi-x-lg"></i></button>
+            <button class="modal-close" onclick="window.closeEditTxModal()"><i class="bi bi-x-lg"></i></button>
         </div>
         <div class="modal-body">
             <input type="hidden" id="editTxId" />
@@ -212,8 +215,8 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeEditTxModal()">Cancel</button>
-            <button class="btn-save" onclick="saveEditTransaction()">Save Changes</button>
+            <button class="btn-cancel" onclick="window.closeEditTxModal()">Cancel</button>
+            <button class="btn-save" onclick="window.saveEditTransaction()">Save Changes</button>
         </div>
     </div>
 </div>
@@ -1106,24 +1109,57 @@
     }
 </style>
 
+<script src="/js/app.js"></script>
 <script src="/js/transactions.js"></script>
 
 @code {
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
+    protected override async Task OnInitializedAsync()
     {
-        // The transactions.js auto-starts on its own
-        // This ensures it runs even after Blazor navigation
-        if (firstRender)
+        PageName = "transactions";
+        await base.OnInitializedAsync();
+    }
+
+    // ============================================
+    // TOAST HELPERS - Using BasePage's JS
+    // ============================================
+    
+    private async Task ShowSuccessToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "success");
+    }
+    
+    private async Task ShowErrorToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "error");
+    }
+    
+    private async Task ShowInfoToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "info");
+    }
+    
+    private async Task ShowWarningToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "warning");
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
         {
-            await JS.InvokeVoidAsync("eval", @"
-                if (typeof setupTxSidebar === 'function') {
-                    console.log('Transactions: Blazor init - starting...');
-                    setupTxSidebar();
-                    renderCategoryDropdowns();
-                    renderAllTransactions();
-                    if (!isLiveTransactionsRunning) startLiveTransactions();
-                }
-            ");
+            JS.InvokeVoidAsync("destroyPage", "transactions");
+        }
+        catch
+        {
+            // Ignore disposal errors
         }
     }
 }

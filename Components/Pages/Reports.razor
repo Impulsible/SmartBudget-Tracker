@@ -1,5 +1,6 @@
 @page "/reports"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
 @attribute [Authorize]
 @inherits BasePage
 @inject IJSRuntime JS
@@ -60,10 +61,10 @@
         <div class="tx-body">
             <!-- Period Selector -->
             <div class="report-periods">
-                <button class="report-period active" data-period="month" onclick="changeReportPeriod('month', this)">This Month</button>
-                <button class="report-period" data-period="quarter" onclick="changeReportPeriod('quarter', this)">Last 3 Months</button>
-                <button class="report-period" data-period="year" onclick="changeReportPeriod('year', this)">This Year</button>
-                <button class="report-period" data-period="all" onclick="changeReportPeriod('all', this)">All Time</button>
+                <button class="report-period active" data-period="month" onclick="window.changeReportPeriod('month', this)">This Month</button>
+                <button class="report-period" data-period="quarter" onclick="window.changeReportPeriod('quarter', this)">Last 3 Months</button>
+                <button class="report-period" data-period="year" onclick="window.changeReportPeriod('year', this)">This Year</button>
+                <button class="report-period" data-period="all" onclick="window.changeReportPeriod('all', this)">All Time</button>
             </div>
 
             <!-- Summary Stats -->
@@ -642,31 +643,71 @@
     }
 </style>
 
+<script src="/js/app.js"></script>
 <script src="/js/reports.js"></script>
 
 @code {
-    // ✅ Set page name for BasePage initialization
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
     protected override async Task OnInitializedAsync()
     {
         PageName = "reports";
         await base.OnInitializedAsync();
     }
 
-    // ✅ RECOMMENDED FINAL FIX: Use forceReportsReload on first render only
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    // ============================================
+    // TOAST HELPERS - For showing notifications
+    // ============================================
+    
+    private async Task ShowSuccessToast(string message)
     {
-        if (firstRender)
+        await JS.InvokeVoidAsync("showToast", message, "success");
+    }
+    
+    private async Task ShowErrorToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "error");
+    }
+    
+    private async Task ShowInfoToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "info");
+    }
+    
+    private async Task ShowWarningToast(string message)
+    {
+        await JS.InvokeVoidAsync("showToast", message, "warning");
+    }
+
+    // ============================================
+    // EXAMPLE: Using Toasts in Blazor Code
+    // ============================================
+    
+    private async Task ExampleReportOperation()
+    {
+        try
         {
-            await JS.InvokeVoidAsync("forceReportsReload");
+            await ShowInfoToast("Generating report...");
+            // Your report generation logic here
+            await ShowSuccessToast("Report generated successfully! 📊");
+        }
+        catch (Exception ex)
+        {
+            await ShowErrorToast($"Error: {ex.Message}");
         }
     }
 
-    // ✅ Clean up when navigating away
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
     public void Dispose()
     {
         try
         {
-            JS.InvokeVoidAsync("stopAutoRefresh");
+            JS.InvokeVoidAsync("destroyPage", "reports");
         }
         catch
         {

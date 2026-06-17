@@ -1,4 +1,11 @@
 @page "/Account/Login"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
 
 <PageTitle>SmartBudget - Sign In</PageTitle>
 
@@ -33,7 +40,7 @@
                     <label class="form-label"><span class="label-icon"><i class="bi bi-lock"></i></span>Password</label>
                     <div class="input-wrapper">
                         <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" autocomplete="current-password" />
-                        <button type="button" class="password-toggle" onclick="toggleLoginPassword()" tabindex="-1">
+                        <button type="button" class="password-toggle" onclick="window.toggleLoginPassword()" tabindex="-1">
                             <i id="loginEyeIcon" class="bi bi-eye"></i>
                         </button>
                     </div>
@@ -50,7 +57,7 @@
                     </label>
                 </div>
 
-                <button type="button" class="btn-auth btn-primary" id="loginBtn">
+                <button type="button" class="btn-auth btn-primary" id="loginBtn" onclick="window.performLogin()">
                     <span>Sign In</span>
                     <i class="bi bi-arrow-right"></i>
                 </button>
@@ -129,4 +136,80 @@
     @@media (max-width:480px){.auth-card{padding:1.5rem 1.25rem}.back-to-home span{display:none}.back-to-home{padding:0.5rem}}
 </style>
 
-<script src="js/login.js"></script>
+<script src="/js/login.js"></script>
+
+@code {
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "login";
+        await base.OnInitializedAsync();
+    }
+
+    // ============================================
+    // REDIRECT IF ALREADY LOGGED IN
+    // ============================================
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        
+        if (firstRender)
+        {
+            // Check if user is already authenticated
+            try
+            {
+                var response = await JS.InvokeAsync<string>("eval", @"
+                    (async function() {
+                        try {
+                            var res = await fetch('/api/auth/check', {
+                                credentials: 'include'
+                            });
+                            var data = await res.json();
+                            return JSON.stringify(data);
+                        } catch(e) {
+                            return 'null';
+                        }
+                    })();
+                ");
+                
+                if (!string.IsNullOrEmpty(response) && response != "null")
+                {
+                    var data = System.Text.Json.JsonSerializer.Deserialize<AuthCheckResponse>(response);
+                    if (data?.isAuthenticated == true)
+                    {
+                        Navigation.NavigateTo("/dashboard", true);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore - just proceed with login page
+            }
+        }
+    }
+
+    private class AuthCheckResponse
+    {
+        public bool isAuthenticated { get; set; }
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "login");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

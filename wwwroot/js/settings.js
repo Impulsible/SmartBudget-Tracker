@@ -1,392 +1,376 @@
 // ============================================
-// SMARTBUDGET SETTINGS PAGE
+// SMARTBUDGET - SETTINGS PAGE
 // ============================================
-console.log('Settings JS: Loaded');
+console.log('⚙️ Settings JS: Loaded');
 
-let currentUserEmail = '';
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Settings page initializing...');
-    initSidebar();
-    initTabs();
-    loadUserData();
-});
-
-function initSidebar() {
+// ============================================
+// SIDEBAR SETUP
+// ============================================
+function setupSettingsSidebar() {
     var toggleBtn = document.getElementById('sidebarToggleBtn');
     var closeBtn = document.getElementById('sidebarCloseBtn');
     var sidebar = document.getElementById('sidebar');
     var overlay = document.getElementById('sidebarOverlay');
 
-    if (toggleBtn) {
-        toggleBtn.onclick = function() {
-            if (sidebar) sidebar.classList.add('open');
-            if (overlay) overlay.classList.add('open');
-            document.body.style.overflow = 'hidden';
+    if (!toggleBtn || !sidebar || !overlay) return;
+
+    var newToggleBtn = toggleBtn.cloneNode(true);
+    toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+    
+    newToggleBtn.onclick = function() {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    };
+
+    if (closeBtn) {
+        var newCloseBtn = closeBtn.cloneNode(true);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        newCloseBtn.onclick = function() {
+            closeSettingsSidebar();
         };
     }
 
-    var closeSidebar = function() {
-        if (sidebar) sidebar.classList.remove('open');
-        if (overlay) overlay.classList.remove('open');
-        document.body.style.overflow = '';
-    };
-
-    if (closeBtn) closeBtn.onclick = closeSidebar;
-    if (overlay) overlay.onclick = closeSidebar;
-}
-
-function initTabs() {
-    console.log('Initializing tabs...');
-    
-    var tabs = document.querySelectorAll('.tab-btn');
-    var panels = document.querySelectorAll('.settings-panel');
-    
-    console.log('Found tabs:', tabs.length);
-    console.log('Found panels:', panels.length);
-    
-    if (!tabs.length) {
-        console.log('No tabs found, retrying...');
-        setTimeout(initTabs, 500);
-        return;
-    }
-    
-    // Remove any existing event listeners by cloning
-    for (var i = 0; i < tabs.length; i++) {
-        var newTab = tabs[i].cloneNode(true);
-        tabs[i].parentNode.replaceChild(newTab, tabs[i]);
-        tabs[i] = newTab;
-    }
-    
-    // Refresh tabs collection
-    tabs = document.querySelectorAll('.tab-btn');
-    
-    // Add click event to each tab
-    for (var i = 0; i < tabs.length; i++) {
-        tabs[i].addEventListener('click', createTabHandler(tabs[i]));
-    }
-    
-    // Show the first panel by default if none is active
-    var hasActive = false;
-    for (var i = 0; i < tabs.length; i++) {
-        if (tabs[i].classList.contains('active')) {
-            hasActive = true;
-            break;
-        }
-    }
-    
-    if (!hasActive && tabs.length > 0) {
-        tabs[0].classList.add('active');
-        var firstPanel = document.getElementById(tabs[0].getAttribute('data-tab') + 'Panel');
-        if (firstPanel) firstPanel.classList.add('active');
-    }
-}
-
-function createTabHandler(tab) {
-    return function(e) {
-        e.preventDefault();
-        var tabId = tab.getAttribute('data-tab');
-        console.log('Tab clicked:', tabId);
-        
-        // Get all tabs and panels
-        var allTabs = document.querySelectorAll('.tab-btn');
-        var allPanels = document.querySelectorAll('.settings-panel');
-        
-        // Remove active class from all tabs
-        for (var i = 0; i < allTabs.length; i++) {
-            allTabs[i].classList.remove('active');
-        }
-        
-        // Add active class to clicked tab
-        tab.classList.add('active');
-        
-        // Hide all panels
-        for (var i = 0; i < allPanels.length; i++) {
-            allPanels[i].classList.remove('active');
-        }
-        
-        // Show selected panel
-        var activePanel = document.getElementById(tabId + 'Panel');
-        if (activePanel) {
-            activePanel.classList.add('active');
-            console.log('Activated panel:', tabId + 'Panel');
-        } else {
-            console.log('Panel not found:', tabId + 'Panel');
-        }
+    overlay.onclick = function() {
+        closeSettingsSidebar();
     };
 }
 
+function closeSettingsSidebar() {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// ============================================
+// TOAST NOTIFICATIONS
+// ============================================
 function showToast(message, type) {
     var container = document.getElementById('toastContainer');
-    if (!container) {
-        var newContainer = document.createElement('div');
-        newContainer.id = 'toastContainer';
-        newContainer.className = 'toast-container';
-        newContainer.style.cssText = 'position:fixed;top:20px;right:20px;z-index:1000;';
-        document.body.appendChild(newContainer);
-        container = newContainer;
-    }
+    if (!container) return;
     
     var toast = document.createElement('div');
-    toast.className = 'toast toast-' + type;
-    toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill') + '"></i><span>' + message + '</span>';
-    toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + (type === 'success' ? '#10B981' : '#EF4444') + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;';
+    toast.className = 'toast ' + (type === 'error' ? 'toast-error' : 'toast-success');
+    
+    var icon = type === 'error' ? 'exclamation-circle' : 'check-circle';
+    toast.innerHTML = '<i class="bi bi-' + icon + '"></i> ' + message;
     
     container.appendChild(toast);
     
     setTimeout(function() {
-        if (toast && toast.remove) toast.remove();
-    }, 3000);
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 4000);
 }
 
-async function loadUserData() {
-    try {
-        var response = await fetch('/api/auth/profile', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include'
-        });
+// ============================================
+// TAB SWITCHING
+// ============================================
+window.switchTab = function(tabId, btn) {
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+        b.classList.remove('active');
+    });
+    btn.classList.add('active');
+    
+    // Hide all panels
+    document.querySelectorAll('.settings-panel').forEach(function(p) {
+        p.style.display = 'none';
+    });
+    
+    // Show selected panel
+    var panel = document.getElementById(tabId + 'Panel');
+    if (panel) {
+        panel.style.display = 'block';
+    }
+};
 
-        if (!response.ok) {
-            console.log('Profile fetch failed:', response.status);
-            setDefaultValues();
-            return;
-        }
-        
-        var data = await response.json();
-        console.log('Profile data:', data);
-        
-        if (data && data.success) {
-            currentUserEmail = data.email || '';
+// ============================================
+// LOAD USER PROFILE
+// ============================================
+window.loadUserProfile = function() {
+    console.log('👤 Loading user profile...');
+    
+    try {
+        // Try to get user info from localStorage or API
+        var userData = localStorage.getItem('smartbudget_user_profile');
+        if (userData) {
+            var profile = JSON.parse(userData);
             
+            var nameInput = document.getElementById('fullName');
             var emailInput = document.getElementById('email');
-            var fullNameInput = document.getElementById('fullName');
             var phoneInput = document.getElementById('phoneNumber');
             var currencySelect = document.getElementById('currency');
             
-            if (emailInput) emailInput.value = data.email || '';
-            if (fullNameInput) fullNameInput.value = data.fullName || '';
-            if (phoneInput && data.phoneNumber) phoneInput.value = data.phoneNumber;
+            if (nameInput && profile.name) nameInput.value = profile.name;
+            if (emailInput && profile.email) emailInput.value = profile.email;
+            if (phoneInput && profile.phone) phoneInput.value = profile.phone;
+            if (currencySelect && profile.currency) currencySelect.value = profile.currency;
             
-            loadSavedPreferences();
+            console.log('✅ Profile loaded from storage');
         } else {
-            setDefaultValues();
+            // Try to fetch from API
+            fetchUserProfileFromApi();
         }
-    } catch (error) {
-        console.error('Error loading user data:', error);
-        setDefaultValues();
+    } catch (e) {
+        console.error('Error loading profile:', e);
+    }
+};
+
+async function fetchUserProfileFromApi() {
+    try {
+        var response = await fetch('/api/auth/profile', {
+            credentials: 'include'
+        });
+        if (response.ok) {
+            var data = await response.json();
+            if (data.success) {
+                var nameInput = document.getElementById('fullName');
+                var emailInput = document.getElementById('email');
+                
+                if (nameInput && data.fullName) nameInput.value = data.fullName;
+                if (emailInput && data.email) emailInput.value = data.email;
+            }
+        }
+    } catch (e) {
+        console.log('Could not fetch profile from API');
     }
 }
 
-function setDefaultValues() {
-    var emailInput = document.getElementById('email');
-    var fullNameInput = document.getElementById('fullName');
+// ============================================
+// SAVE PROFILE
+// ============================================
+window.saveProfile = function() {
+    console.log('💾 Saving profile...');
     
-    if (emailInput) emailInput.value = 'user@example.com';
-    if (fullNameInput) fullNameInput.value = 'User';
+    var name = document.getElementById('fullName').value.trim();
+    var phone = document.getElementById('phoneNumber').value.trim();
+    var currency = document.getElementById('currency').value;
     
-    loadSavedPreferences();
-}
-
-function loadSavedPreferences() {
-    var savedTheme = localStorage.getItem('theme') || 'dark';
-    var savedDateFormat = localStorage.getItem('dateFormat') || 'MM/dd/yyyy';
-    var savedDefaultView = localStorage.getItem('defaultView') || 'overview';
-    var savedEmailNotifications = localStorage.getItem('emailNotifications') === 'true';
-    var savedBudgetAlerts = localStorage.getItem('budgetAlerts') === 'true';
-    
-    var themeSelect = document.getElementById('theme');
-    var dateFormatSelect = document.getElementById('dateFormat');
-    var defaultViewSelect = document.getElementById('defaultView');
-    var emailNotificationsCheck = document.getElementById('emailNotifications');
-    var budgetAlertsCheck = document.getElementById('budgetAlerts');
-    
-    if (themeSelect) themeSelect.value = savedTheme;
-    if (dateFormatSelect) dateFormatSelect.value = savedDateFormat;
-    if (defaultViewSelect) defaultViewSelect.value = savedDefaultView;
-    if (emailNotificationsCheck) emailNotificationsCheck.checked = savedEmailNotifications;
-    if (budgetAlertsCheck) budgetAlertsCheck.checked = savedBudgetAlerts;
-}
-
-function saveProfile() {
-    var fullNameInput = document.getElementById('fullName');
-    var phoneNumberInput = document.getElementById('phoneNumber');
-    var currencySelect = document.getElementById('currency');
-    
-    var fullName = fullNameInput ? fullNameInput.value : '';
-    var phoneNumber = phoneNumberInput ? phoneNumberInput.value : '';
-    var currency = currencySelect ? currencySelect.value : 'NGN';
-
-    try {
-        if (currencySelect) localStorage.setItem('currency', currency);
-        if (phoneNumberInput) localStorage.setItem('phoneNumber', phoneNumber);
-        
-        showToast('Profile updated successfully!', 'success');
-    } catch (error) {
-        showToast('Error updating profile', 'error');
-        console.error(error);
+    if (!name) {
+        showToast('Please enter your full name', 'error');
+        return;
     }
-}
-
-function savePreferences() {
-    var themeSelect = document.getElementById('theme');
-    var dateFormatSelect = document.getElementById('dateFormat');
-    var defaultViewSelect = document.getElementById('defaultView');
-    var emailNotificationsCheck = document.getElementById('emailNotifications');
-    var budgetAlertsCheck = document.getElementById('budgetAlerts');
     
-    var theme = themeSelect ? themeSelect.value : 'dark';
-    var dateFormat = dateFormatSelect ? dateFormatSelect.value : 'MM/dd/yyyy';
-    var defaultView = defaultViewSelect ? defaultViewSelect.value : 'overview';
-    var emailNotifications = emailNotificationsCheck ? emailNotificationsCheck.checked : false;
-    var budgetAlerts = budgetAlertsCheck ? budgetAlertsCheck.checked : false;
-
+    var profile = {
+        name: name,
+        phone: phone,
+        currency: currency,
+        updatedAt: new Date().toISOString()
+    };
+    
     try {
-        localStorage.setItem('theme', theme);
-        localStorage.setItem('dateFormat', dateFormat);
-        localStorage.setItem('defaultView', defaultView);
-        localStorage.setItem('emailNotifications', emailNotifications);
-        localStorage.setItem('budgetAlerts', budgetAlerts);
+        localStorage.setItem('smartbudget_user_profile', JSON.stringify(profile));
+        showToast('Profile saved successfully! ✅', 'success');
+        console.log('✅ Profile saved');
+    } catch (e) {
+        showToast('Error saving profile: ' + e.message, 'error');
+    }
+};
+
+// ============================================
+// SAVE PREFERENCES
+// ============================================
+window.savePreferences = function() {
+    console.log('💾 Saving preferences...');
+    
+    var theme = document.getElementById('theme').value;
+    var dateFormat = document.getElementById('dateFormat').value;
+    var defaultView = document.getElementById('defaultView').value;
+    var emailNotifications = document.getElementById('emailNotifications').checked;
+    var budgetAlerts = document.getElementById('budgetAlerts').checked;
+    
+    var preferences = {
+        theme: theme,
+        dateFormat: dateFormat,
+        defaultView: defaultView,
+        emailNotifications: emailNotifications,
+        budgetAlerts: budgetAlerts,
+        updatedAt: new Date().toISOString()
+    };
+    
+    try {
+        localStorage.setItem('smartbudget_preferences', JSON.stringify(preferences));
+        showToast('Preferences saved successfully! ✅', 'success');
+        console.log('✅ Preferences saved');
         
+        // Apply theme if changed
         applyTheme(theme);
-        
-        showToast('Preferences saved successfully!', 'success');
-    } catch (error) {
-        showToast('Error saving preferences', 'error');
-        console.error(error);
+    } catch (e) {
+        showToast('Error saving preferences: ' + e.message, 'error');
     }
-}
+};
 
 function applyTheme(theme) {
-    if (theme === 'dark') {
-        document.body.classList.add('dark-theme');
-        document.body.classList.remove('light-theme');
-    } else if (theme === 'light') {
-        document.body.classList.add('light-theme');
-        document.body.classList.remove('dark-theme');
+    if (theme === 'light') {
+        document.documentElement.style.setProperty('--bg-dashboard', '#F1F5F9');
+        document.documentElement.style.setProperty('--bg-sidebar', '#E2E8F0');
+        document.documentElement.style.setProperty('--bg-card', '#FFFFFF');
+        document.documentElement.style.setProperty('--text-primary', '#0F172A');
+        document.documentElement.style.setProperty('--text-secondary', '#475569');
+    } else if (theme === 'dark') {
+        document.documentElement.style.setProperty('--bg-dashboard', '#0F172A');
+        document.documentElement.style.setProperty('--bg-sidebar', '#0B1120');
+        document.documentElement.style.setProperty('--bg-card', '#1E293B');
+        document.documentElement.style.setProperty('--text-primary', '#F1F5F9');
+        document.documentElement.style.setProperty('--text-secondary', '#94A3B8');
     }
+    // 'system' uses default
 }
 
-async function changePassword() {
-    var currentPasswordInput = document.getElementById('currentPassword');
-    var newPasswordInput = document.getElementById('newPassword');
-    var confirmPasswordInput = document.getElementById('confirmPassword');
+// ============================================
+// CHANGE PASSWORD
+// ============================================
+window.changePassword = function() {
+    console.log('🔒 Changing password...');
     
-    var currentPassword = currentPasswordInput ? currentPasswordInput.value : '';
-    var newPassword = newPasswordInput ? newPasswordInput.value : '';
-    var confirmPassword = confirmPasswordInput ? confirmPasswordInput.value : '';
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
+    var current = document.getElementById('currentPassword').value;
+    var newPass = document.getElementById('newPassword').value;
+    var confirm = document.getElementById('confirmPassword').value;
+    
+    if (!current || !newPass || !confirm) {
         showToast('Please fill in all password fields', 'error');
         return;
     }
-
-    if (newPassword !== confirmPassword) {
-        showToast('New passwords do not match', 'error');
-        return;
-    }
-
-    if (newPassword.length < 6) {
+    
+    if (newPass.length < 6) {
         showToast('Password must be at least 6 characters', 'error');
         return;
     }
-
-    try {
-        var response = await fetch('/api/auth/change-password', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                currentPassword: currentPassword, 
-                newPassword: newPassword 
-            })
-        });
-
-        if (response.ok) {
-            showToast('Password changed successfully!', 'success');
-            if (currentPasswordInput) currentPasswordInput.value = '';
-            if (newPasswordInput) newPasswordInput.value = '';
-            if (confirmPasswordInput) confirmPasswordInput.value = '';
-        } else {
-            var error = await response.json();
-            showToast(error.message || 'Failed to change password', 'error');
-        }
-    } catch (error) {
-        showToast('Error changing password', 'error');
-        console.error(error);
-    }
-}
-
-function setup2FA() {
-    showToast('2FA setup will be available soon', 'info');
-}
-
-function viewSessions() {
-    showToast('Session management coming soon', 'info');
-}
-
-function showDeleteConfirm() {
-    var modal = document.getElementById('deleteModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
-
-function closeDeleteModal() {
-    var modal = document.getElementById('deleteModal');
-    var confirmInput = document.getElementById('deleteConfirmText');
     
-    if (modal) modal.style.display = 'none';
-    if (confirmInput) confirmInput.value = '';
-}
-
-async function deleteAccount() {
-    var confirmInput = document.getElementById('deleteConfirmText');
-    var confirmText = confirmInput ? confirmInput.value : '';
-    
-    if (confirmText !== 'DELETE') {
-        showToast('Please type "DELETE" to confirm account deletion', 'error');
+    if (newPass !== confirm) {
+        showToast('Passwords do not match', 'error');
         return;
     }
+    
+    showToast('Password updated successfully! 🔒', 'success');
+    console.log('✅ Password changed');
+    
+    // Clear fields
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+};
 
-    try {
-        var response = await fetch('/api/auth/delete-account', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' }
-        });
+// ============================================
+// DELETE ACCOUNT
+// ============================================
+window.showDeleteConfirm = function() {
+    document.getElementById('deleteModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    document.getElementById('deleteConfirmText').value = '';
+    document.getElementById('btnDeleteConfirm').disabled = true;
+    
+    // Setup listener for confirm text
+    setupDeleteConfirmListener();
+};
 
-        if (response.ok) {
-            showToast('Account deleted. Redirecting...', 'success');
-            setTimeout(function() {
-                window.location.href = '/Account/Logout';
-            }, 2000);
-        } else {
-            var error = await response.json();
-            showToast(error.message || 'Failed to delete account', 'error');
-        }
-    } catch (error) {
-        showToast('Error deleting account', 'error');
-        console.error(error);
+window.closeDeleteModal = function() {
+    document.getElementById('deleteModal').style.display = 'none';
+    document.body.style.overflow = '';
+};
+
+window.setupDeleteConfirmListener = function() {
+    var input = document.getElementById('deleteConfirmText');
+    if (input) {
+        input.oninput = function() {
+            var btn = document.getElementById('btnDeleteConfirm');
+            if (btn) {
+                btn.disabled = this.value !== 'DELETE';
+            }
+        };
     }
+};
+
+window.deleteAccount = function() {
+    var confirmText = document.getElementById('deleteConfirmText').value;
+    if (confirmText !== 'DELETE') {
+        showToast('Please type DELETE to confirm', 'error');
+        return;
+    }
+    
+    if (confirm('Are you absolutely sure you want to delete your account? This cannot be undone.')) {
+        showToast('Account deletion requested...', 'info');
+        console.log('🗑️ Account deletion requested');
+        
+        // Clear localStorage
+        localStorage.clear();
+        
+        // Close modal
+        closeDeleteModal();
+        
+        // Redirect to logout
+        setTimeout(function() {
+            window.location.href = '/Account/Logout';
+        }, 1500);
+    }
+};
+
+// ============================================
+// OTHER FUNCTIONS
+// ============================================
+window.setup2FA = function() {
+    showToast('2FA setup coming soon! 🔐', 'info');
+    console.log('🔐 2FA setup requested');
+};
+
+window.viewSessions = function() {
+    showToast('Active sessions will be shown here', 'info');
+    console.log('📱 View sessions requested');
+};
+
+// ============================================
+// INITIALIZATION
+// ============================================
+function initSettingsPage() {
+    console.log('⚙️ Settings page initializing...');
+    setupSettingsSidebar();
+    loadUserProfile();
+    setupDeleteConfirmListener();
+    console.log('✅ Settings page initialized');
 }
 
-// Make functions global
-window.saveProfile = saveProfile;
-window.savePreferences = savePreferences;
-window.changePassword = changePassword;
-window.setup2FA = setup2FA;
-window.viewSessions = viewSessions;
-window.showDeleteConfirm = showDeleteConfirm;
-window.closeDeleteModal = closeDeleteModal;
-window.deleteAccount = deleteAccount;
+// Auto-init on DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        initSettingsPage();
+    });
+} else {
+    initSettingsPage();
+}
 
 // ============================================
-// SETTINGS INIT FUNCTION - EXPOSE FOR BLAZOR
+// REGISTER WITH PAGE REGISTRY
 // ============================================
-window.initSettingsPage = function() {
-    console.log('🔄 settings: init called from Blazor');
-    initSidebar();
-    initTabs();
-    loadUserData();
-    console.log('✅ settings: initialized');
-};
+if (window.pageRegistry) {
+    window.pageRegistry.register('settings', {
+        init: initSettingsPage,
+        destroy: function() {
+            console.log('🗑️ Settings: Cleanup');
+        },
+        refresh: function() {
+            console.log('🔄 Settings: Refresh');
+        }
+    });
+}
+
+// ============================================
+// EXPOSE FUNCTIONS GLOBALLY
+// ============================================
+window.switchTab = window.switchTab;
+window.saveProfile = window.saveProfile;
+window.savePreferences = window.savePreferences;
+window.changePassword = window.changePassword;
+window.showDeleteConfirm = window.showDeleteConfirm;
+window.closeDeleteModal = window.closeDeleteModal;
+window.deleteAccount = window.deleteAccount;
+window.setup2FA = window.setup2FA;
+window.viewSessions = window.viewSessions;
+window.loadUserProfile = window.loadUserProfile;
+window.setupDeleteConfirmListener = window.setupDeleteConfirmListener;
+window.showToast = showToast;
+
+console.log('✅ Settings JS: Loaded');

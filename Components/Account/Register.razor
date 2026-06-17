@@ -1,10 +1,15 @@
 @page "/Account/Register"
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
 @inject UserManager<IdentityUser> UserManager
 @inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager Navigation
 @inject RoleManager<IdentityRole> RoleManager
+@inject IJSRuntime JS
 
 <PageTitle>SmartBudget - Create Account</PageTitle>
 
@@ -48,8 +53,8 @@
                 <div class="form-group">
                     <label class="form-label"><span class="label-icon"><i class="bi bi-lock"></i></span>Password</label>
                     <div class="input-wrapper">
-                        <input type="password" id="password" class="form-control" placeholder="Create a strong password" autocomplete="new-password" onkeyup="validatePassword()" />
-                        <span class="password-toggle" onclick="togglePassword('password','passwordEyeIcon')" tabindex="-1" style="cursor:pointer;">
+                        <input type="password" id="password" class="form-control" placeholder="Create a strong password" autocomplete="new-password" onkeyup="window.validatePassword()" />
+                        <span class="password-toggle" onclick="window.togglePassword('password','passwordEyeIcon')" tabindex="-1" style="cursor:pointer;">
                             <i class="bi bi-eye" id="passwordEyeIcon"></i>
                         </span>
                     </div>
@@ -67,8 +72,8 @@
                 <div class="form-group">
                     <label class="form-label"><span class="label-icon"><i class="bi bi-shield-lock"></i></span>Confirm Password</label>
                     <div class="input-wrapper">
-                        <input type="password" id="confirmPasswordInput" class="form-control" placeholder="Confirm your password" autocomplete="new-password" onkeyup="validateMatch()" />
-                        <span class="password-toggle" onclick="togglePassword('confirmPasswordInput','confirmPasswordEyeIcon')" tabindex="-1" style="cursor:pointer;">
+                        <input type="password" id="confirmPasswordInput" class="form-control" placeholder="Confirm your password" autocomplete="new-password" onkeyup="window.validateMatch()" />
+                        <span class="password-toggle" onclick="window.togglePassword('confirmPasswordInput','confirmPasswordEyeIcon')" tabindex="-1" style="cursor:pointer;">
                             <i class="bi bi-eye" id="confirmPasswordEyeIcon"></i>
                         </span>
                     </div>
@@ -83,7 +88,7 @@
                     </label>
                 </div>
 
-                <button type="button" class="btn-auth btn-primary" id="registerBtn" onclick="createAccount()">
+                <button type="button" class="btn-auth btn-primary" id="registerBtn" onclick="window.createAccount()">
                     <span>Create free account</span>
                 </button>
             </div>
@@ -173,7 +178,32 @@
     @@media (max-width:480px){.auth-card{padding:1.5rem 1.25rem}.form-control{font-size:0.875rem}.back-to-home span{display:none}.back-to-home{padding:0.5rem;border-radius:8px}}
 </style>
 
+<script src="/js/register.js"></script>
+
 @code {
-    // This page uses JavaScript for all functionality
-    // No C# code needed - everything is handled by register.js
+    // ============================================
+    // PAGE INITIALIZATION
+    // ============================================
+    
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "register";
+        await base.OnInitializedAsync();
+    }
+
+    // ============================================
+    // CLEANUP
+    // ============================================
+    
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "register");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
 }
