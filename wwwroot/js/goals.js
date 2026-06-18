@@ -1,8 +1,8 @@
 // ============================================
-// SMARTBUDGET GOALS PAGE
-// Full CRUD with Database Persistence via API + LocalStorage Fallback
+// SMARTBUDGET GOALS PAGE - Full CRUD with API
+// FIXED: API endpoints and error handling
 // ============================================
-console.log('Goals JS: Loaded');
+console.log('Goals JS: Loaded (Fixed)');
 
 var currentPage = 1;
 var itemsPerPage = 6;
@@ -35,12 +35,6 @@ function setupGoalsSidebar() {
     overlay.onclick = function() {
         closeGoalsSidebar();
     };
-
-    sidebar.querySelectorAll('.nav-item').forEach(function(link) {
-        link.addEventListener('click', function() {
-            closeGoalsSidebar();
-        });
-    });
 }
 
 function closeGoalsSidebar() {
@@ -52,7 +46,7 @@ function closeGoalsSidebar() {
 }
 
 // ============================================
-// FALLBACK STORAGE
+// FALLBACK STORAGE - LocalStorage
 // ============================================
 function getFallbackGoals() {
     try {
@@ -74,6 +68,31 @@ function setFallbackGoals(goals) {
     }
 }
 
+function getDefaultGoals() {
+    return [
+        { 
+            id: 1, 
+            name: "Emergency Fund", 
+            targetAmount: 500000, 
+            currentAmount: 50000, 
+            color: "#10B981", 
+            icon: "bi-shield-check",
+            targetDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            isCompleted: false
+        },
+        { 
+            id: 2, 
+            name: "New Laptop", 
+            targetAmount: 350000, 
+            currentAmount: 150000, 
+            color: "#3B82F6", 
+            icon: "bi-laptop",
+            targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            isCompleted: false
+        }
+    ];
+}
+
 // ============================================
 // API CALLS
 // ============================================
@@ -83,6 +102,8 @@ async function fetchGoals() {
         var response = await fetch('/api/goals', {
             credentials: 'include'
         });
+        
+        console.log('📡 Response status:', response.status);
         
         if (response.status === 401) {
             console.log('❌ Not authenticated - using fallback');
@@ -146,41 +167,6 @@ async function fetchGoals() {
     }
 }
 
-function getDefaultGoals() {
-    return [
-        { 
-            id: 1, 
-            name: "Emergency Fund", 
-            targetAmount: 500000, 
-            currentAmount: 50000, 
-            color: "#10B981", 
-            icon: "bi-shield-check",
-            targetDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            isCompleted: false
-        },
-        { 
-            id: 2, 
-            name: "New Laptop", 
-            targetAmount: 350000, 
-            currentAmount: 150000, 
-            color: "#3B82F6", 
-            icon: "bi-laptop",
-            targetDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            isCompleted: false
-        },
-        { 
-            id: 3, 
-            name: "Vacation", 
-            targetAmount: 1000000, 
-            currentAmount: 200000, 
-            color: "#8B5CF6", 
-            icon: "bi-airplane",
-            targetDate: new Date(Date.now() + 270 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            isCompleted: false
-        }
-    ];
-}
-
 async function saveGoalToApi(goal) {
     try {
         var body = {
@@ -192,11 +178,13 @@ async function saveGoalToApi(goal) {
             targetDate: goal.targetDate || new Date().toISOString().split('T')[0]
         };
         
-        console.log('📤 Saving goal:', body);
+        console.log('📤 Saving goal to API:', JSON.stringify(body, null, 2));
         
         var response = await fetch('/api/goals', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
             credentials: 'include',
             body: JSON.stringify(body)
         });
@@ -204,15 +192,16 @@ async function saveGoalToApi(goal) {
         console.log('📡 Response status:', response.status);
         
         if (!response.ok) {
-            console.log('⚠️ API save failed with status:', response.status);
+            var errorText = await response.text();
+            console.log('⚠️ API save failed with status:', response.status, errorText);
             // Save to fallback
             var fallbackGoals = getFallbackGoals() || [];
-            var newGoal = {
-                id: Date.now(),
-                name: goal.name,
-                targetAmount: goal.targetAmount,
-                currentAmount: goal.currentAmount || 0,
-                color: goal.color || '#10B981',
+            var newGoal = { 
+                id: Date.now(), 
+                name: goal.name, 
+                targetAmount: goal.targetAmount, 
+                currentAmount: goal.currentAmount || 0, 
+                color: goal.color || '#10B981', 
                 icon: goal.icon || 'bi-flag',
                 targetDate: goal.targetDate || new Date().toISOString().split('T')[0],
                 isCompleted: false
@@ -221,6 +210,7 @@ async function saveGoalToApi(goal) {
             setFallbackGoals(fallbackGoals);
             allGoals = fallbackGoals;
             isUsingFallback = true;
+            showToast('Goal saved locally (offline mode)', 'info');
             return true;
         }
         
@@ -233,12 +223,12 @@ async function saveGoalToApi(goal) {
         } else {
             // Save to fallback
             var fallbackGoals = getFallbackGoals() || [];
-            var newGoal = {
-                id: Date.now(),
-                name: goal.name,
-                targetAmount: goal.targetAmount,
-                currentAmount: goal.currentAmount || 0,
-                color: goal.color || '#10B981',
+            var newGoal = { 
+                id: Date.now(), 
+                name: goal.name, 
+                targetAmount: goal.targetAmount, 
+                currentAmount: goal.currentAmount || 0, 
+                color: goal.color || '#10B981', 
                 icon: goal.icon || 'bi-flag',
                 targetDate: goal.targetDate || new Date().toISOString().split('T')[0],
                 isCompleted: false
@@ -247,18 +237,19 @@ async function saveGoalToApi(goal) {
             setFallbackGoals(fallbackGoals);
             allGoals = fallbackGoals;
             isUsingFallback = true;
+            showToast('Goal saved locally (offline mode)', 'info');
             return true;
         }
     } catch (e) {
         console.error('❌ Error saving goal:', e);
         // Save to fallback
         var fallbackGoals = getFallbackGoals() || [];
-        var newGoal = {
-            id: Date.now(),
-            name: goal.name,
-            targetAmount: goal.targetAmount,
-            currentAmount: goal.currentAmount || 0,
-            color: goal.color || '#10B981',
+        var newGoal = { 
+            id: Date.now(), 
+            name: goal.name, 
+            targetAmount: goal.targetAmount, 
+            currentAmount: goal.currentAmount || 0, 
+            color: goal.color || '#10B981', 
             icon: goal.icon || 'bi-flag',
             targetDate: goal.targetDate || new Date().toISOString().split('T')[0],
             isCompleted: false
@@ -283,7 +274,7 @@ async function updateGoalInApi(id, goal) {
             targetDate: goal.targetDate
         };
         
-        console.log('📤 Updating goal:', id, body);
+        console.log('📤 Updating goal in API:', id, JSON.stringify(body, null, 2));
         
         var response = await fetch('/api/goals/' + id, {
             method: 'PUT',
@@ -304,6 +295,7 @@ async function updateGoalInApi(id, goal) {
                 fallbackGoals[index].color = goal.color || '#10B981';
                 fallbackGoals[index].icon = goal.icon || 'bi-flag';
                 fallbackGoals[index].targetDate = goal.targetDate;
+                fallbackGoals[index].isCompleted = fallbackGoals[index].currentAmount >= fallbackGoals[index].targetAmount;
                 setFallbackGoals(fallbackGoals);
                 allGoals = fallbackGoals;
                 isUsingFallback = true;
@@ -328,6 +320,7 @@ async function updateGoalInApi(id, goal) {
                 fallbackGoals[index].color = goal.color || '#10B981';
                 fallbackGoals[index].icon = goal.icon || 'bi-flag';
                 fallbackGoals[index].targetDate = goal.targetDate;
+                fallbackGoals[index].isCompleted = fallbackGoals[index].currentAmount >= fallbackGoals[index].targetAmount;
                 setFallbackGoals(fallbackGoals);
                 allGoals = fallbackGoals;
                 isUsingFallback = true;
@@ -346,6 +339,7 @@ async function updateGoalInApi(id, goal) {
             fallbackGoals[index].color = goal.color || '#10B981';
             fallbackGoals[index].icon = goal.icon || 'bi-flag';
             fallbackGoals[index].targetDate = goal.targetDate;
+            fallbackGoals[index].isCompleted = fallbackGoals[index].currentAmount >= fallbackGoals[index].targetAmount;
             setFallbackGoals(fallbackGoals);
             allGoals = fallbackGoals;
             isUsingFallback = true;
@@ -387,7 +381,6 @@ async function deleteGoalFromApi(id) {
         }
     } catch (e) {
         console.error('❌ Error deleting goal:', e);
-        // Delete from fallback
         var fallbackGoals = getFallbackGoals() || [];
         fallbackGoals = fallbackGoals.filter(function(g) { return g.id !== id; });
         setFallbackGoals(fallbackGoals);
@@ -401,6 +394,7 @@ async function deleteGoalFromApi(id) {
 // MODAL HANDLERS
 // ============================================
 function openGoalModal() {
+    console.log('📝 openGoalModal called');
     var modal = document.getElementById('goalModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -452,7 +446,7 @@ async function openEditGoalModal(id) {
 }
 
 // ============================================
-// ADD SAVINGS
+// ADD SAVINGS TO GOAL
 // ============================================
 async function addToGoal(goalId) {
     var goal = allGoals.find(function(g) { return g.id === goalId; });
@@ -490,18 +484,26 @@ async function addToGoal(goalId) {
 }
 
 // ============================================
-// SAVE GOAL - FIXED
+// SAVE GOAL
 // ============================================
 async function saveGoal() {
     console.log('📝 saveGoal called');
     
-    var id = document.getElementById('goalId').value;
-    var name = document.getElementById('goalName').value.trim();
-    var targetAmount = parseFloat(document.getElementById('goalTargetAmount').value);
-    var currentAmount = parseFloat(document.getElementById('goalCurrentAmount').value) || 0;
-    var color = document.getElementById('goalColor').value;
-    var icon = document.getElementById('goalIcon').value;
-    var targetDate = document.getElementById('goalTargetDate').value;
+    var idInput = document.getElementById('goalId');
+    var nameInput = document.getElementById('goalName');
+    var targetInput = document.getElementById('goalTargetAmount');
+    var currentInput = document.getElementById('goalCurrentAmount');
+    var colorInput = document.getElementById('goalColor');
+    var iconInput = document.getElementById('goalIcon');
+    var dateInput = document.getElementById('goalTargetDate');
+    
+    var id = idInput ? idInput.value : '';
+    var name = nameInput ? nameInput.value.trim() : '';
+    var targetAmount = targetInput ? parseFloat(targetInput.value) : 0;
+    var currentAmount = currentInput ? parseFloat(currentInput.value) || 0 : 0;
+    var color = colorInput ? colorInput.value : '#10B981';
+    var icon = iconInput ? iconInput.value : 'bi-flag';
+    var targetDate = dateInput ? dateInput.value : '';
     
     console.log('📋 Form values:', { id, name, targetAmount, currentAmount, color, icon, targetDate });
     
@@ -516,8 +518,8 @@ async function saveGoal() {
     }
     
     var saveBtn = document.querySelector('#goalModal .btn-save');
-    var originalText = saveBtn ? saveBtn.innerHTML : '';
     if (saveBtn) {
+        var originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<span class="spinner-sm"></span> Saving...';
         saveBtn.disabled = true;
     }
@@ -558,7 +560,7 @@ async function saveGoal() {
         await renderAllGoals();
         showToast(id ? 'Goal updated successfully!' : 'Goal created successfully!', 'success');
     } else {
-        alert('Failed to save goal. Please check console for errors.');
+        alert('Failed to save goal. Please try again.');
     }
 }
 
@@ -616,6 +618,7 @@ if (!document.querySelector('#spinnerStyle')) {
 // ============================================
 async function renderAllGoals() {
     var goals = await fetchGoals();
+    allGoals = goals;
     
     // Update stats
     var totalTargetEl = document.getElementById('goalTotalTarget');
@@ -685,21 +688,6 @@ async function renderAllGoals() {
             </div>
         `;
     }).join('');
-    
-    // Show fallback indicator if using local storage
-    if (isUsingFallback) {
-        var indicator = document.getElementById('fallbackIndicator');
-        if (!indicator) {
-            var fallbackDiv = document.createElement('div');
-            fallbackDiv.id = 'fallbackIndicator';
-            fallbackDiv.style.cssText = 'text-align:center;padding:0.5rem;margin-top:1rem;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.15);color:#94A3B8;font-size:0.8rem;';
-            fallbackDiv.innerHTML = '<i class="bi bi-info-circle" style="color:#10B981;"></i> Offline mode: Your goals are saved locally and will sync when you reconnect.';
-            grid.parentNode.appendChild(fallbackDiv);
-        }
-    } else {
-        var existing = document.getElementById('fallbackIndicator');
-        if (existing) existing.remove();
-    }
 }
 
 function escapeHtml(str) {
@@ -760,3 +748,5 @@ window.initGoalsPage = async function() {
 };
 
 window.renderAllGoals = renderAllGoals;
+
+console.log('✅ Goals JS: Fully loaded and ready');

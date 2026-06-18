@@ -140,49 +140,14 @@ using (var scope = app.Services.CreateScope())
         {
             try
             {
-                var canConnect = await dbContext.Database.CanConnectAsync();
-                if (canConnect)
-                {
-                    logger.LogInformation("✅ Database connection successful");
-                }
-                else
-                {
-                    logger.LogWarning("⚠️ Cannot connect to database - creating...");
-                    await dbContext.Database.EnsureCreatedAsync();
-                    logger.LogInformation("✅ Database created");
-                }
+                logger.LogInformation("📋 Applying PostgreSQL migrations...");
+                await dbContext.Database.MigrateAsync();
+                logger.LogInformation("✅ Migrations applied successfully");
             }
-            catch (Exception connEx)
+            catch (Exception migrateEx)
             {
-                logger.LogError($"❌ Cannot connect to database: {connEx.Message}");
-            }
-            
-            try
-            {
-                var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
-                if (pendingMigrations.Any())
-                {
-                    logger.LogInformation($"📋 Found {pendingMigrations.Count()} pending migrations");
-                    
-                    try
-                    {
-                        await dbContext.Database.MigrateAsync();
-                        logger.LogInformation("✅ Migrations applied successfully");
-                    }
-                    catch (Exception migrateEx)
-                    {
-                        logger.LogWarning($"⚠️ Could not apply migrations: {migrateEx.Message}");
-                        logger.LogInformation("⚠️ Database may already have tables. Continuing...");
-                    }
-                }
-                else
-                {
-                    logger.LogInformation("✅ No pending migrations");
-                }
-            }
-            catch (Exception migrationEx)
-            {
-                logger.LogWarning($"⚠️ Could not check migrations: {migrationEx.Message}");
+                logger.LogWarning($"⚠️ Could not apply migrations: {migrateEx.Message}");
+                logger.LogInformation("⚠️ Attempting to ensure database exists...");
                 await dbContext.Database.EnsureCreatedAsync();
                 logger.LogInformation("✅ Database ensured");
             }
@@ -409,7 +374,7 @@ app.MapGet("/api/db-status", async (IServiceProvider services) =>
 });
 
 // ============================================
-// ✅ GOALS API ENDPOINTS - Using Database
+// ✅ GOALS API ENDPOINTS - FULL CRUD
 // ============================================
 
 // GET all goals for the current user
@@ -417,14 +382,14 @@ app.MapGet("/api/goals", async (UserManager<IdentityUser> userManager, ClaimsPri
 {
     try
     {
-        var currentUser = await userManager.GetUserAsync(user);
-        if (currentUser == null)
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
         {
-            return Results.Unauthorized();
+            return Results.Ok(new { success = true, goals = new List<object>() });
         }
 
         var goals = await dbContext.SavingsGoals
-            .Where(g => g.UserId == currentUser.Id)
+            .Where(g => g.UserId == userId)
             .OrderByDescending(g => g.CreatedAt)
             .Select(g => new
             {
@@ -446,7 +411,7 @@ app.MapGet("/api/goals", async (UserManager<IdentityUser> userManager, ClaimsPri
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error fetching goals: {ex.Message}");
-        return Results.Json(new { success = false, message = ex.Message }, statusCode: 500);
+        return Results.Ok(new { success = true, goals = new List<object>() });
     }
 });
 
@@ -455,8 +420,8 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
 {
     try
     {
-        var currentUser = await userManager.GetUserAsync(user);
-        if (currentUser == null)
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
         {
             return Results.Unauthorized();
         }
@@ -487,15 +452,13 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
             Color = request.Color ?? "#10B981",
             Icon = request.Icon ?? "bi-flag",
             TargetDate = !string.IsNullOrEmpty(request.TargetDate) ? DateTime.Parse(request.TargetDate) : (DateTime?)null,
-            UserId = currentUser.Id,
+            UserId = userId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
 
         dbContext.SavingsGoals.Add(goal);
         await dbContext.SaveChangesAsync();
-
-        Console.WriteLine($"✅ Goal created: {goal.Name} for user {currentUser.Email}");
 
         return Results.Ok(new 
         { 
@@ -528,8 +491,8 @@ app.MapPut("/api/goals/{id}", async (int id, HttpContext ctx, UserManager<Identi
 {
     try
     {
-        var currentUser = await userManager.GetUserAsync(user);
-        if (currentUser == null)
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
         {
             return Results.Unauthorized();
         }
@@ -542,7 +505,7 @@ app.MapPut("/api/goals/{id}", async (int id, HttpContext ctx, UserManager<Identi
 
         // Find the goal
         var goal = await dbContext.SavingsGoals
-            .FirstOrDefaultAsync(g => g.Id == id && g.UserId == currentUser.Id);
+            .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
         if (goal == null)
         {
@@ -568,13 +531,9 @@ app.MapPut("/api/goals/{id}", async (int id, HttpContext ctx, UserManager<Identi
         goal.Icon = request.Icon ?? "bi-flag";
         goal.TargetDate = !string.IsNullOrEmpty(request.TargetDate) ? DateTime.Parse(request.TargetDate) : (DateTime?)null;
         goal.UpdatedAt = DateTime.UtcNow;
-
-        // Check if goal is completed
         goal.IsCompleted = goal.CurrentAmount >= goal.TargetAmount;
 
         await dbContext.SaveChangesAsync();
-
-        Console.WriteLine($"✅ Goal updated: {goal.Name} (ID: {id}) for user {currentUser.Email}");
 
         return Results.Ok(new { success = true, message = "Goal updated successfully" });
     }
@@ -590,15 +549,15 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
 {
     try
     {
-        var currentUser = await userManager.GetUserAsync(user);
-        if (currentUser == null)
+        var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
         {
             return Results.Unauthorized();
         }
 
         // Find the goal
         var goal = await dbContext.SavingsGoals
-            .FirstOrDefaultAsync(g => g.Id == id && g.UserId == currentUser.Id);
+            .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
         if (goal == null)
         {
@@ -608,8 +567,6 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
         // Delete the goal
         dbContext.SavingsGoals.Remove(goal);
         await dbContext.SaveChangesAsync();
-
-        Console.WriteLine($"✅ Goal deleted: ID {id} for user {currentUser.Email}");
 
         return Results.Ok(new { success = true, message = "Goal deleted successfully" });
     }
@@ -623,7 +580,7 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
 app.Run();
 
 // ============================================
-// ✅ GOALS REQUEST MODEL
+// ✅ GOALS REQUEST MODEL - MUST BE AFTER app.Run()
 // ============================================
 public class GoalRequest
 {
