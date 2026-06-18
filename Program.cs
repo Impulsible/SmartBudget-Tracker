@@ -6,7 +6,7 @@ using SmartBudget.Data;
 using SmartBudget.Services;
 using SmartBudget.Components.Account;
 using System.Security.Claims;
-using SmartBudget.Models;
+using SmartBudget.Models;  // ✅ This imports GoalRequest
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -426,6 +426,7 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
             return Results.Unauthorized();
         }
 
+        // ✅ Use the imported GoalRequest class
         var request = await ctx.Request.ReadFromJsonAsync<GoalRequest>();
         if (request == null)
         {
@@ -578,16 +579,3 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
 });
 
 app.Run();
-
-// ============================================
-// ✅ GOALS REQUEST MODEL - MUST BE AFTER app.Run()
-// ============================================
-public class GoalRequest
-{
-    public string Name { get; set; } = "";
-    public decimal TargetAmount { get; set; }
-    public decimal? CurrentAmount { get; set; }
-    public string? Color { get; set; }
-    public string? Icon { get; set; }
-    public string? TargetDate { get; set; }
-}
