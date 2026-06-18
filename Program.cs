@@ -121,7 +121,7 @@ builder.Services.AddScoped<PageInitializationService>();
 var app = builder.Build();
 
 // ============================================
-// DATABASE MIGRATION & SEEDING
+// DATABASE MIGRATION & SEEDING - FIXED
 // ============================================
 using (var scope = app.Services.CreateScope())
 {
@@ -136,26 +136,16 @@ using (var scope = app.Services.CreateScope())
         
         logger.LogInformation("🔄 Checking database...");
         
-        if (usePostgres)
+        // ✅ ENSURE DATABASE IS CREATED - FIXED
+        try
         {
-            try
-            {
-                logger.LogInformation("📋 Applying PostgreSQL migrations...");
-                await dbContext.Database.MigrateAsync();
-                logger.LogInformation("✅ Migrations applied successfully");
-            }
-            catch (Exception migrateEx)
-            {
-                logger.LogWarning($"⚠️ Could not apply migrations: {migrateEx.Message}");
-                logger.LogInformation("⚠️ Attempting to ensure database exists...");
-                await dbContext.Database.EnsureCreatedAsync();
-                logger.LogInformation("✅ Database ensured");
-            }
-        }
-        else
-        {
+            logger.LogInformation("📋 Ensuring database exists...");
             await dbContext.Database.EnsureCreatedAsync();
-            logger.LogInformation("✅ SQLite database created");
+            logger.LogInformation("✅ Database ensured");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning($"⚠️ Could not ensure database: {ex.Message}");
         }
         
         // ============================================
@@ -415,7 +405,7 @@ app.MapGet("/api/goals", async (UserManager<IdentityUser> userManager, ClaimsPri
     }
 });
 
-// POST - Create a new goal
+// POST - Create a new goal - FIXED with better error handling
 app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> userManager, ClaimsPrincipal user, ApplicationDbContext dbContext) =>
 {
     try
@@ -423,24 +413,37 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
         {
-            return Results.Unauthorized();
+            return Results.Json(new { success = false, message = "User not authenticated" }, statusCode: 401);
         }
 
-        var request = await ctx.Request.ReadFromJsonAsync<GoalRequest>();
+        // Read request body as string first to debug
+        string requestBody;
+        using (var reader = new StreamReader(ctx.Request.Body))
+        {
+            requestBody = await reader.ReadToEndAsync();
+        }
+        Console.WriteLine($"📥 Request body: {requestBody}");
+
+        // Deserialize manually
+        var request = System.Text.Json.JsonSerializer.Deserialize<GoalRequest>(requestBody, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
         if (request == null)
         {
-            return Results.BadRequest(new { success = false, message = "Invalid request" });
+            return Results.Json(new { success = false, message = "Invalid request body" }, statusCode: 400);
         }
 
         // Validate
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return Results.BadRequest(new { success = false, message = "Goal name is required" });
+            return Results.Json(new { success = false, message = "Goal name is required" }, statusCode: 400);
         }
 
         if (request.TargetAmount <= 0)
         {
-            return Results.BadRequest(new { success = false, message = "Target amount must be greater than 0" });
+            return Results.Json(new { success = false, message = "Target amount must be greater than 0" }, statusCode: 400);
         }
 
         // Create goal
@@ -454,13 +457,18 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
             TargetDate = !string.IsNullOrEmpty(request.TargetDate) ? DateTime.Parse(request.TargetDate) : (DateTime?)null,
             UserId = userId,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
+            UpdatedAt = DateTime.UtcNow,
+            IsCompleted = false
         };
+
+        Console.WriteLine($"📝 Creating goal: {goal.Name} for user {userId}");
 
         dbContext.SavingsGoals.Add(goal);
         await dbContext.SaveChangesAsync();
 
-        return Results.Ok(new 
+        Console.WriteLine($"✅ Goal created with ID: {goal.Id}");
+
+        return Results.Json(new 
         { 
             success = true, 
             message = "Goal created successfully",
@@ -472,16 +480,22 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
                 goal.CurrentAmount,
                 goal.Color,
                 goal.Icon,
-                TargetDate = goal.TargetDate.HasValue ? goal.TargetDate.Value.ToString("yyyy-MM-dd") : null,
+                TargetDate = goal.TargetDate?.ToString("yyyy-MM-dd"),
                 goal.IsCompleted,
                 goal.CreatedAt,
                 goal.UpdatedAt
             }
         });
     }
+    catch (System.Text.Json.JsonException jsonEx)
+    {
+        Console.WriteLine($"❌ JSON parsing error: {jsonEx.Message}");
+        return Results.Json(new { success = false, message = $"Invalid JSON: {jsonEx.Message}" }, statusCode: 400);
+    }
     catch (Exception ex)
     {
         Console.WriteLine($"❌ Error creating goal: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
         return Results.Json(new { success = false, message = ex.Message }, statusCode: 500);
     }
 });
@@ -494,13 +508,13 @@ app.MapPut("/api/goals/{id}", async (int id, HttpContext ctx, UserManager<Identi
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
         {
-            return Results.Unauthorized();
+            return Results.Json(new { success = false, message = "User not authenticated" }, statusCode: 401);
         }
 
         var request = await ctx.Request.ReadFromJsonAsync<GoalRequest>();
         if (request == null)
         {
-            return Results.BadRequest(new { success = false, message = "Invalid request" });
+            return Results.Json(new { success = false, message = "Invalid request" }, statusCode: 400);
         }
 
         // Find the goal
@@ -509,18 +523,18 @@ app.MapPut("/api/goals/{id}", async (int id, HttpContext ctx, UserManager<Identi
 
         if (goal == null)
         {
-            return Results.NotFound(new { success = false, message = "Goal not found" });
+            return Results.Json(new { success = false, message = "Goal not found" }, statusCode: 404);
         }
 
         // Validate
         if (string.IsNullOrWhiteSpace(request.Name))
         {
-            return Results.BadRequest(new { success = false, message = "Goal name is required" });
+            return Results.Json(new { success = false, message = "Goal name is required" }, statusCode: 400);
         }
 
         if (request.TargetAmount <= 0)
         {
-            return Results.BadRequest(new { success = false, message = "Target amount must be greater than 0" });
+            return Results.Json(new { success = false, message = "Target amount must be greater than 0" }, statusCode: 400);
         }
 
         // Update goal
@@ -535,7 +549,7 @@ app.MapPut("/api/goals/{id}", async (int id, HttpContext ctx, UserManager<Identi
 
         await dbContext.SaveChangesAsync();
 
-        return Results.Ok(new { success = true, message = "Goal updated successfully" });
+        return Results.Json(new { success = true, message = "Goal updated successfully" });
     }
     catch (Exception ex)
     {
@@ -552,7 +566,7 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
         var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
         {
-            return Results.Unauthorized();
+            return Results.Json(new { success = false, message = "User not authenticated" }, statusCode: 401);
         }
 
         // Find the goal
@@ -561,14 +575,14 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
 
         if (goal == null)
         {
-            return Results.NotFound(new { success = false, message = "Goal not found" });
+            return Results.Json(new { success = false, message = "Goal not found" }, statusCode: 404);
         }
 
         // Delete the goal
         dbContext.SavingsGoals.Remove(goal);
         await dbContext.SaveChangesAsync();
 
-        return Results.Ok(new { success = true, message = "Goal deleted successfully" });
+        return Results.Json(new { success = true, message = "Goal deleted successfully" });
     }
     catch (Exception ex)
     {
@@ -585,14 +599,24 @@ app.MapGet("/api/debug/db", async (ApplicationDbContext dbContext) =>
     try
     {
         var canConnect = await dbContext.Database.CanConnectAsync();
-        var tableExists = await dbContext.Database.ExecuteSqlRawAsync(
-            "SELECT 1 FROM information_schema.tables WHERE table_name = 'SavingsGoals'");
+        var tableExists = false;
+        
+        try
+        {
+            // Check if SavingsGoals table exists
+            await dbContext.Database.ExecuteSqlRawAsync("SELECT 1 FROM \"SavingsGoals\" LIMIT 1");
+            tableExists = true;
+        }
+        catch
+        {
+            tableExists = false;
+        }
         
         return Results.Ok(new
         {
             databaseConnected = canConnect,
-            tableExists = tableExists > 0,
-            hasData = tableExists > 0 ? await dbContext.SavingsGoals.AnyAsync() : false
+            tableExists = tableExists,
+            hasData = tableExists ? await dbContext.SavingsGoals.AnyAsync() : false
         });
     }
     catch (Exception ex)

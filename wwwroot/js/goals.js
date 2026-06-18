@@ -10,6 +10,20 @@ var allGoals = [];
 var isUsingFallback = false;
 
 // ============================================
+// API BASE URL - FIXED for Render
+// ============================================
+function getApiBaseUrl() {
+    // If we're in production (Render), use the full URL
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        return window.location.origin; // Uses the current domain
+    }
+    return ''; // Relative path for local development
+}
+
+const API_BASE = getApiBaseUrl();
+console.log('📡 API Base URL:', API_BASE || '/');
+
+// ============================================
 // SIDEBAR SETUP
 // ============================================
 function setupGoalsSidebar() {
@@ -94,13 +108,18 @@ function getDefaultGoals() {
 }
 
 // ============================================
-// API CALLS
+// API CALLS - FIXED with absolute URLs
 // ============================================
 async function fetchGoals() {
     try {
-        console.log('🔍 Fetching goals from API...');
-        var response = await fetch('/api/goals', {
-            credentials: 'include'
+        const url = `${API_BASE}/api/goals`;
+        console.log('🔍 Fetching goals from:', url);
+        
+        var response = await fetch(url, {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
         
         console.log('📡 Response status:', response.status);
@@ -120,6 +139,9 @@ async function fetchGoals() {
         
         if (!response.ok) {
             console.log('❌ Goals API returned:', response.status);
+            var text = await response.text();
+            console.log('Response text (first 200 chars):', text.substring(0, 200));
+            
             var fallbackData = getFallbackGoals();
             if (fallbackData && fallbackData.length > 0) {
                 console.log('📂 Using fallback data');
@@ -135,7 +157,7 @@ async function fetchGoals() {
         var data = await response.json();
         console.log('✅ Goals response:', data);
         
-        if (data.success && data.goals && data.goals.length > 0) {
+        if (data.success && data.goals) {
             allGoals = data.goals;
             setFallbackGoals(allGoals);
             isUsingFallback = false;
@@ -178,12 +200,15 @@ async function saveGoalToApi(goal) {
             targetDate: goal.targetDate || new Date().toISOString().split('T')[0]
         };
         
-        console.log('📤 Saving goal to API:', JSON.stringify(body, null, 2));
+        const url = `${API_BASE}/api/goals`;
+        console.log('📤 Saving goal to API:', url);
+        console.log('📤 Request body:', JSON.stringify(body, null, 2));
         
-        var response = await fetch('/api/goals', {
+        var response = await fetch(url, {
             method: 'POST',
             headers: { 
-                'Content-Type': 'application/json' 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             credentials: 'include',
             body: JSON.stringify(body)
@@ -191,9 +216,12 @@ async function saveGoalToApi(goal) {
         
         console.log('📡 Response status:', response.status);
         
+        // Get response text for debugging
+        var responseText = await response.text();
+        console.log('📡 Response text (first 500 chars):', responseText.substring(0, 500));
+        
         if (!response.ok) {
-            var errorText = await response.text();
-            console.log('⚠️ API save failed with status:', response.status, errorText);
+            console.log('⚠️ API save failed with status:', response.status);
             // Save to fallback
             var fallbackGoals = getFallbackGoals() || [];
             var newGoal = { 
@@ -214,7 +242,8 @@ async function saveGoalToApi(goal) {
             return true;
         }
         
-        var data = await response.json();
+        // Parse JSON response
+        var data = JSON.parse(responseText);
         console.log('✅ Response data:', data);
         
         if (data.success === true) {
@@ -274,14 +303,21 @@ async function updateGoalInApi(id, goal) {
             targetDate: goal.targetDate
         };
         
-        console.log('📤 Updating goal in API:', id, JSON.stringify(body, null, 2));
+        const url = `${API_BASE}/api/goals/${id}`;
+        console.log('📤 Updating goal in API:', url);
+        console.log('📤 Request body:', JSON.stringify(body, null, 2));
         
-        var response = await fetch('/api/goals/' + id, {
+        var response = await fetch(url, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
             credentials: 'include',
             body: JSON.stringify(body)
         });
+        
+        console.log('📡 Response status:', response.status);
         
         if (!response.ok) {
             console.log('⚠️ API update failed with status:', response.status);
@@ -350,10 +386,18 @@ async function updateGoalInApi(id, goal) {
 
 async function deleteGoalFromApi(id) {
     try {
-        var response = await fetch('/api/goals/' + id, {
+        const url = `${API_BASE}/api/goals/${id}`;
+        console.log('📤 Deleting goal from API:', url);
+        
+        var response = await fetch(url, {
             method: 'DELETE',
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
+        
+        console.log('📡 Response status:', response.status);
         
         if (!response.ok) {
             console.log('⚠️ API delete failed with status:', response.status);
@@ -701,10 +745,38 @@ function escapeHtml(str) {
 }
 
 // ============================================
+// TEST API CONNECTION
+// ============================================
+async function testApiConnection() {
+    try {
+        const url = `${API_BASE}/api/health`;
+        console.log('🧪 Testing API connection:', url);
+        
+        const response = await fetch(url);
+        const text = await response.text();
+        console.log('✅ Health check response:', text);
+        
+        try {
+            const data = JSON.parse(text);
+            alert('✅ API is healthy!\n\n' + JSON.stringify(data, null, 2));
+        } catch (e) {
+            alert('⚠️ API responded but not with JSON:\n\n' + text.substring(0, 200));
+        }
+    } catch (e) {
+        console.error('❌ API test failed:', e);
+        alert('❌ API test failed: ' + e.message);
+    }
+}
+
+// Make test function global
+window.testApiConnection = testApiConnection;
+
+// ============================================
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Goals page initializing...');
+    console.log('🌐 API Base URL:', API_BASE || '/');
     setupGoalsSidebar();
     
     // Wait for DOM elements to be ready
@@ -712,6 +784,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     await renderAllGoals();
     console.log('Goals page initialized');
+    
+    // Add test button if not already present
+    if (!document.getElementById('testApiBtn')) {
+        var headerRight = document.querySelector('.header-right');
+        if (headerRight) {
+            var testBtn = document.createElement('button');
+            testBtn.id = 'testApiBtn';
+            testBtn.className = 'btn-add-transaction';
+            testBtn.style.background = '#3B82F6';
+            testBtn.style.marginRight = '0.5rem';
+            testBtn.innerHTML = '<i class="bi bi-plug"></i> Test API';
+            testBtn.onclick = testApiConnection;
+            headerRight.insertBefore(testBtn, headerRight.firstChild);
+        }
+    }
 
     // Close modal on overlay click
     var goalModal = document.getElementById('goalModal');
