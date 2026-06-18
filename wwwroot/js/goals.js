@@ -1,6 +1,6 @@
 // ============================================
 // SMARTBUDGET GOALS PAGE - Full CRUD with API
-// FIXED: API endpoints and error handling
+// FIXED: Authentication, API endpoints, error handling
 // ============================================
 console.log('Goals JS: Loaded (Fixed)');
 
@@ -108,7 +108,38 @@ function getDefaultGoals() {
 }
 
 // ============================================
-// API CALLS - FIXED with absolute URLs
+// CHECK AUTHENTICATION STATUS
+// ============================================
+async function checkAuthStatus() {
+    try {
+        const url = `${API_BASE}/api/goals`;
+        console.log('🔍 Checking auth status...');
+        
+        const response = await fetch(url, {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('📡 Auth check response status:', response.status);
+        
+        if (response.status === 401 || response.status === 302) {
+            console.log('❌ Not authenticated');
+            showToast('Please log in to sync goals to the cloud', 'info');
+            return false;
+        }
+        
+        console.log('✅ Authenticated');
+        return true;
+    } catch (e) {
+        console.error('❌ Auth check error:', e);
+        return false;
+    }
+}
+
+// ============================================
+// API CALLS - FIXED with absolute URLs and auth
 // ============================================
 async function fetchGoals() {
     try {
@@ -124,7 +155,7 @@ async function fetchGoals() {
         
         console.log('📡 Response status:', response.status);
         
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 302) {
             console.log('❌ Not authenticated - using fallback');
             isUsingFallback = true;
             var fallbackData = getFallbackGoals();
@@ -215,10 +246,36 @@ async function saveGoalToApi(goal) {
         });
         
         console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', response.headers.get('content-type'));
         
         // Get response text for debugging
         var responseText = await response.text();
         console.log('📡 Response text (first 500 chars):', responseText.substring(0, 500));
+        
+        // Check if we got HTML instead of JSON (auth redirect)
+        if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+            console.error('❌ Received HTML instead of JSON - likely authentication issue');
+            showToast('Please log in to save goals to the cloud', 'warning');
+            
+            // Save to fallback
+            var fallbackGoals = getFallbackGoals() || [];
+            var newGoal = { 
+                id: Date.now(), 
+                name: goal.name, 
+                targetAmount: goal.targetAmount, 
+                currentAmount: goal.currentAmount || 0, 
+                color: goal.color || '#10B981', 
+                icon: goal.icon || 'bi-flag',
+                targetDate: goal.targetDate || new Date().toISOString().split('T')[0],
+                isCompleted: false
+            };
+            fallbackGoals.push(newGoal);
+            setFallbackGoals(fallbackGoals);
+            allGoals = fallbackGoals;
+            isUsingFallback = true;
+            showToast('Goal saved locally (offline mode)', 'info');
+            return true;
+        }
         
         if (!response.ok) {
             console.log('⚠️ API save failed with status:', response.status);
@@ -248,6 +305,7 @@ async function saveGoalToApi(goal) {
         
         if (data.success === true) {
             await fetchGoals();
+            showToast('Goal saved successfully! 🎯', 'success');
             return true;
         } else {
             // Save to fallback
@@ -266,7 +324,7 @@ async function saveGoalToApi(goal) {
             setFallbackGoals(fallbackGoals);
             allGoals = fallbackGoals;
             isUsingFallback = true;
-            showToast('Goal saved locally (offline mode)', 'info');
+            showToast('Goal saved locally (API issue)', 'info');
             return true;
         }
     } catch (e) {
@@ -319,6 +377,28 @@ async function updateGoalInApi(id, goal) {
         
         console.log('📡 Response status:', response.status);
         
+        var responseText = await response.text();
+        if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+            console.error('❌ Received HTML instead of JSON - authentication issue');
+            showToast('Please log in to update goals', 'warning');
+            // Update in fallback
+            var fallbackGoals = getFallbackGoals() || [];
+            var index = fallbackGoals.findIndex(function(g) { return g.id === id; });
+            if (index !== -1) {
+                fallbackGoals[index].name = goal.name;
+                fallbackGoals[index].targetAmount = goal.targetAmount;
+                fallbackGoals[index].currentAmount = goal.currentAmount || 0;
+                fallbackGoals[index].color = goal.color || '#10B981';
+                fallbackGoals[index].icon = goal.icon || 'bi-flag';
+                fallbackGoals[index].targetDate = goal.targetDate;
+                fallbackGoals[index].isCompleted = fallbackGoals[index].currentAmount >= fallbackGoals[index].targetAmount;
+                setFallbackGoals(fallbackGoals);
+                allGoals = fallbackGoals;
+                isUsingFallback = true;
+            }
+            return true;
+        }
+        
         if (!response.ok) {
             console.log('⚠️ API update failed with status:', response.status);
             // Update in fallback
@@ -339,7 +419,7 @@ async function updateGoalInApi(id, goal) {
             return true;
         }
         
-        var data = await response.json();
+        var data = JSON.parse(responseText);
         console.log('✅ Update response:', data);
         
         if (data.success === true) {
@@ -399,6 +479,18 @@ async function deleteGoalFromApi(id) {
         
         console.log('📡 Response status:', response.status);
         
+        var responseText = await response.text();
+        if (responseText.trim().startsWith('<!DOCTYPE') || responseText.trim().startsWith('<html')) {
+            console.error('❌ Received HTML instead of JSON - authentication issue');
+            // Delete from fallback
+            var fallbackGoals = getFallbackGoals() || [];
+            fallbackGoals = fallbackGoals.filter(function(g) { return g.id !== id; });
+            setFallbackGoals(fallbackGoals);
+            allGoals = fallbackGoals;
+            isUsingFallback = true;
+            return true;
+        }
+        
         if (!response.ok) {
             console.log('⚠️ API delete failed with status:', response.status);
             // Delete from fallback
@@ -410,7 +502,7 @@ async function deleteGoalFromApi(id) {
             return true;
         }
         
-        var data = await response.json();
+        var data = JSON.parse(responseText);
         if (data.success === true) {
             await fetchGoals();
             return true;
@@ -637,8 +729,8 @@ function showToast(message, type) {
     }
     
     var toast = document.createElement('div');
-    var iconColor = type === 'success' ? '#10B981' : (type === 'info' ? '#3B82F6' : '#EF4444');
-    var icon = type === 'success' ? 'check-circle-fill' : (type === 'info' ? 'info-circle-fill' : 'exclamation-triangle-fill');
+    var iconColor = type === 'success' ? '#10B981' : (type === 'error' ? '#EF4444' : (type === 'warning' ? '#F59E0B' : '#3B82F6'));
+    var icon = type === 'success' ? 'check-circle-fill' : (type === 'error' ? 'exclamation-triangle-fill' : (type === 'warning' ? 'exclamation-triangle-fill' : 'info-circle-fill'));
     toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + iconColor + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
     toast.innerHTML = '<i class="bi bi-' + icon + '" style="color:' + iconColor + '"></i><span>' + message + '</span>';
     
@@ -745,23 +837,59 @@ function escapeHtml(str) {
 }
 
 // ============================================
-// TEST API CONNECTION
+// TEST API CONNECTION - IMPROVED
 // ============================================
 async function testApiConnection() {
     try {
-        const url = `${API_BASE}/api/health`;
-        console.log('🧪 Testing API connection:', url);
+        // Check health
+        const healthUrl = `${API_BASE}/api/health`;
+        console.log('🧪 Testing API health...');
+        const healthResponse = await fetch(healthUrl);
+        const healthText = await healthResponse.text();
+        console.log('✅ Health check:', healthText);
         
-        const response = await fetch(url);
-        const text = await response.text();
-        console.log('✅ Health check response:', text);
+        // Check auth
+        const authUrl = `${API_BASE}/api/goals`;
+        console.log('🧪 Testing authentication...');
+        const authResponse = await fetch(authUrl, {
+            credentials: 'include'
+        });
+        console.log('📡 Auth status:', authResponse.status);
         
-        try {
-            const data = JSON.parse(text);
-            alert('✅ API is healthy!\n\n' + JSON.stringify(data, null, 2));
-        } catch (e) {
-            alert('⚠️ API responded but not with JSON:\n\n' + text.substring(0, 200));
+        let authStatus = 'Unknown';
+        let authDetail = '';
+        if (authResponse.status === 200) {
+            authStatus = '✅ Authenticated (logged in)';
+            const data = await authResponse.json();
+            authDetail = `Found ${data.goals?.length || 0} goals`;
+        } else if (authResponse.status === 401) {
+            authStatus = '❌ Not authenticated (please log in)';
+        } else if (authResponse.status === 302) {
+            authStatus = '🔄 Redirecting to login page';
+        } else {
+            authStatus = `⚠️ Status: ${authResponse.status}`;
         }
+        
+        let healthData = {};
+        try {
+            healthData = JSON.parse(healthText);
+        } catch (e) {
+            healthData = { error: 'Invalid JSON response' };
+        }
+        
+        alert(
+            '🔍 API Test Results\n\n' +
+            '✅ Health: ' + (healthData.status || 'OK') + '\n' +
+            '🔐 Auth: ' + authStatus + '\n' +
+            '📊 DB: ' + (healthData.services?.database?.status || 'Unknown') + '\n' +
+            (authDetail ? '📝 ' + authDetail + '\n' : '') + '\n' +
+            '💡 If you see "Not authenticated":\n' +
+            '  1. Log in to your account\n' +
+            '  2. Then try saving a goal again\n\n' +
+            '💡 If you see "Redirecting":\n' +
+            '  The app is trying to redirect to login.\n' +
+            '  Make sure you are logged in first.'
+        );
     } catch (e) {
         console.error('❌ API test failed:', e);
         alert('❌ API test failed: ' + e.message);
@@ -814,6 +942,9 @@ document.addEventListener('DOMContentLoaded', async function() {
             closeGoalModal();
         }
     });
+    
+    // Check authentication status on load
+    await checkAuthStatus();
 });
 
 // Make functions global
@@ -823,6 +954,7 @@ window.saveGoal = saveGoal;
 window.deleteGoal = deleteGoal;
 window.openEditGoalModal = openEditGoalModal;
 window.addToGoal = addToGoal;
+window.checkAuthStatus = checkAuthStatus;
 
 // ============================================
 // GOALS INIT FUNCTION - EXPOSE FOR BLAZOR
@@ -831,6 +963,7 @@ window.initGoalsPage = async function() {
     console.log('🔄 goals: init called from Blazor');
     setupGoalsSidebar();
     await renderAllGoals();
+    await checkAuthStatus();
     console.log('✅ goals: initialized');
 };
 
