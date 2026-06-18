@@ -108,37 +108,6 @@ function getDefaultGoals() {
 }
 
 // ============================================
-// CHECK AUTHENTICATION STATUS
-// ============================================
-async function checkAuthStatus() {
-    try {
-        const url = `${API_BASE}/api/goals`;
-        console.log('🔍 Checking auth status...');
-        
-        const response = await fetch(url, {
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        
-        console.log('📡 Auth check response status:', response.status);
-        
-        if (response.status === 401 || response.status === 302) {
-            console.log('❌ Not authenticated');
-            showToast('Please log in to sync goals to the cloud', 'info');
-            return false;
-        }
-        
-        console.log('✅ Authenticated');
-        return true;
-    } catch (e) {
-        console.error('❌ Auth check error:', e);
-        return false;
-    }
-}
-
-// ============================================
 // API CALLS - FIXED with absolute URLs and auth
 // ============================================
 async function fetchGoals() {
@@ -837,69 +806,6 @@ function escapeHtml(str) {
 }
 
 // ============================================
-// TEST API CONNECTION - IMPROVED
-// ============================================
-async function testApiConnection() {
-    try {
-        // Check health
-        const healthUrl = `${API_BASE}/api/health`;
-        console.log('🧪 Testing API health...');
-        const healthResponse = await fetch(healthUrl);
-        const healthText = await healthResponse.text();
-        console.log('✅ Health check:', healthText);
-        
-        // Check auth
-        const authUrl = `${API_BASE}/api/goals`;
-        console.log('🧪 Testing authentication...');
-        const authResponse = await fetch(authUrl, {
-            credentials: 'include'
-        });
-        console.log('📡 Auth status:', authResponse.status);
-        
-        let authStatus = 'Unknown';
-        let authDetail = '';
-        if (authResponse.status === 200) {
-            authStatus = '✅ Authenticated (logged in)';
-            const data = await authResponse.json();
-            authDetail = `Found ${data.goals?.length || 0} goals`;
-        } else if (authResponse.status === 401) {
-            authStatus = '❌ Not authenticated (please log in)';
-        } else if (authResponse.status === 302) {
-            authStatus = '🔄 Redirecting to login page';
-        } else {
-            authStatus = `⚠️ Status: ${authResponse.status}`;
-        }
-        
-        let healthData = {};
-        try {
-            healthData = JSON.parse(healthText);
-        } catch (e) {
-            healthData = { error: 'Invalid JSON response' };
-        }
-        
-        alert(
-            '🔍 API Test Results\n\n' +
-            '✅ Health: ' + (healthData.status || 'OK') + '\n' +
-            '🔐 Auth: ' + authStatus + '\n' +
-            '📊 DB: ' + (healthData.services?.database?.status || 'Unknown') + '\n' +
-            (authDetail ? '📝 ' + authDetail + '\n' : '') + '\n' +
-            '💡 If you see "Not authenticated":\n' +
-            '  1. Log in to your account\n' +
-            '  2. Then try saving a goal again\n\n' +
-            '💡 If you see "Redirecting":\n' +
-            '  The app is trying to redirect to login.\n' +
-            '  Make sure you are logged in first.'
-        );
-    } catch (e) {
-        console.error('❌ API test failed:', e);
-        alert('❌ API test failed: ' + e.message);
-    }
-}
-
-// Make test function global
-window.testApiConnection = testApiConnection;
-
-// ============================================
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', async function() {
@@ -912,21 +818,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     await renderAllGoals();
     console.log('Goals page initialized');
-    
-    // Add test button if not already present
-    if (!document.getElementById('testApiBtn')) {
-        var headerRight = document.querySelector('.header-right');
-        if (headerRight) {
-            var testBtn = document.createElement('button');
-            testBtn.id = 'testApiBtn';
-            testBtn.className = 'btn-add-transaction';
-            testBtn.style.background = '#3B82F6';
-            testBtn.style.marginRight = '0.5rem';
-            testBtn.innerHTML = '<i class="bi bi-plug"></i> Test API';
-            testBtn.onclick = testApiConnection;
-            headerRight.insertBefore(testBtn, headerRight.firstChild);
-        }
-    }
 
     // Close modal on overlay click
     var goalModal = document.getElementById('goalModal');
