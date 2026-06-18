@@ -6,7 +6,7 @@ using SmartBudget.Data;
 using SmartBudget.Services;
 using SmartBudget.Components.Account;
 using System.Security.Claims;
-using SmartBudget.Models;  // ✅ This imports GoalRequest
+using SmartBudget.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -426,7 +426,6 @@ app.MapPost("/api/goals", async (HttpContext ctx, UserManager<IdentityUser> user
             return Results.Unauthorized();
         }
 
-        // ✅ Use the imported GoalRequest class
         var request = await ctx.Request.ReadFromJsonAsync<GoalRequest>();
         if (request == null)
         {
@@ -575,6 +574,30 @@ app.MapDelete("/api/goals/{id}", async (int id, UserManager<IdentityUser> userMa
     {
         Console.WriteLine($"❌ Error deleting goal: {ex.Message}");
         return Results.Json(new { success = false, message = ex.Message }, statusCode: 500);
+    }
+});
+
+// ============================================
+// ✅ DEBUG - Check if SavingsGoals table exists
+// ============================================
+app.MapGet("/api/debug/db", async (ApplicationDbContext dbContext) =>
+{
+    try
+    {
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        var tableExists = await dbContext.Database.ExecuteSqlRawAsync(
+            "SELECT 1 FROM information_schema.tables WHERE table_name = 'SavingsGoals'");
+        
+        return Results.Ok(new
+        {
+            databaseConnected = canConnect,
+            tableExists = tableExists > 0,
+            hasData = tableExists > 0 ? await dbContext.SavingsGoals.AnyAsync() : false
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Json(new { error = ex.Message }, statusCode: 500);
     }
 });
 
