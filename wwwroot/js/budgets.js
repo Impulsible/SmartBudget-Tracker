@@ -6,6 +6,8 @@ console.log('Budgets JS: Loaded');
 var allBudgets = [];
 var budgetChart = null;
 var isUsingFallback = false;
+var chartRetryCount = 0;
+var maxChartRetries = 10;
 
 // ============================================
 // SIDEBAR SETUP
@@ -44,7 +46,7 @@ function closeBudgetsSidebar() {
 }
 
 // ============================================
-// FALLBACK STORAGE - LocalStorage when API fails
+// FALLBACK STORAGE
 // ============================================
 function getFallbackBudgets() {
     try {
@@ -66,28 +68,18 @@ function setFallbackBudgets(budgets) {
     }
 }
 
-function getFallbackTransactions() {
-    try {
-        var stored = localStorage.getItem('smartbudget_transactions_fallback');
-        if (stored) {
-            return JSON.parse(stored);
-        }
-    } catch (e) {
-        console.log('Fallback read error:', e);
-    }
-    return null;
-}
-
-function setFallbackTransactions(transactions) {
-    try {
-        localStorage.setItem('smartbudget_transactions_fallback', JSON.stringify(transactions));
-    } catch (e) {
-        console.log('Fallback write error:', e);
-    }
+function getDefaultBudgets() {
+    return [
+        { id: 1, name: "Food", amount: 65000, color: "#10B981", spent: 0 },
+        { id: 2, name: "Transport", amount: 35000, color: "#3B82F6", spent: 0 },
+        { id: 3, name: "Shopping", amount: 45000, color: "#F59E0B", spent: 0 },
+        { id: 4, name: "Bills", amount: 30000, color: "#EF4444", spent: 0 },
+        { id: 5, name: "Entertainment", amount: 20000, color: "#8B5CF6", spent: 0 }
+    ];
 }
 
 // ============================================
-// API CALLS - PERSISTENT DATA
+// API CALLS
 // ============================================
 async function fetchBudgets() {
     try {
@@ -160,16 +152,6 @@ async function fetchBudgets() {
         setFallbackBudgets(allBudgets);
         return allBudgets;
     }
-}
-
-function getDefaultBudgets() {
-    return [
-        { id: 1, name: "Food", amount: 65000, color: "#10B981", spent: 0 },
-        { id: 2, name: "Transport", amount: 35000, color: "#3B82F6", spent: 0 },
-        { id: 3, name: "Shopping", amount: 45000, color: "#F59E0B", spent: 0 },
-        { id: 4, name: "Bills", amount: 30000, color: "#EF4444", spent: 0 },
-        { id: 5, name: "Entertainment", amount: 20000, color: "#8B5CF6", spent: 0 }
-    ];
 }
 
 async function saveBudgetToApi(budget) {
@@ -393,6 +375,14 @@ function closeBudgetModal() {
     }
 }
 
+function updateColorPreview() {
+    var colorInput = document.getElementById('budgetColor');
+    var preview = document.getElementById('budgetColorPreview');
+    if (colorInput && preview) {
+        preview.style.background = colorInput.value;
+    }
+}
+
 async function openEditBudgetModal(id) {
     try {
         var budget = allBudgets.find(function(b) { return b.id === id; });
@@ -423,7 +413,7 @@ async function openEditBudgetModal(id) {
 }
 
 // ============================================
-// SAVE BUDGET - PERSISTENT
+// SAVE BUDGET
 // ============================================
 async function saveBudget() {
     console.log('📝 saveBudget called');
@@ -458,10 +448,15 @@ async function saveBudget() {
     }
     
     var success;
-    if (id) {
-        success = await updateBudgetInApi(parseInt(id), { name: name, amount: amount, color: color });
-    } else {
-        success = await saveBudgetToApi({ name: name, amount: amount, color: color });
+    try {
+        if (id) {
+            success = await updateBudgetInApi(parseInt(id), { name: name, amount: amount, color: color });
+        } else {
+            success = await saveBudgetToApi({ name: name, amount: amount, color: color });
+        }
+    } catch (error) {
+        console.error('❌ Error in saveBudget:', error);
+        success = false;
     }
     
     if (saveBtn) {
@@ -483,7 +478,7 @@ async function saveBudget() {
 }
 
 // ============================================
-// DELETE BUDGET - PERSISTENT
+// DELETE BUDGET
 // ============================================
 async function deleteBudget(id) {
     if (confirm('Are you sure you want to delete this budget category?')) {
@@ -538,17 +533,36 @@ function showToast(message, type) {
     }, 3000);
 }
 
+// Add spinner CSS if not exists
+if (!document.querySelector('#spinnerStyle')) {
+    var style = document.createElement('style');
+    style.id = 'spinnerStyle';
+    style.textContent = '.spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;} @keyframes spin{to{transform:rotate(360deg)}} @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}';
+    document.head.appendChild(style);
+}
+
 // ============================================
-// UPDATE BUDGET CHART - PERSISTENT DATA
+// UPDATE BUDGET CHART - WITH RETRY
 // ============================================
 function updateBudgetChart() {
     console.log('📊 Updating budget chart with:', allBudgets);
     
     var ctx = document.getElementById('budgetChart');
     if (!ctx) {
-        console.log('❌ Budget chart canvas not found');
+        chartRetryCount++;
+        if (chartRetryCount <= maxChartRetries) {
+            console.log('❌ Budget chart canvas not found, retrying... (' + chartRetryCount + '/' + maxChartRetries + ')');
+            setTimeout(function() {
+                updateBudgetChart();
+            }, 300);
+        } else {
+            console.log('⚠️ Budget chart canvas not found after ' + maxChartRetries + ' attempts. Skipping chart render.');
+        }
         return;
     }
+    
+    // Reset retry counter on success
+    chartRetryCount = 0;
     
     if (budgetChart) {
         budgetChart.destroy();
@@ -650,6 +664,7 @@ function updateBudgetChart() {
         }
     });
     
+    // Register center text plugin
     Chart.register({
         id: 'budgetCenterText',
         afterDraw: function(chart) {
@@ -673,7 +688,7 @@ function updateBudgetChart() {
 }
 
 // ============================================
-// RENDER ALL BUDGETS - PERSISTENT
+// RENDER ALL BUDGETS
 // ============================================
 async function renderAllBudgets() {
     var budgets = await fetchBudgets();
@@ -745,14 +760,6 @@ function escapeHtml(str) {
     });
 }
 
-// Add spinner CSS if not exists
-if (!document.querySelector('#spinnerStyle')) {
-    var style = document.createElement('style');
-    style.id = 'spinnerStyle';
-    style.textContent = '.spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;} @keyframes spin{to{transform:rotate(360deg)}} @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}';
-    document.head.appendChild(style);
-}
-
 // ============================================
 // MAKE FUNCTIONS GLOBALLY AVAILABLE
 // ============================================
@@ -764,9 +771,16 @@ window.openEditBudgetModal = openEditBudgetModal;
 window.resetBudgetCategories = resetBudgetCategories;
 window.updateBudgetChart = updateBudgetChart;
 window.renderAllBudgets = renderAllBudgets;
+window.updateColorPreview = updateColorPreview;
+window.budgets = {
+    openModal: openBudgetModal,
+    closeModal: closeBudgetModal,
+    saveBudget: saveBudget,
+    updateColorPreview: updateColorPreview
+};
 
 // ============================================
-// INITIALIZATION - PERSISTENT
+// INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Budgets page initializing...');
@@ -805,17 +819,9 @@ window.initBudgetsPage = async function() {
     console.log('🔄 budgets: init called from Blazor');
     setupBudgetsSidebar();
     await renderAllBudgets();
-    
-    var budgetModal = document.getElementById('budgetModal');
-    if (budgetModal) {
-        var newModal = budgetModal.cloneNode(true);
-        budgetModal.parentNode.replaceChild(newModal, budgetModal);
-        newModal.addEventListener('click', function(e) {
-            if (e.target === this) closeBudgetModal();
-        });
-    }
-    
     console.log('✅ budgets: initialized');
 };
 
 window.renderAllBudgets = renderAllBudgets;
+
+console.log('✅ Budgets JS: Fully loaded and ready');

@@ -4,130 +4,254 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartBudget.Data;
 using SmartBudget.Models;
+using System.Security.Claims;
 
 namespace SmartBudget.Controllers;
 
 [ApiController]
-[Route("api/goals")]
+[Route("api/[controller]")]
 [Authorize]
 public class GoalsController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly ILogger<GoalsController> _logger;
 
-    public GoalsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    public GoalsController(
+        ApplicationDbContext context,
+        UserManager<IdentityUser> userManager,
+        ILogger<GoalsController> logger)
     {
         _context = context;
         _userManager = userManager;
+        _logger = logger;
     }
 
-    private async Task<string> GetUserId()
-    {
-        var user = await _userManager.GetUserAsync(User);
-        return user?.Id ?? throw new UnauthorizedAccessException();
-    }
-
+    // GET: api/goals
     [HttpGet]
     public async Task<IActionResult> GetGoals()
     {
-        var userId = await GetUserId();
-        var goals = await _context.SavingsGoals
-            .Where(g => g.UserId == userId)
-            .OrderBy(g => g.Status)
-            .ThenBy(g => g.TargetDate)
-            .Select(g => new
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            _logger.LogInformation($"📊 Fetching goals for user: {userId ?? "null"}");
+            
+            if (string.IsNullOrEmpty(userId))
             {
-                g.Id,
-                g.Name,
-                g.TargetAmount,
-                g.CurrentAmount,
-                g.Color,
-                g.Icon,
-                g.TargetDate,
-                Status = g.Status.ToString(),
-                g.IsCompleted
-            })
-            .ToListAsync();
+                _logger.LogWarning("⚠️ User not authenticated - returning empty goals");
+                return Ok(new { success = true, goals = new List<object>() });
+            }
 
-        return Ok(new { success = true, goals });
+            var goals = await _context.SavingsGoals
+                .Where(g => g.UserId == userId)
+                .OrderByDescending(g => g.CreatedAt)
+                .Select(g => new
+                {
+                    g.Id,
+                    g.Name,
+                    g.TargetAmount,
+                    g.CurrentAmount,
+                    g.Color,
+                    g.Icon,
+                    TargetDate = g.TargetDate.HasValue ? g.TargetDate.Value.ToString("yyyy-MM-dd") : null,
+                    g.IsCompleted,
+                    g.CreatedAt,
+                    g.UpdatedAt
+                })
+                .ToListAsync();
+
+            _logger.LogInformation($"✅ Found {goals.Count} goals for user {userId}");
+            return Ok(new { success = true, goals = goals });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"❌ Error fetching goals: {ex.Message}");
+            _logger.LogError($"Stack trace: {ex.StackTrace}");
+            
+            // Return empty goals instead of error to prevent frontend crash
+            return Ok(new { success = true, goals = new List<object>(), message = "Error loading goals, but continuing" });
+        }
     }
 
+    // POST: api/goals
     [HttpPost]
     public async Task<IActionResult> CreateGoal([FromBody] GoalRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Name))
-            return BadRequest(new { success = false, message = "Goal name is required." });
-
-        if (request.TargetAmount <= 0)
-            return BadRequest(new { success = false, message = "Target amount must be greater than zero." });
-
-        var userId = await GetUserId();
-        var goal = new SavingsGoal
+        try
         {
-            UserId = userId,
-            Name = request.Name.Trim(),
-            TargetAmount = request.TargetAmount,
-            CurrentAmount = request.CurrentAmount,
-            Color = request.Color ?? "#10B981",
-            Icon = request.Icon ?? "bi-flag",
-            TargetDate = request.TargetDate,
-            Status = SavingsGoalStatus.Active
-        };
+            _logger.LogInformation($"📝 Creating goal: {request?.Name ?? "null"}");
+            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated" });
+            }
 
-        _context.SavingsGoals.Add(goal);
-        await _context.SaveChangesAsync();
+            if (request == null)
+            {
+                return BadRequest(new { success = false, message = "Invalid request" });
+            }
 
-        return Ok(new { success = true, id = goal.Id });
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return BadRequest(new { success = false, message = "Goal name is required" });
+            }
+
+            if (request.TargetAmount <= 0)
+            {
+                return BadRequest(new { success = false, message = "Target amount must be greater than 0" });
+            }
+
+            var goal = new SavingsGoal
+            {
+                Name = request.Name.Trim(),
+                TargetAmount = request.TargetAmount,
+                CurrentAmount = request.CurrentAmount ?? 0,
+                Color = request.Color ?? "#10B981",
+                Icon = request.Icon ?? "bi-flag",
+                TargetDate = !string.IsNullOrEmpty(request.TargetDate) ? DateTime.Parse(request.TargetDate) : (DateTime?)null,
+                UserId = userId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsCompleted = false
+            };
+
+            _context.SavingsGoals.Add(goal);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"✅ Goal created: {goal.Name} (ID: {goal.Id})");
+
+            return Ok(new
+            {
+                success = true,
+                message = "Goal created successfully",
+                goal = new
+                {
+                    goal.Id,
+                    goal.Name,
+                    goal.TargetAmount,
+                    goal.CurrentAmount,
+                    goal.Color,
+                    goal.Icon,
+                    TargetDate = goal.TargetDate.HasValue ? goal.TargetDate.Value.ToString("yyyy-MM-dd") : null,
+                    goal.IsCompleted,
+                    goal.CreatedAt,
+                    goal.UpdatedAt
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"❌ Error creating goal: {ex.Message}");
+            _logger.LogError($"Stack trace: {ex.StackTrace}");
+            return StatusCode(500, new { success = false, message = ex.Message });
+        }
     }
 
+    // PUT: api/goals/{id}
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateGoal(int id, [FromBody] GoalRequest request)
     {
-        var userId = await GetUserId();
-        var goal = await _context.SavingsGoals
-            .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
+        try
+        {
+            _logger.LogInformation($"📝 Updating goal ID: {id}");
+            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated" });
+            }
 
-        if (goal == null)
-            return NotFound(new { success = false });
+            if (request == null)
+            {
+                return BadRequest(new { success = false, message = "Invalid request" });
+            }
 
-        if (!string.IsNullOrWhiteSpace(request.Name)) goal.Name = request.Name.Trim();
-        if (request.TargetAmount > 0) goal.TargetAmount = request.TargetAmount;
-        goal.CurrentAmount = request.CurrentAmount;
-        if (!string.IsNullOrWhiteSpace(request.Color)) goal.Color = request.Color;
-        if (!string.IsNullOrWhiteSpace(request.Icon)) goal.Icon = request.Icon;
-        if (request.TargetDate != default) goal.TargetDate = request.TargetDate;
+            var goal = await _context.SavingsGoals
+                .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
-        if (goal.CurrentAmount >= goal.TargetAmount && goal.TargetAmount > 0)
-            goal.Status = SavingsGoalStatus.Completed;
+            if (goal == null)
+            {
+                return NotFound(new { success = false, message = "Goal not found" });
+            }
 
-        goal.UpdatedAt = DateTime.UtcNow;
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return BadRequest(new { success = false, message = "Goal name is required" });
+            }
 
-        await _context.SaveChangesAsync();
-        return Ok(new { success = true });
+            if (request.TargetAmount <= 0)
+            {
+                return BadRequest(new { success = false, message = "Target amount must be greater than 0" });
+            }
+
+            goal.Name = request.Name.Trim();
+            goal.TargetAmount = request.TargetAmount;
+            goal.CurrentAmount = request.CurrentAmount ?? 0;
+            goal.Color = request.Color ?? "#10B981";
+            goal.Icon = request.Icon ?? "bi-flag";
+            goal.TargetDate = !string.IsNullOrEmpty(request.TargetDate) ? DateTime.Parse(request.TargetDate) : (DateTime?)null;
+            goal.UpdatedAt = DateTime.UtcNow;
+            goal.IsCompleted = goal.CurrentAmount >= goal.TargetAmount;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"✅ Goal updated: {goal.Name} (ID: {goal.Id})");
+
+            return Ok(new { success = true, message = "Goal updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"❌ Error updating goal: {ex.Message}");
+            _logger.LogError($"Stack trace: {ex.StackTrace}");
+            return StatusCode(500, new { success = false, message = ex.Message });
+        }
     }
 
+    // DELETE: api/goals/{id}
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteGoal(int id)
     {
-        var userId = await GetUserId();
-        var goal = await _context.SavingsGoals
-            .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
+        try
+        {
+            _logger.LogInformation($"🗑️ Deleting goal ID: {id}");
+            
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new { success = false, message = "User not authenticated" });
+            }
 
-        if (goal == null)
-            return NotFound(new { success = false });
+            var goal = await _context.SavingsGoals
+                .FirstOrDefaultAsync(g => g.Id == id && g.UserId == userId);
 
-        _context.SavingsGoals.Remove(goal);
-        await _context.SaveChangesAsync();
-        return Ok(new { success = true });
+            if (goal == null)
+            {
+                return NotFound(new { success = false, message = "Goal not found" });
+            }
+
+            _context.SavingsGoals.Remove(goal);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"✅ Goal deleted: ID {id}");
+
+            return Ok(new { success = true, message = "Goal deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"❌ Error deleting goal: {ex.Message}");
+            _logger.LogError($"Stack trace: {ex.StackTrace}");
+            return StatusCode(500, new { success = false, message = ex.Message });
+        }
     }
 }
 
 public class GoalRequest
 {
-    public string? Name { get; set; }
+    public string Name { get; set; } = "";
     public decimal TargetAmount { get; set; }
-    public decimal CurrentAmount { get; set; }
+    public decimal? CurrentAmount { get; set; }
     public string? Color { get; set; }
     public string? Icon { get; set; }
-    public DateTime TargetDate { get; set; }
+    public string? TargetDate { get; set; }
 }

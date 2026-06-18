@@ -1,8 +1,8 @@
 // ============================================
 // SMARTBUDGET DASHBOARD - Production Ready
-// FIXED: Category Dropdown Now Populates
+// FIXED: Category Dropdown Now Populates & Budgets Sync
 // ============================================
-console.log('Dashboard JS: Loaded (Fixed v3)');
+console.log('Dashboard JS: Loaded (Fixed v4)');
 
 var spendingChart = null;
 var budgetChart = null;
@@ -51,6 +51,14 @@ function getFallbackBudgets() {
     return null;
 }
 
+function setFallbackBudgets(budgets) {
+    try {
+        localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(budgets));
+    } catch (e) {
+        console.log('Fallback write error:', e);
+    }
+}
+
 function getFallbackTransactions() {
     try {
         var stored = localStorage.getItem('smartbudget_transactions_fallback');
@@ -69,6 +77,26 @@ function setFallbackTransactions(transactions) {
     } catch (e) {
         console.log('Fallback write error:', e);
     }
+}
+
+// ============================================
+// SYNC BUDGETS FROM LOCAL STORAGE
+// ============================================
+function syncBudgetsFromStorage() {
+    var stored = getFallbackBudgets();
+    if (stored && stored.length > 0) {
+        dashboardBudgets = stored.map(function(b) {
+            if (b.color) categoryColors[b.name] = b.color;
+            return { 
+                name: b.name, 
+                amount: b.amount || 0, 
+                color: b.color || getCategoryColor(b.name)
+            };
+        });
+        console.log('Dashboard: Synced budgets from storage:', dashboardBudgets.length);
+        return true;
+    }
+    return false;
 }
 
 // ============================================
@@ -286,16 +314,8 @@ async function loadBudgetsFromApi() {
         
         if (response.status === 401) {
             console.log('Dashboard: Not authenticated - using fallback');
-            var fallbackData = getFallbackBudgets();
-            if (fallbackData && fallbackData.length > 0) {
-                dashboardBudgets = fallbackData.map(function(b) {
-                    if (b.color) categoryColors[b.name] = b.color;
-                    return { 
-                        name: b.name, 
-                        amount: b.amount || 0, 
-                        color: b.color || getCategoryColor(b.name)
-                    };
-                });
+            // ✅ Try to sync from localStorage first
+            if (syncBudgetsFromStorage()) {
                 return true;
             }
             dashboardBudgets = [];
@@ -313,53 +333,28 @@ async function loadBudgetsFromApi() {
                         color: b.color || getCategoryColor(b.name)
                     };
                 });
-                console.log('Dashboard: Loaded', dashboardBudgets.length, 'budgets');
+                // ✅ Save to localStorage for sync
+                setFallbackBudgets(data.budgets);
+                console.log('Dashboard: Loaded', dashboardBudgets.length, 'budgets from API');
                 return true;
             } else {
-                console.log('Dashboard: No budgets found');
-                var fallbackData = getFallbackBudgets();
-                if (fallbackData && fallbackData.length > 0) {
-                    dashboardBudgets = fallbackData.map(function(b) {
-                        if (b.color) categoryColors[b.name] = b.color;
-                        return { 
-                            name: b.name, 
-                            amount: b.amount || 0, 
-                            color: b.color || getCategoryColor(b.name)
-                        };
-                    });
+                console.log('Dashboard: No budgets from API, checking localStorage');
+                if (syncBudgetsFromStorage()) {
                     return true;
                 }
                 dashboardBudgets = [];
                 return false;
             }
         }
-        console.log('Dashboard: Budgets API error');
-        var fallbackData = getFallbackBudgets();
-        if (fallbackData && fallbackData.length > 0) {
-            dashboardBudgets = fallbackData.map(function(b) {
-                if (b.color) categoryColors[b.name] = b.color;
-                return { 
-                    name: b.name, 
-                    amount: b.amount || 0, 
-                    color: b.color || getCategoryColor(b.name)
-                };
-            });
+        console.log('Dashboard: Budgets API error, checking localStorage');
+        if (syncBudgetsFromStorage()) {
             return true;
         }
         dashboardBudgets = [];
         return false;
     } catch (e) {
-        console.log('Dashboard: Network error:', e.message);
-        var fallbackData = getFallbackBudgets();
-        if (fallbackData && fallbackData.length > 0) {
-            dashboardBudgets = fallbackData.map(function(b) {
-                if (b.color) categoryColors[b.name] = b.color;
-                return { 
-                    name: b.name, 
-                    amount: b.amount || 0, 
-                    color: b.color || getCategoryColor(b.name)
-                };
-            });
+        console.log('Dashboard: Network error, checking localStorage');
+        if (syncBudgetsFromStorage()) {
             return true;
         }
         dashboardBudgets = [];
@@ -377,6 +372,9 @@ async function loadAllData() {
     
     isDataLoaded = true;
     console.log('Dashboard: Data loaded - Tx:', dashboardTransactions.length, 'Budgets:', dashboardBudgets.length);
+    
+    // ✅ Update chart after loading
+    updateBudgetChart();
 }
 
 // ============================================
@@ -719,7 +717,7 @@ window.addCategory = async function() {
         } else {
             var fallbackBudgets = getFallbackBudgets() || [];
             fallbackBudgets.push({ id: Date.now(), name: name, amount: amount, color: color, spent: 0 });
-            localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(fallbackBudgets));
+            setFallbackBudgets(fallbackBudgets);
             dashboardBudgets = fallbackBudgets;
             renderCategoryOptions();
             updateBudgetChart();
@@ -731,7 +729,7 @@ window.addCategory = async function() {
         console.error('Error adding category:', e);
         var fallbackBudgets = getFallbackBudgets() || [];
         fallbackBudgets.push({ id: Date.now(), name: name, amount: amount, color: color, spent: 0 });
-        localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(fallbackBudgets));
+        setFallbackBudgets(fallbackBudgets);
         dashboardBudgets = fallbackBudgets;
         renderCategoryOptions();
         updateBudgetChart();
@@ -1085,6 +1083,7 @@ function startLiveChartMovement() {
             } catch(e) {}
         }
 
+        // ✅ Update budget chart with latest data
         if (budgetChart) {
             try {
                 updateBudgetCategoriesFromTransactions();
@@ -1107,8 +1106,8 @@ function startLiveDataRefresh() {
     setInterval(async function() {
         try {
             var dataChanged = await loadTransactionsFromApi();
-            if (dataChanged) {
-                await loadBudgetsFromApi();
+            var budgetsChanged = await loadBudgetsFromApi();
+            if (dataChanged || budgetsChanged) {
                 renderTransactions();
                 renderCategoryOptions();
                 updateStatsFromTransactions();
@@ -1266,6 +1265,9 @@ function updateBudgetChart() {
     if (!ctx) return;
     if (budgetChart) budgetChart.destroy();
 
+    // ✅ Always refresh from localStorage first
+    syncBudgetsFromStorage();
+    
     updateBudgetCategoriesFromTransactions();
 
     var total = dashboardBudgets.reduce(function(s, c) { return s + c.amount; }, 0);

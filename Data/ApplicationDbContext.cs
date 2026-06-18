@@ -38,11 +38,17 @@ namespace SmartBudget.Data
                 .HasIndex(b => new { b.UserId, b.CategoryId, b.Year, b.Month })
                 .IsUnique();
 
-            // SavingsGoal indexes
+            // ✅ FIXED: SavingsGoal indexes - remove Status reference
             builder.Entity<SavingsGoal>()
-                .HasIndex(g => new { g.UserId, g.Status });
+                .HasIndex(g => new { g.UserId, g.IsCompleted });
 
-            // Seed default categories will be handled in Program.cs
+            // Alternative: If you want to add a Status property later:
+            // builder.Entity<SavingsGoal>()
+            //     .HasIndex(g => new { g.UserId, g.Status });
+            
+            // Or just index by UserId only:
+            // builder.Entity<SavingsGoal>()
+            //     .HasIndex(g => g.UserId);
         }
     }
 }

@@ -1,7 +1,7 @@
 // ============================================
 // SMARTBUDGET REPORTS PAGE - Auto-updating Charts
 // ============================================
-console.log('Reports JS: Loaded');
+console.log('Reports JS: Loaded (Fixed)');
 
 var reportTrendChart = null;
 var reportExpenseChart = null;
@@ -10,7 +10,8 @@ var currentPeriod = 'month';
 var refreshInterval = null;
 var allTransactions = [];
 var isInitialized = false;
-var initCount = 0;
+var initAttempts = 0;
+var maxInitAttempts = 10;
 
 // ============================================
 // DESTROY ALL CHARTS
@@ -81,7 +82,9 @@ function closeReportsSidebar() {
 // ============================================
 async function fetchReportTransactions(period) {
     try {
-        var response = await fetch('/api/reports/transactions?period=' + period);
+        var response = await fetch('/api/reports/transactions?period=' + period, {
+            credentials: 'include'
+        });
         if (!response.ok) {
             console.log('Reports API not available, using demo data');
             return getDemoTransactions();
@@ -633,8 +636,13 @@ function showToast(message, type) {
 // REPORTS INIT FUNCTION - EXPOSE FOR BLAZOR
 // ============================================
 window.initReportsPage = function() {
-    initCount++;
-    console.log('🔄 reports: init called from Blazor (#' + initCount + ')');
+    initAttempts++;
+    console.log('🔄 reports: init called from Blazor (attempt ' + initAttempts + ')');
+    
+    if (initAttempts > maxInitAttempts) {
+        console.log('⚠️ Max init attempts reached, stopping retries');
+        return;
+    }
     
     // Check if DOM elements exist
     var trendCanvas = document.getElementById('reportTrendChart');
@@ -643,6 +651,15 @@ window.initReportsPage = function() {
     
     if (!trendCanvas || !expenseCanvas || !savingsCanvas) {
         console.log('⚠️ Canvas elements not ready, retrying...');
+        setTimeout(function() {
+            window.initReportsPage();
+        }, 200);
+        return;
+    }
+    
+    // Check if Chart.js is loaded
+    if (typeof Chart === 'undefined') {
+        console.log('⏳ Chart.js not loaded, retrying...');
         setTimeout(function() {
             window.initReportsPage();
         }, 200);
@@ -678,7 +695,7 @@ window.initReportsPage = function() {
         loadReportData();
         startAutoRefresh();
         isInitialized = true;
-        console.log('✅ Reports initialized successfully (#' + initCount + ')');
+        console.log('✅ Reports initialized successfully (attempt ' + initAttempts + ')');
     }, 300);
 };
 
@@ -708,3 +725,5 @@ window.startAutoRefresh = startAutoRefresh;
 window.stopAutoRefresh = stopAutoRefresh;
 window.initReportsPage = initReportsPage;
 window.destroyAllCharts = destroyAllCharts;
+
+console.log('✅ Reports JS: Fully loaded and ready');

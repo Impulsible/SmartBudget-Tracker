@@ -13,6 +13,10 @@
 
 <PageTitle>SmartBudget - Dashboard</PageTitle>
 
+<!-- ✅ Load page-specific scripts -->
+<script src="/js/dashboard.js"></script>
+<script src="/js/budgets.js"></script>
+
 <div class="dashboard-layout">
     <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
@@ -308,8 +312,22 @@
     @@media (max-width: 480px){.dashboard-header{padding:.75rem}.header-greeting h2{font-size:.95rem}.header-greeting p{font-size:.75rem}.stat-card{border-radius:14px}.stat-card-body .stat-value{font-size:1.8rem}.stat-icon{width:40px;height:40px}.transactions-actions{flex-direction:column;width:100%}.chart-container{height:220px}.modal-body,.modal-header,.modal-footer{padding:1rem}}
 </style>
 
-<script src="/js/app.js"></script>
-<script src="/js/dashboard.js"></script>
+<script>
+    // ✅ Auto-initialize dashboard when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('📊 Dashboard: DOM loaded, initializing...');
+        if (typeof window.initDashboardPage === 'function') {
+            window.initDashboardPage();
+        } else {
+            console.log('⏳ Waiting for dashboard.js to load...');
+            setTimeout(function() {
+                if (typeof window.initDashboardPage === 'function') {
+                    window.initDashboardPage();
+                }
+            }, 500);
+        }
+    });
+</script>
 
 @code {
     // ============================================
@@ -318,33 +336,6 @@
     private string _userName = "User";
     private string _userEmail = "";
     private string _userInitials = "U";
-    
-    // ✅ REMOVED UNUSED FIELDS:
-    // newTransactionDescription, newTransactionAmount, newTransactionCategory, newTransactionType
-    // newCategoryName, newCategoryAmount, newCategoryColor
-    // All transaction and category logic is handled by JavaScript
-
-    // Sample transactions - kept for reference/backup
-    private List<Transaction> recentTransactions = new()
-    {
-        new() { Description = "Grocery Shopping", Category = "Food", Date = DateTime.Now.AddDays(-1), Amount = 15000, Type = "expense", Status = "Completed" },
-        new() { Description = "Monthly Salary", Category = "Salary", Date = DateTime.Now.AddDays(-2), Amount = 350000, Type = "income", Status = "Completed" },
-        new() { Description = "Uber Ride", Category = "Transport", Date = DateTime.Now.AddDays(-2), Amount = 3500, Type = "expense", Status = "Completed" },
-        new() { Description = "Netflix Subscription", Category = "Entertainment", Date = DateTime.Now.AddDays(-3), Amount = 4500, Type = "expense", Status = "Completed" },
-        new() { Description = "Freelance Payment", Category = "Salary", Date = DateTime.Now.AddDays(-4), Amount = 50000, Type = "income", Status = "Pending" },
-        new() { Description = "Electricity Bill", Category = "Bills", Date = DateTime.Now.AddDays(-5), Amount = 12000, Type = "expense", Status = "Completed" },
-        new() { Description = "Shopping Mall", Category = "Shopping", Date = DateTime.Now.AddDays(-6), Amount = 25000, Type = "expense", Status = "Completed" },
-    };
-
-    public class Transaction
-    {
-        public string Description { get; set; } = "";
-        public string Category { get; set; } = "";
-        public DateTime Date { get; set; }
-        public decimal Amount { get; set; }
-        public string Type { get; set; } = "expense";
-        public string Status { get; set; } = "Completed";
-    }
 
     // ============================================
     // PAGE INITIALIZATION - PERSISTENT USER INFO
@@ -379,11 +370,11 @@
             
             if (user.Identity?.IsAuthenticated == true)
             {
-                // Get email - use null-coalescing operator to handle null
+                // Get email
                 var emailClaim = user.FindFirst(ClaimTypes.Email);
                 _userEmail = emailClaim?.Value ?? string.Empty;
                 
-                // Get name - try multiple sources with null checking
+                // Get name - try multiple sources
                 var fullNameClaim = user.FindFirst("FullName");
                 var nameClaim = user.FindFirst(ClaimTypes.Name);
                 var givenNameClaim = user.FindFirst(ClaimTypes.GivenName);
@@ -442,30 +433,6 @@
             return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
         }
         return "U";
-    }
-
-    // ============================================
-    // TOAST HELPERS - For showing notifications
-    // ============================================
-    
-    private async Task ShowSuccessToast(string message)
-    {
-        await JS.InvokeVoidAsync("showToast", message, "success");
-    }
-    
-    private async Task ShowErrorToast(string message)
-    {
-        await JS.InvokeVoidAsync("showToast", message, "error");
-    }
-    
-    private async Task ShowInfoToast(string message)
-    {
-        await JS.InvokeVoidAsync("showToast", message, "info");
-    }
-    
-    private async Task ShowWarningToast(string message)
-    {
-        await JS.InvokeVoidAsync("showToast", message, "warning");
     }
 
     // ============================================
