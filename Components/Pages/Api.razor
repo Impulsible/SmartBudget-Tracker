@@ -1,0 +1,1433 @@
+@page "/api"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<PageTitle>SmartBudget - API Documentation</PageTitle>
+
+<div class="api-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        API Documentation
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="api-hero">
+        <div class="container">
+            <div class="api-hero-content">
+                <div class="api-badge">⚡ API Documentation</div>
+                <h1>SmartBudget <span class="gradient-text">API</span></h1>
+                <p>RESTful API for integrating with SmartBudget's financial management platform.</p>
+                <div class="api-version">
+                    <span class="version-badge">v1.0.0</span>
+                    <span class="status-badge operational">● Operational</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    API OVERVIEW
+    ============================================ -->
+    <section class="api-overview">
+        <div class="container">
+            <div class="api-stats-grid">
+                <div class="api-stat">
+                    <div class="api-stat-number">12</div>
+                    <div class="api-stat-label">Endpoints</div>
+                </div>
+                <div class="api-stat">
+                    <div class="api-stat-number">4</div>
+                    <div class="api-stat-label">Methods</div>
+                </div>
+                <div class="api-stat">
+                    <div class="api-stat-number">99.9%</div>
+                    <div class="api-stat-label">Uptime</div>
+                </div>
+                <div class="api-stat">
+                    <div class="api-stat-number">&lt;200ms</div>
+                    <div class="api-stat-label">Response Time</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    API CONTENT
+    ============================================ -->
+    <section class="api-content">
+        <div class="container">
+            <div class="api-card">
+                <!-- Base URL -->
+                <div class="base-url-section">
+                    <h2>Base URL</h2>
+                    <div class="base-url-box">
+                        <code id="baseUrl">https://smartbudget-tracker.onrender.com/api</code>
+                        <button class="btn-copy" onclick="window.copyBaseUrl()">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                    <p class="base-url-note">All API requests should be made to this base URL.</p>
+                </div>
+
+                <!-- Authentication -->
+                <div class="auth-section">
+                    <h2>Authentication</h2>
+                    <p>All API endpoints require authentication using JWT (JSON Web Token).</p>
+                    
+                    <div class="auth-box">
+                        <div class="auth-header">
+                            <span class="auth-method">Bearer</span>
+                            <span class="auth-type">Token Authentication</span>
+                        </div>
+                        <div class="auth-example">
+                            <p><strong>Header:</strong></p>
+                            <code>Authorization: Bearer &lt;your_jwt_token&gt;</code>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <p><strong>Getting Started:</strong> Obtain your JWT token by logging in through the app or using the <code>/api/auth/login</code> endpoint.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Endpoints -->
+                <div class="endpoints-section">
+                    <h2>Endpoints</h2>
+
+                    <!-- Auth Endpoints -->
+                    <div class="endpoint-group">
+                        <h3>🔐 Authentication</h3>
+                        
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method post">POST</span>
+                                <span class="path">/api/auth/login</span>
+                            </div>
+                            <div class="endpoint-desc">Authenticate user and return JWT token</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-request">
+                                    <h4>Request Body:</h4>
+                                    <pre><code>{
+  "email": "user@example.com",
+  "password": "your_password"
+}</code></pre>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": "123",
+    "email": "user@example.com",
+    "fullName": "John Doe"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method post">POST</span>
+                                <span class="path">/api/auth/register</span>
+                            </div>
+                            <div class="endpoint-desc">Create a new user account</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-request">
+                                    <h4>Request Body:</h4>
+                                    <pre><code>{
+  "email": "user@example.com",
+  "password": "StrongPass123!",
+  "fullName": "John Doe"
+}</code></pre>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "message": "User created successfully",
+  "userId": "123"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Endpoints -->
+                    <div class="endpoint-group">
+                        <h3>💰 Transactions</h3>
+                        
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method get">GET</span>
+                                <span class="path">/api/transactions</span>
+                            </div>
+                            <div class="endpoint-desc">Get all transactions for the authenticated user</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-params">
+                                    <h4>Query Parameters:</h4>
+                                    <table>
+                                        <tr><td><code>page</code></td><td>Page number (default: 1)</td></tr>
+                                        <tr><td><code>pageSize</code></td><td>Items per page (default: 20)</td></tr>
+                                        <tr><td><code>type</code></td><td>Filter by type (income/expense)</td></tr>
+                                        <tr><td><code>category</code></td><td>Filter by category</td></tr>
+                                    </table>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "data": {
+    "transactions": [
+      {
+        "id": 1,
+        "title": "Salary",
+        "amount": 500000,
+        "type": "income",
+        "category": "Salary",
+        "date": "2024-01-15"
+      }
+    ],
+    "pagination": {
+      "currentPage": 1,
+      "pageSize": 20,
+      "totalItems": 150,
+      "totalPages": 8
+    }
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method post">POST</span>
+                                <span class="path">/api/transactions</span>
+                            </div>
+                            <div class="endpoint-desc">Create a new transaction</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-request">
+                                    <h4>Request Body:</h4>
+                                    <pre><code>{
+  "title": "Groceries",
+  "amount": 25000,
+  "type": "expense",
+  "category": "Food",
+  "date": "2024-01-15",
+  "description": "Weekly groceries"
+}</code></pre>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "transaction": {
+    "id": 123,
+    "title": "Groceries",
+    "amount": 25000,
+    "type": "expense",
+    "category": "Food",
+    "date": "2024-01-15"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method put">PUT</span>
+                                <span class="path">/api/transactions/{id}</span>
+                            </div>
+                            <div class="endpoint-desc">Update an existing transaction</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-request">
+                                    <h4>Request Body:</h4>
+                                    <pre><code>{
+  "title": "Updated Groceries",
+  "amount": 30000,
+  "category": "Food"
+}</code></pre>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "message": "Transaction updated successfully"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method delete">DELETE</span>
+                                <span class="path">/api/transactions/{id}</span>
+                            </div>
+                            <div class="endpoint-desc">Delete a transaction</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "message": "Transaction deleted successfully"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Budget Endpoints -->
+                    <div class="endpoint-group">
+                        <h3>📊 Budgets</h3>
+                        
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method get">GET</span>
+                                <span class="path">/api/budgets</span>
+                            </div>
+                            <div class="endpoint-desc">Get all budget categories</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "budgets": [
+    {
+      "id": 1,
+      "name": "Food",
+      "amount": 65000,
+      "color": "#10B981",
+      "spent": 32000
+    }
+  ]
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method post">POST</span>
+                                <span class="path">/api/budgets</span>
+                            </div>
+                            <div class="endpoint-desc">Create a new budget category</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-request">
+                                    <h4>Request Body:</h4>
+                                    <pre><code>{
+  "name": "Entertainment",
+  "amount": 20000,
+  "color": "#8B5CF6"
+}</code></pre>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "budget": {
+    "id": 5,
+    "name": "Entertainment",
+    "amount": 20000,
+    "color": "#8B5CF6"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reports Endpoints -->
+                    <div class="endpoint-group">
+                        <h3>📈 Reports</h3>
+                        
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method get">GET</span>
+                                <span class="path">/api/reports/summary</span>
+                            </div>
+                            <div class="endpoint-desc">Get financial summary report</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-params">
+                                    <h4>Query Parameters:</h4>
+                                    <table>
+                                        <tr><td><code>period</code></td><td>month, quarter, year, or all</td></tr>
+                                    </table>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "summary": {
+    "totalIncome": 850000,
+    "totalExpenses": 420000,
+    "netSavings": 430000,
+    "transactionCount": 45,
+    "topCategories": [
+      { "category": "Food", "amount": 120000 },
+      { "category": "Transport", "amount": 80000 }
+    ]
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Endpoints -->
+                    <div class="endpoint-group">
+                        <h3>👤 User</h3>
+                        
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method get">GET</span>
+                                <span class="path">/api/user/profile</span>
+                            </div>
+                            <div class="endpoint-desc">Get current user profile</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "user": {
+    "id": "123",
+    "email": "user@example.com",
+    "fullName": "John Doe",
+    "createdAt": "2024-01-01T00:00:00Z"
+  }
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="endpoint-card">
+                            <div class="endpoint-header">
+                                <span class="method put">PUT</span>
+                                <span class="path">/api/user/profile</span>
+                            </div>
+                            <div class="endpoint-desc">Update user profile</div>
+                            <div class="endpoint-details">
+                                <div class="endpoint-request">
+                                    <h4>Request Body:</h4>
+                                    <pre><code>{
+  "fullName": "John Smith",
+  "email": "john.smith@example.com"
+}</code></pre>
+                                </div>
+                                <div class="endpoint-response">
+                                    <h4>Response:</h4>
+                                    <pre><code>{
+  "success": true,
+  "message": "Profile updated successfully"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Codes -->
+                <div class="errors-section">
+                    <h2>Error Codes</h2>
+                    
+                    <div class="error-grid">
+                        <div class="error-item">
+                            <div class="error-code">200</div>
+                            <div class="error-desc">Success - Request completed successfully</div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-code">400</div>
+                            <div class="error-desc">Bad Request - Invalid parameters or request body</div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-code">401</div>
+                            <div class="error-desc">Unauthorized - Missing or invalid authentication</div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-code">403</div>
+                            <div class="error-desc">Forbidden - Insufficient permissions</div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-code">404</div>
+                            <div class="error-desc">Not Found - Resource does not exist</div>
+                        </div>
+                        <div class="error-item">
+                            <div class="error-code">500</div>
+                            <div class="error-desc">Internal Server Error - Something went wrong</div>
+                        </div>
+                    </div>
+
+                    <div class="error-example">
+                        <h4>Error Response Format:</h4>
+                        <pre><code>{
+  "success": false,
+  "error": "Error message describing what went wrong",
+  "code": "ERROR_CODE",
+  "timestamp": "2024-01-15T10:30:00Z"
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Rate Limiting -->
+                <div class="rate-limit-section">
+                    <h2>Rate Limiting</h2>
+                    <p>API requests are rate-limited to ensure fair usage and system stability.</p>
+                    
+                    <div class="rate-grid">
+                        <div class="rate-item">
+                            <div class="rate-icon"><i class="bi bi-clock"></i></div>
+                            <div>
+                                <h4>100 requests</h4>
+                                <p>per minute for authenticated users</p>
+                            </div>
+                        </div>
+                        <div class="rate-item">
+                            <div class="rate-icon"><i class="bi bi-stopwatch"></i></div>
+                            <div>
+                                <h4>20 requests</h4>
+                                <p>per minute for unauthenticated users</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <p><strong>Rate Limit Headers:</strong> Rate limit information is included in response headers: <code>X-RateLimit-Limit</code>, <code>X-RateLimit-Remaining</code>, and <code>X-RateLimit-Reset</code>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Try API -->
+                <div class="try-api-section">
+                    <h2>Try the API</h2>
+                    <p>Test the API directly from your browser:</p>
+                    
+                    <div class="try-api-box">
+                        <div class="try-api-controls">
+                            <select id="tryMethod" class="try-method">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                                <option value="PUT">PUT</option>
+                                <option value="DELETE">DELETE</option>
+                            </select>
+                            <input type="text" id="tryEndpoint" class="try-endpoint" value="/api/transactions" placeholder="/api/endpoint" />
+                            <button class="btn-try" onclick="window.tryApi()">Send Request</button>
+                        </div>
+                        <div class="try-api-response" id="tryResponse">
+                            <p>Click "Send Request" to test the API</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="api-footer">
+        <div class="container">
+            <div class="api-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="api-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/api">API</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .api-page {
+        background: #0B1120;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .breadcrumb-container {
+        padding: .75rem 0;
+        background: transparent;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all .2s ease;
+        padding: .25rem .5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: .65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: .25rem .5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .api-hero {
+        padding: 3rem 0 2rem;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        text-align: center;
+    }
+
+    .api-hero-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .api-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: .4rem 1.2rem;
+        border-radius: 20px;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .api-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: .5rem;
+        line-height: 1.2;
+    }
+
+    .api-hero .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .api-hero p {
+        font-size: 1rem;
+        color: #94A3B8;
+        margin-bottom: 1rem;
+    }
+
+    .api-version {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .version-badge {
+        padding: .2rem .8rem;
+        background: #1E293B;
+        border-radius: 12px;
+        color: #94A3B8;
+        font-size: .7rem;
+        font-weight: 600;
+        border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .status-badge.operational {
+        padding: .2rem .8rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 12px;
+        color: #34D399;
+        font-size: .7rem;
+        font-weight: 600;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .api-overview {
+        padding: 2rem 0;
+        background: #111827;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .api-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .api-stat {
+        text-align: center;
+        padding: .5rem;
+    }
+
+    .api-stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10B981;
+    }
+
+    .api-stat-label {
+        font-size: .8rem;
+        color: #94A3B8;
+        margin-top: .25rem;
+    }
+
+    .api-content {
+        padding: 2.5rem 0;
+        background: #0B1120;
+    }
+
+    .api-card {
+        background: #1E293B;
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .api-card h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+    }
+
+    .api-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #E2E8F0;
+        margin: 1.5rem 0 .75rem 0;
+    }
+
+    .api-card p {
+        color: #94A3B8;
+        font-size: .95rem;
+        line-height: 1.7;
+        margin-bottom: .75rem;
+    }
+
+    .base-url-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .base-url-box {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        padding: .75rem 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        flex-wrap: wrap;
+    }
+
+    .base-url-box code {
+        flex: 1;
+        color: #10B981;
+        font-size: .9rem;
+        font-family: 'Courier New', monospace;
+        word-break: break-all;
+    }
+
+    .btn-copy {
+        padding: .3rem .8rem;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10B981;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        border-radius: 6px;
+        font-size: .7rem;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: all .2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-copy:hover {
+        background: rgba(16, 185, 129, 0.2);
+    }
+
+    .base-url-note {
+        font-size: .8rem;
+        color: #64748B;
+        margin-top: .5rem;
+    }
+
+    .auth-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .auth-box {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        margin: .75rem 0;
+    }
+
+    .auth-header {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: .5rem;
+    }
+
+    .auth-method {
+        padding: .2rem .6rem;
+        background: #10B981;
+        color: #0B1120;
+        border-radius: 4px;
+        font-size: .7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .auth-type {
+        color: #94A3B8;
+        font-size: .8rem;
+    }
+
+    .auth-example code {
+        color: #10B981;
+        font-family: 'Courier New', monospace;
+        font-size: .8rem;
+    }
+
+    .info-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        margin: 1rem 0;
+    }
+
+    .info-box i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .info-box p {
+        color: #94A3B8;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .info-box code {
+        color: #10B981;
+        font-family: 'Courier New', monospace;
+        font-size: .8rem;
+        background: rgba(16, 185, 129, 0.08);
+        padding: .05rem .4rem;
+        border-radius: 4px;
+    }
+
+    .endpoint-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .endpoint-card {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        margin-bottom: .75rem;
+        transition: all .3s ease;
+    }
+
+    .endpoint-card:hover {
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .endpoint-header {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+    }
+
+    .method {
+        padding: .2rem .6rem;
+        border-radius: 4px;
+        font-size: .65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        min-width: 50px;
+        text-align: center;
+    }
+
+    .method.get {
+        background: #3B82F6;
+        color: white;
+    }
+
+    .method.post {
+        background: #10B981;
+        color: white;
+    }
+
+    .method.put {
+        background: #F59E0B;
+        color: #0B1120;
+    }
+
+    .method.delete {
+        background: #EF4444;
+        color: white;
+    }
+
+    .path {
+        color: #F1F5F9;
+        font-family: 'Courier New', monospace;
+        font-size: .85rem;
+    }
+
+    .endpoint-desc {
+        color: #94A3B8;
+        font-size: .85rem;
+        margin-top: .25rem;
+        padding-left: 4.5rem;
+    }
+
+    .endpoint-details {
+        margin-top: .75rem;
+        padding-top: .75rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .endpoint-details h4 {
+        color: #94A3B8;
+        font-size: .7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: .25rem;
+    }
+
+    .endpoint-params table {
+        width: 100%;
+        font-size: .75rem;
+        border-collapse: collapse;
+    }
+
+    .endpoint-params td {
+        padding: .2rem .5rem;
+        color: #94A3B8;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    .endpoint-params td:first-child {
+        font-family: 'Courier New', monospace;
+        color: #10B981;
+        padding-left: 0;
+    }
+
+    pre {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+        padding: .5rem .75rem;
+        overflow-x: auto;
+        margin: 0;
+        border: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    pre code {
+        color: #CBD5E1;
+        font-family: 'Courier New', monospace;
+        font-size: .75rem;
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+
+    .error-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem;
+        margin: .75rem 0;
+    }
+
+    .error-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: .5rem .75rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 6px;
+        border: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    .error-code {
+        font-weight: 700;
+        color: #F1F5F9;
+        font-size: .85rem;
+        min-width: 40px;
+        font-family: 'Courier New', monospace;
+    }
+
+    .error-desc {
+        color: #94A3B8;
+        font-size: .8rem;
+    }
+
+    .error-example {
+        margin-top: .75rem;
+    }
+
+    .errors-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .rate-limit-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .rate-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: .75rem 0;
+    }
+
+    .rate-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .rate-icon {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .rate-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .rate-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .try-api-section {
+        margin-bottom: 0;
+    }
+
+    .try-api-box {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        overflow: hidden;
+    }
+
+    .try-api-controls {
+        display: flex;
+        gap: .5rem;
+        padding: .75rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+        flex-wrap: wrap;
+    }
+
+    .try-method {
+        padding: .4rem .6rem;
+        background: #0B1120;
+        color: #F1F5F9;
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 6px;
+        font-size: .8rem;
+        font-family: 'Inter', sans-serif;
+        cursor: pointer;
+    }
+
+    .try-endpoint {
+        flex: 1;
+        padding: .4rem .6rem;
+        background: #0B1120;
+        color: #F1F5F9;
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 6px;
+        font-size: .8rem;
+        font-family: 'Courier New', monospace;
+        min-width: 150px;
+    }
+
+    .try-endpoint:focus {
+        outline: none;
+        border-color: #10B981;
+    }
+
+    .btn-try {
+        padding: .4rem 1.2rem;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: .8rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: all .2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-try:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .try-api-response {
+        padding: 1rem;
+        min-height: 80px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .try-api-response p {
+        color: #64748B;
+        font-size: .85rem;
+        margin: 0;
+    }
+
+    .try-api-response pre {
+        background: #0B1120;
+        margin: 0;
+    }
+
+    .try-api-response pre code {
+        color: #CBD5E1;
+        font-size: .75rem;
+    }
+
+    .api-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .api-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .api-footer-content p {
+        color: #64748B;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .api-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .api-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: .8rem;
+        transition: color .2s ease;
+    }
+
+    .api-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .api-stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .endpoint-details {
+            grid-template-columns: 1fr;
+        }
+
+        .error-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .rate-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .api-page {
+            padding-top: 70px;
+        }
+
+        .api-hero {
+            padding: 2rem 0 1.5rem;
+        }
+
+        .api-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+
+        .endpoint-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: .25rem;
+        }
+
+        .endpoint-desc {
+            padding-left: 0;
+        }
+
+        .try-api-controls {
+            flex-direction: column;
+        }
+
+        .api-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .api-footer-links {
+            justify-content: center;
+        }
+
+        .base-url-box {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .base-url-box code {
+            word-break: break-all;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .api-hero h1 {
+            font-size: 1.8rem;
+        }
+
+        .api-card {
+            padding: 1rem;
+        }
+
+        .api-stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: .5rem;
+        }
+
+        .breadcrumb-item.active {
+            font-size: .7rem;
+            padding: .15rem .4rem;
+        }
+
+        .breadcrumb-item a span {
+            display: none;
+        }
+
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+
+        .error-item {
+            flex-direction: column;
+            text-align: center;
+            gap: .25rem;
+        }
+
+        .rate-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<script>
+    // ============================================
+    // API PAGE FUNCTIONS
+    // ============================================
+
+    window.copyBaseUrl = function() {
+        var urlElement = document.getElementById('baseUrl');
+        var url = urlElement.textContent;
+        
+        navigator.clipboard.writeText(url).then(function() {
+            var btn = document.querySelector('.btn-copy');
+            var originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            btn.style.background = 'rgba(16, 185, 129, 0.2)';
+            
+            setTimeout(function() {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+        });
+    };
+
+    window.tryApi = function() {
+        var method = document.getElementById('tryMethod').value;
+        var endpoint = document.getElementById('tryEndpoint').value;
+        var responseDiv = document.getElementById('tryResponse');
+        
+        responseDiv.innerHTML = '<p style="color:#F59E0B;">⏳ Sending request...</p>';
+        
+        var baseUrl = 'https://smartbudget-tracker.onrender.com';
+        var url = baseUrl + endpoint;
+        
+        fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(function(response) {
+            var status = response.status;
+            var statusText = response.statusText;
+            
+            return response.text().then(function(text) {
+                var result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    result = text;
+                }
+                
+                var responseHtml = '<div style="margin-bottom:.5rem;">';
+                responseHtml += '<span style="color:' + (status >= 200 && status < 300 ? '#34D399' : '#EF4444') + ';font-weight:600;">Status: ' + status + ' ' + statusText + '</span>';
+                responseHtml += '</div>';
+                
+                if (typeof result === 'object') {
+                    responseHtml += '<pre><code>' + JSON.stringify(result, null, 2) + '</code></pre>';
+                } else {
+                    responseHtml += '<pre><code>' + result + '</code></pre>';
+                }
+                
+                responseDiv.innerHTML = responseHtml;
+            });
+        })
+        .catch(function(error) {
+            responseDiv.innerHTML = '<p style="color:#EF4444;">❌ Error: ' + error.message + '</p>';
+        });
+    };
+
+    // Auto-try on load with GET /api
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            var endpoint = document.getElementById('tryEndpoint');
+            if (endpoint) {
+                endpoint.value = '/api';
+            }
+        }, 500);
+    });
+</script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "api";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "api");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

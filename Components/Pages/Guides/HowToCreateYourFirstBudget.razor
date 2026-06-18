@@ -1,0 +1,130 @@
+@page "/guides/how-to-create-your-first-budget"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - How to Create Your First Budget</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">How to Create Your First Budget</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Budgeting</span>
+                <h1>How to Create Your First Budget</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 10 min read</span>
+                    <span><i class="bi bi-file-text"></i> Beginner</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Creating your first budget is the most important step toward financial freedom. This guide will walk you through the process step by step.</p>
+
+                <h2>Why You Need a Budget</h2>
+                <p>A budget helps you:</p>
+                <ul>
+                    <li><strong>Track your spending</strong> - Know exactly where your money goes</li>
+                    <li><strong>Save more money</strong> - Identify areas to cut back</li>
+                    <li><strong>Avoid debt</strong> - Plan for expenses before they happen</li>
+                    <li><strong>Achieve financial goals</strong> - Save for what matters most</li>
+                </ul>
+
+                <h2>Step 1: Calculate Your Income</h2>
+                <p>Start by calculating your total monthly income. Include:</p>
+                <ul>
+                    <li>Salary after taxes</li>
+                    <li>Side hustle income</li>
+                    <li>Investment income</li>
+                    <li>Any other regular income</li>
+                </ul>
+
+                <h2>Step 2: Track Your Expenses</h2>
+                <p>List all your monthly expenses:</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Category</th><th>Amount (₦)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Rent/Mortgage</td><td>_____</td></tr>
+                            <tr><td>Utilities (Electricity, Water, Internet)</td><td>_____</td></tr>
+                            <tr><td>Food & Groceries</td><td>_____</td></tr>
+                            <tr><td>Transportation</td><td>_____</td></tr>
+                            <tr><td>Insurance</td><td>_____</td></tr>
+                            <tr><td>Debt Payments</td><td>_____</td></tr>
+                            <tr><td>Entertainment</td><td>_____</td></tr>
+                            <tr><td>Savings</td><td>_____</td></tr>
+                            <tr><td>Other</td><td>_____</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Step 3: Choose a Budgeting Method</h2>
+                <h3>The 50/30/20 Rule</h3>
+                <ul>
+                    <li><strong>50% for Needs:</strong> Rent, food, utilities, transportation</li>
+                    <li><strong>30% for Wants:</strong> Entertainment, dining out, shopping</li>
+                    <li><strong>20% for Savings:</strong> Emergency fund, investments, debt repayment</li>
+                </ul>
+
+                <h3>Zero-Based Budgeting</h3>
+                <p>Every Naira has a job. Income minus expenses equals zero.</p>
+
+                <h2>Step 4: Set Up Your Budget in SmartBudget</h2>
+                <ol>
+                    <li>Log in to your <a href="/Account/Login">SmartBudget account</a></li>
+                    <li>Go to the <a href="/budgets">Budgets page</a></li>
+                    <li>Click <strong>"Add Budget"</strong> for each category</li>
+                    <li>Enter the category name and your budget amount</li>
+                    <li>Choose a color to track your progress</li>
+                    <li>Click <strong>"Save Budget"</strong></li>
+                </ol>
+
+                <h2>Step 5: Track Your Spending</h2>
+                <p>Use SmartBudget to track every transaction. Review your spending weekly to stay on track.</p>
+
+                <h2>Step 6: Adjust as Needed</h2>
+                <p>Your first budget won't be perfect. Review and adjust monthly to match your real spending patterns.</p>
+
+                <h2>Common Budgeting Mistakes to Avoid</h2>
+                <ul>
+                    <li>Being too restrictive (allow some flexibility)</li>
+                    <li>Forgetting occasional expenses (annual subscriptions, car maintenance)</li>
+                    <li>Not tracking cash spending</li>
+                    <li>Giving up too soon (it takes 3 months to form a budgeting habit)</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Ready to Start Budgeting?</h3>
+                    <p>Create your first budget with SmartBudget today.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

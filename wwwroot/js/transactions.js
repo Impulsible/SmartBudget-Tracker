@@ -8,6 +8,7 @@ console.log('Transactions JS: Loaded (Fixed)');
 
 var currentPage = 1;
 var itemsPerPage = 10;
+var cachedCategories = [];
 
 // ============================================
 // LIVE TRANSACTIONS ANIMATION ENGINE
@@ -22,10 +23,11 @@ var isLiveTransactionsRunning = false;
     console.log('Transactions: Auto-starting...');
     setTimeout(function() {
         setupTxSidebar();
-        renderCategoryDropdowns();
-        renderAllTransactions();
-        startLiveTransactions();
-        console.log('Transactions: Live updates started!');
+        renderCategoryDropdowns().then(function() {
+            renderAllTransactions();
+            startLiveTransactions();
+            console.log('Transactions: Live updates started!');
+        });
     }, 100);
 })();
 
@@ -87,11 +89,11 @@ function startLiveTransactions() {
         clearInterval(liveTransactionsInterval);
     }
 
-    // Refresh every 5 seconds
+    // Refresh every 10 seconds (reduced frequency for performance)
     liveTransactionsInterval = setInterval(function() {
         renderAllTransactions();
         console.log('Transactions: Auto-refreshed');
-    }, 5000);
+    }, 10000);
 }
 
 // ============================================
@@ -99,18 +101,20 @@ function startLiveTransactions() {
 // ============================================
 async function getTransactionsFromApi() {
     try {
-        var response = await fetch('/api/transactions?pageSize=200');
+        var response = await fetch('/api/transactions?pageSize=200', {
+            credentials: 'include'
+        });
         if (!response.ok) return [];
         var data = await response.json();
         if (data.success && data.transactions) {
             return data.transactions.map(function(t) {
                 return {
                     id: t.id,
-                    desc: t.title || t.description,
-                    cat: t.category,
+                    desc: t.title || t.description || 'Untitled',
+                    cat: t.category || 'Other',
                     date: new Date(t.date),
-                    amount: t.amount,
-                    type: t.type,
+                    amount: t.amount || 0,
+                    type: t.type || 'expense',
                     status: t.status || 'Completed'
                 };
             });
@@ -129,7 +133,7 @@ async function saveTransactionToApi(tx) {
             description: tx.desc,
             amount: tx.amount,
             type: tx.type,
-            category: tx.cat,  // FIXED: Added category field
+            category: tx.cat,
             date: tx.date || new Date().toISOString()
         };
         
@@ -138,6 +142,7 @@ async function saveTransactionToApi(tx) {
         var response = await fetch('/api/transactions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify(body)
         });
         
@@ -154,16 +159,25 @@ async function saveTransactionToApi(tx) {
 }
 
 async function getCategoriesFromApi() {
+    // Return cached categories if available
+    if (cachedCategories.length > 0) {
+        console.log('Transactions: Using cached categories:', cachedCategories.length);
+        return cachedCategories;
+    }
+    
     try {
         // Try to get categories from budgets first
-        var response = await fetch('/api/budgets');
+        var response = await fetch('/api/budgets', {
+            credentials: 'include'
+        });
         if (response.ok) {
             var data = await response.json();
             if (data.success && data.budgets && data.budgets.length > 0) {
                 console.log('Transactions: Loaded categories from budgets API');
-                return data.budgets.map(function(b) {
+                cachedCategories = data.budgets.map(function(b) {
                     return { id: b.id, name: b.name, color: b.color };
                 });
+                return cachedCategories;
             }
         }
     } catch (e) {
@@ -172,14 +186,17 @@ async function getCategoriesFromApi() {
     
     // Also try categories endpoint
     try {
-        var catResponse = await fetch('/api/categories');
+        var catResponse = await fetch('/api/categories', {
+            credentials: 'include'
+        });
         if (catResponse.ok) {
             var catData = await catResponse.json();
             if (catData.success && catData.categories && catData.categories.length > 0) {
                 console.log('Transactions: Loaded categories from categories API');
-                return catData.categories.map(function(c) {
+                cachedCategories = catData.categories.map(function(c) {
                     return { id: c.id, name: c.name, color: c.color };
                 });
+                return cachedCategories;
             }
         }
     } catch (e) {
@@ -188,7 +205,7 @@ async function getCategoriesFromApi() {
     
     // Default categories as fallback
     console.log('Transactions: Using default categories');
-    return [
+    cachedCategories = [
         { id: 1, name: "Food", color: "#10B981" },
         { id: 2, name: "Transport", color: "#3B82F6" },
         { id: 3, name: "Shopping", color: "#F59E0B" },
@@ -202,13 +219,14 @@ async function getCategoriesFromApi() {
         { id: 11, name: "Health", color: "#F43F5E" },
         { id: 12, name: "Other", color: "#64748B" }
     ];
+    return cachedCategories;
 }
 
 // ============================================
 // MODAL HANDLERS - FIXED
 // ============================================
 function openTxModal() {
-    console.log('Opening transaction modal');
+    console.log('🔓 Opening transaction modal');
     var modal = document.getElementById('txModal');
     if (modal) {
         modal.style.display = 'flex';
@@ -225,8 +243,19 @@ function openTxModal() {
         if (descInput) descInput.value = '';
         if (amountInput) amountInput.value = '';
         
-        // IMPORTANT: Populate category dropdown when opening modal
-        renderCategoryDropdowns();
+        // ✅ CRITICAL FIX: Populate category dropdown IMMEDIATELY when opening modal
+        // Use synchronous approach - check if categories are cached
+        if (cachedCategories.length > 0) {
+            console.log('✅ Using cached categories for modal');
+            populateDropdownsFromCache();
+        } else {
+            console.log('⏳ Fetching categories for modal...');
+            // Fetch and populate
+            getCategoriesFromApi().then(function() {
+                populateDropdownsFromCache();
+                console.log('✅ Categories populated for modal');
+            });
+        }
     }
 }
 
@@ -239,46 +268,59 @@ function closeTxModal() {
 }
 
 // ============================================
-// RENDER CATEGORY DROPDOWNS - FIXED
+// POPULATE DROPDOWNS FROM CACHE - FIXED
 // ============================================
-async function renderCategoryDropdowns() {
-    console.log('Rendering category dropdowns...');
-    var categories = await getCategoriesFromApi();
-    
-    console.log('Categories for dropdown:', categories);
+function populateDropdownsFromCache() {
+    console.log('📋 Populating dropdowns from cache, categories:', cachedCategories.length);
     
     var html = '<option value="">-- Select Category --</option>';
-    categories.forEach(function(c) {
+    cachedCategories.forEach(function(c) {
         html += '<option value="' + c.name + '">' + c.name + '</option>';
     });
     
+    // Populate Add Transaction modal
     var txCat = document.getElementById('txCat');
-    var filterCat = document.getElementById('txFilterCategory');
-    
     if (txCat) {
         txCat.innerHTML = html;
-        console.log('Transaction category dropdown populated with', categories.length, 'options');
+        console.log('✅ Add modal populated with', cachedCategories.length, 'options');
     } else {
-        console.log('txCat element not found');
+        console.log('⚠️ txCat element not found');
     }
     
+    // Populate Edit Transaction modal
+    var editTxCat = document.getElementById('editTxCat');
+    if (editTxCat) {
+        editTxCat.innerHTML = html;
+        console.log('✅ Edit modal populated with', cachedCategories.length, 'options');
+    }
+    
+    // Populate filter dropdown
+    var filterCat = document.getElementById('txFilterCategory');
     if (filterCat) {
         var filterHtml = '<option value="all">All Categories</option>';
-        categories.forEach(function(c) {
+        cachedCategories.forEach(function(c) {
             filterHtml += '<option value="' + c.name + '">' + c.name + '</option>';
         });
         filterCat.innerHTML = filterHtml;
-        console.log('Filter category dropdown populated');
-    } else {
-        console.log('txFilterCategory element not found');
+        console.log('✅ Filter dropdown populated with', cachedCategories.length, 'options');
     }
+}
+
+// ============================================
+// RENDER CATEGORY DROPDOWNS - FIXED
+// ============================================
+async function renderCategoryDropdowns() {
+    console.log('📋 Rendering category dropdowns...');
+    await getCategoriesFromApi();
+    populateDropdownsFromCache();
+    console.log('✅ Category dropdowns rendered');
 }
 
 // ============================================
 // ADD TRANSACTION - FIXED
 // ============================================
 window.addTransactionFull = async function() {
-    console.log('addTransactionFull called');
+    console.log('➕ addTransactionFull called');
     
     var desc = document.getElementById('txDesc').value.trim();
     var amount = document.getElementById('txAmt').value;
@@ -290,17 +332,17 @@ window.addTransactionFull = async function() {
 
     // Validation
     if (!desc) {
-        alert('Please enter a description.');
+        showToast('Please enter a description.', 'error');
         return;
     }
     
     if (!amount || parseFloat(amount) <= 0) {
-        alert('Please enter a valid amount.');
+        showToast('Please enter a valid amount.', 'error');
         return;
     }
     
     if (!cat) {
-        alert('Please select a category.');
+        showToast('Please select a category.', 'error');
         return;
     }
 
@@ -309,14 +351,14 @@ window.addTransactionFull = async function() {
     var originalText = '';
     if (saveBtn) {
         originalText = saveBtn.innerHTML;
-        saveBtn.innerHTML = '<span style="display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;"></span> Saving...';
+        saveBtn.innerHTML = '<span class="spinner-sm"></span> Saving...';
         saveBtn.disabled = true;
         
         // Add spin animation if not exists
         if (!document.querySelector('#spinStyle')) {
             var style = document.createElement('style');
             style.id = 'spinStyle';
-            style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+            style.textContent = '.spinner-sm{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;margin-right:8px;} @keyframes spin{to{transform:rotate(360deg)}}';
             document.head.appendChild(style);
         }
     }
@@ -339,11 +381,11 @@ window.addTransactionFull = async function() {
         closeTxModal();
         currentPage = 1;
         await renderAllTransactions();
-        // Also refresh category dropdowns in case new category was added
+        // Refresh categories in case new category was added
         await renderCategoryDropdowns();
         showToast('Transaction added successfully!', 'success');
     } else {
-        alert('Failed to save transaction. Check console for details.');
+        showToast('Failed to save transaction. Please try again.', 'error');
     }
 };
 
@@ -353,16 +395,19 @@ window.addTransactionFull = async function() {
 window.deleteTxFull = async function(id) {
     if (confirm('Are you sure you want to delete this transaction?')) {
         try {
-            var response = await fetch('/api/transactions/' + id, { method: 'DELETE' });
+            var response = await fetch('/api/transactions/' + id, { 
+                method: 'DELETE',
+                credentials: 'include'
+            });
             var data = await response.json();
             if (data.success) {
                 await renderAllTransactions();
                 showToast('Transaction deleted successfully!', 'success');
             } else {
-                alert('Failed to delete transaction.');
+                showToast('Failed to delete transaction.', 'error');
             }
         } catch (e) {
-            alert('Error deleting transaction.');
+            showToast('Error deleting transaction.', 'error');
         }
     }
 };
@@ -373,7 +418,7 @@ window.deleteTxFull = async function(id) {
 window.exportTransactions = async function() {
     var transactions = await getTransactionsFromApi();
     if (transactions.length === 0) {
-        alert('No transactions to export.');
+        showToast('No transactions to export.', 'warning');
         return;
     }
 
@@ -402,22 +447,25 @@ window.exportTransactions = async function() {
 window.clearAllTransactionsFull = async function() {
     var transactions = await getTransactionsFromApi();
     if (transactions.length === 0) {
-        alert('No transactions to clear.');
+        showToast('No transactions to clear.', 'warning');
         return;
     }
     if (confirm('WARNING: This will delete ALL your transactions. This cannot be undone. Are you sure?')) {
         try {
-            var response = await fetch('/api/transactions/clear', { method: 'DELETE' });
+            var response = await fetch('/api/transactions/clear', { 
+                method: 'DELETE',
+                credentials: 'include'
+            });
             var data = await response.json();
             if (data.success) {
                 currentPage = 1;
                 await renderAllTransactions();
                 showToast('All transactions cleared!', 'success');
             } else {
-                alert('Failed to clear transactions.');
+                showToast('Failed to clear transactions.', 'error');
             }
         } catch (e) {
-            alert('Error clearing transactions.');
+            showToast('Error clearing transactions.', 'error');
         }
     }
 };
@@ -436,8 +484,10 @@ function showToast(message, type) {
     }
     
     var toast = document.createElement('div');
-    toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + (type === 'success' ? '#10B981' : '#EF4444') + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
-    toast.innerHTML = '<i class="bi bi-' + (type === 'success' ? 'check-circle-fill' : 'exclamation-triangle-fill') + '" style="color:' + (type === 'success' ? '#10B981' : '#EF4444') + '"></i><span>' + message + '</span>';
+    var iconColor = type === 'success' ? '#10B981' : type === 'warning' ? '#F59E0B' : '#EF4444';
+    var icon = type === 'success' ? 'check-circle-fill' : type === 'warning' ? 'exclamation-triangle-fill' : 'x-circle-fill';
+    toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + iconColor + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
+    toast.innerHTML = '<i class="bi bi-' + icon + '" style="color:' + iconColor + '"></i><span>' + message + '</span>';
     
     container.appendChild(toast);
     
@@ -718,6 +768,8 @@ window.cleanupTransactions = function() {
 // Make functions globally available
 window.openTxModal = openTxModal;
 window.closeTxModal = closeTxModal;
+window.renderAllTransactions = renderAllTransactions;
+window.renderCategoryDropdowns = renderCategoryDropdowns;
 
 // ============================================
 // FALLBACK: Check if elements exist and start anyway
@@ -726,9 +778,10 @@ setTimeout(function() {
     if (!isLiveTransactionsRunning) {
         console.log('Transactions: Force starting (fallback)...');
         setupTxSidebar();
-        renderCategoryDropdowns();
-        renderAllTransactions();
-        startLiveTransactions();
+        renderCategoryDropdowns().then(function() {
+            renderAllTransactions();
+            startLiveTransactions();
+        });
     }
 }, 1000);
 
@@ -746,7 +799,7 @@ document.addEventListener('visibilitychange', function() {
         if (!liveTransactionsInterval && isLiveTransactionsRunning) {
             liveTransactionsInterval = setInterval(function() {
                 renderAllTransactions();
-            }, 5000);
+            }, 10000);
             console.log('Transactions: Updates resumed (tab visible)');
         }
     }
@@ -763,4 +816,4 @@ window.initTransactionsPage = async function() {
     console.log('✅ transactions: initialized');
 };
 
-window.renderAllTransactions = renderAllTransactions;
+console.log('✅ Transactions JS: Fully loaded and ready');

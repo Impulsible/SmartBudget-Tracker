@@ -1,0 +1,129 @@
+@page "/guides/beginners-guide-to-investing-nigeria"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - Beginner's Guide to Investing in Nigeria</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">Beginner's Guide to Investing</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Investing</span>
+                <h1>Beginner's Guide to Investing in Nigeria</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 20 min read</span>
+                    <span><i class="bi bi-file-text"></i> Beginner</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Investing is the key to building long-term wealth. This comprehensive guide covers everything you need to know about investing in Nigeria.</p>
+
+                <h2>Why Invest?</h2>
+                <ul>
+                    <li><strong>Beat inflation:</strong> Grow your money faster than the cost of living</li>
+                    <li><strong>Build wealth:</strong> Create long-term financial security</li>
+                    <li><strong>Passive income:</strong> Earn money while you sleep</li>
+                    <li><strong>Financial freedom:</strong> Achieve your goals faster</li>
+                </ul>
+
+                <h2>Investment Options in Nigeria</h2>
+                <h3>1. Nigerian Stocks (Equities)</h3>
+                <p>Buy shares in companies listed on the Nigerian Exchange (NGX).</p>
+                <ul>
+                    <li><strong>Pros:</strong> High growth potential, dividends</li>
+                    <li><strong>Cons:</strong> Volatile, requires research</li>
+                    <li><strong>Minimum:</strong> ₦5,000 - ₦10,000</li>
+                    <li><strong>Platform:</strong> Stockbrokers (e.g., Cordros, FBNQuest)</li>
+                </ul>
+
+                <h3>2. Treasury Bills</h3>
+                <p>Short-term government securities with low risk.</p>
+                <ul>
+                    <li><strong>Pros:</strong> Very safe, good for short-term</li>
+                    <li><strong>Cons:</strong> Low returns compared to stocks</li>
+                    <li><strong>Minimum:</strong> ₦100,000</li>
+                    <li><strong>Platform:</strong> Primary Dealer Market</li>
+                </ul>
+
+                <h3>3. Mutual Funds</h3>
+                <p>Professional managed investment pools.</p>
+                <ul>
+                    <li><strong>Pros:</strong> Diversification, professional management</li>
+                    <li><strong>Cons:</strong> Management fees</li>
+                    <li><strong>Minimum:</strong> ₦5,000 - ₦10,000</li>
+                    <li><strong>Platforms:</strong> Stanbic IBTC, ARM, FBN</li>
+                </ul>
+
+                <h3>4. Real Estate</h3>
+                <p>Property investment for rental income or capital appreciation.</p>
+                <ul>
+                    <li><strong>Pros:</strong> Tangible asset, rental income</li>
+                    <li><strong>Cons:</strong> High capital requirement</li>
+                    <li><strong>Minimum:</strong> ₦1,000,000+</li>
+                    <li><strong>Platforms:</strong> Real estate companies, REITs</li>
+                </ul>
+
+                <h3>5. REITs (Real Estate Investment Trusts)</h3>
+                <p>Invest in real estate without buying property directly.</p>
+                <ul>
+                    <li><strong>Pros:</strong> Low minimum, regular income</li>
+                    <li><strong>Cons:</strong> Market volatility</li>
+                    <li><strong>Minimum:</strong> ₦10,000</li>
+                    <li><strong>Platforms:</strong> Nigerian Stock Exchange</li>
+                </ul>
+
+                <h2>How to Start Investing</h2>
+                <ol>
+                    <li>Set your investment goals</li>
+                    <li>Choose your investment platform</li>
+                    <li>Start small and learn</li>
+                    <li>Diversify your investments</li>
+                    <li>Stay informed and review regularly</li>
+                </ol>
+
+                <h2>Common Investment Mistakes to Avoid</h2>
+                <ul>
+                    <li>Not doing enough research</li>
+                    <li>Following the crowd without analysis</li>
+                    <li>Investing money you can't afford to lose</li>
+                    <li>Not diversifying your portfolio</li>
+                    <li>Panic selling during market downturns</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Start Your Investment Journey</h3>
+                    <p>Track your investments with SmartBudget.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

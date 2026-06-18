@@ -1,0 +1,427 @@
+@page "/blog"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Blog</PageTitle>
+
+<div class="blog-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Blog
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="blog-hero">
+        <div class="container">
+            <div class="blog-hero-content">
+                <div class="blog-badge">📝 Financial Insights</div>
+                <h1>SmartMoney <span class="gradient-text">Blog</span></h1>
+                <p>Expert tips, guides, and insights to help you master your finances and achieve your money goals.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FEATURED POST
+    ============================================ -->
+    <section class="featured-post">
+        <div class="container">
+            <div class="featured-card">
+                <div class="featured-tag">Featured</div>
+                <div class="featured-content">
+                    <span class="featured-category">Money Management</span>
+                    <h2>How to Save ₦1,000,000 in @DateTime.Now.Year: The Ultimate Nigerian Savings Guide</h2>
+                    <p>Discover practical strategies to save your first million Naira this year. From smart budgeting to investment tips, this guide covers everything you need to know.</p>
+                    <div class="featured-meta">
+                        <span class="featured-author"><i class="bi bi-person-circle"></i> Chidi Okonkwo</span>
+                        <span class="featured-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        <span class="featured-read-time"><i class="bi bi-clock"></i> 8 min read</span>
+                    </div>
+                    <a href="/blog/how-to-save-1-million-naira" class="btn-read-more">Read Article →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CATEGORIES
+    ============================================ -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="categories-scroll">
+                <button class="category-btn active" onclick="window.filterPosts('all')">All</button>
+                <button class="category-btn" onclick="window.filterPosts('budgeting')">Budgeting</button>
+                <button class="category-btn" onclick="window.filterPosts('savings')">Savings</button>
+                <button class="category-btn" onclick="window.filterPosts('investing')">Investing</button>
+                <button class="category-btn" onclick="window.filterPosts('debt')">Debt Management</button>
+                <button class="category-btn" onclick="window.filterPosts('lifestyle')">Lifestyle</button>
+                <button class="category-btn" onclick="window.filterPosts('business')">Business</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    BLOG POSTS GRID
+    ============================================ -->
+    <section class="blog-posts">
+        <div class="container">
+            <div class="posts-grid" id="postsGrid">
+                <!-- Post 1 -->
+                <div class="post-card" data-category="budgeting">
+                    <div class="post-image">
+                        <div class="post-image-placeholder">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <span class="post-category">Budgeting</span>
+                    </div>
+                    <div class="post-body">
+                        <h3>The 50/30/20 Budgeting Rule for Nigerians</h3>
+                        <p>Learn how to allocate your income using the 50/30/20 rule adapted for the Nigerian economy and lifestyle.</p>
+                        <div class="post-meta">
+                            <span class="post-author"><i class="bi bi-person-circle"></i> Amara Obi</span>
+                            <span class="post-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <a href="/blog/50-30-20-budgeting-rule" class="btn-read">Read More →</a>
+                    </div>
+                </div>
+
+                <!-- Post 2 -->
+                <div class="post-card" data-category="savings">
+                    <div class="post-image">
+                        <div class="post-image-placeholder">
+                            <i class="bi bi-piggy-bank"></i>
+                        </div>
+                        <span class="post-category">Savings</span>
+                    </div>
+                    <div class="post-body">
+                        <h3>Emergency Fund: How Much Should You Save?</h3>
+                        <p>Find out why an emergency fund is crucial and how much you should save to protect yourself from financial shocks.</p>
+                        <div class="post-meta">
+                            <span class="post-author"><i class="bi bi-person-circle"></i> Folake Adeyemi</span>
+                            <span class="post-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <a href="/blog/emergency-fund-guide" class="btn-read">Read More →</a>
+                    </div>
+                </div>
+
+                <!-- Post 3 -->
+                <div class="post-card" data-category="investing">
+                    <div class="post-image">
+                        <div class="post-image-placeholder">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <span class="post-category">Investing</span>
+                    </div>
+                    <div class="post-body">
+                        <h3>Beginner's Guide to Investing in Nigeria</h3>
+                        <p>Start your investment journey with this comprehensive guide covering stocks, bonds, mutual funds, and more.</p>
+                        <div class="post-meta">
+                            <span class="post-author"><i class="bi bi-person-circle"></i> Emeka Okafor</span>
+                            <span class="post-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <a href="/blog/investing-guide-nigeria" class="btn-read">Read More →</a>
+                    </div>
+                </div>
+
+                <!-- Post 4 -->
+                <div class="post-card" data-category="debt">
+                    <div class="post-image">
+                        <div class="post-image-placeholder">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <span class="post-category">Debt Management</span>
+                    </div>
+                    <div class="post-body">
+                        <h3>How to Get Out of Debt: A Step-by-Step Plan</h3>
+                        <p>A practical guide to becoming debt-free. Learn strategies to pay off loans, credit cards, and other debts effectively.</p>
+                        <div class="post-meta">
+                            <span class="post-author"><i class="bi bi-person-circle"></i> Chidi Okonkwo</span>
+                            <span class="post-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <a href="/blog/debt-free-plan" class="btn-read">Read More →</a>
+                    </div>
+                </div>
+
+                <!-- Post 5 -->
+                <div class="post-card" data-category="lifestyle">
+                    <div class="post-image">
+                        <div class="post-image-placeholder">
+                            <i class="bi bi-heart"></i>
+                        </div>
+                        <span class="post-category">Lifestyle</span>
+                    </div>
+                    <div class="post-body">
+                        <h3>Financial Wellness: How to Reduce Money Stress</h3>
+                        <p>Discover strategies to improve your financial wellness and reduce the stress that comes with money management.</p>
+                        <div class="post-meta">
+                            <span class="post-author"><i class="bi bi-person-circle"></i> Folake Adeyemi</span>
+                            <span class="post-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <a href="/blog/financial-wellness" class="btn-read">Read More →</a>
+                    </div>
+                </div>
+
+                <!-- Post 6 -->
+                <div class="post-card" data-category="business">
+                    <div class="post-image">
+                        <div class="post-image-placeholder">
+                            <i class="bi bi-briefcase"></i>
+                        </div>
+                        <span class="post-category">Business</span>
+                    </div>
+                    <div class="post-body">
+                        <h3>Money Management Tips for Small Business Owners</h3>
+                        <p>Essential financial tips for Nigerian entrepreneurs to manage business cash flow and grow their ventures.</p>
+                        <div class="post-meta">
+                            <span class="post-author"><i class="bi bi-person-circle"></i> Emeka Okafor</span>
+                            <span class="post-date"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM dd, yyyy")</span>
+                        </div>
+                        <a href="/blog/small-business-money-tips" class="btn-read">Read More →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    NEWSLETTER SECTION
+    ============================================ -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-card">
+                <div class="newsletter-icon"><i class="bi bi-envelope-paper"></i></div>
+                <h2>Subscribe to Our Newsletter</h2>
+                <p>Get the latest financial tips and insights delivered straight to your inbox.</p>
+                <div class="newsletter-form">
+                    <input type="email" id="newsletterEmail" class="newsletter-input" placeholder="Enter your email address" />
+                    <button class="newsletter-btn" onclick="window.subscribeNewsletter()">Subscribe</button>
+                </div>
+                <div id="newsletterMessage" style="display:none;"></div>
+                <p class="newsletter-note">No spam, unsubscribe anytime. We respect your privacy.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CTA SECTION
+    ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Take Control of Your Finances?</h2>
+                <p>Join over 50,000 Nigerians who use SmartBudget to track, budget, and save.</p>
+                <a href="/Account/Register" class="btn-get-started">Get Started Free →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="blog-footer">
+        <div class="container">
+            <div class="blog-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="blog-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/cookies">Cookies</a>
+                    <a href="/security">Security</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .blog-page{background:#0B1120;min-height:100vh;padding-top:80px}
+    .breadcrumb-container{padding:.75rem 0;background:transparent}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;list-style:none;padding:0;margin:0;flex-wrap:wrap}
+    .breadcrumb-item{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#94A3B8}
+    .breadcrumb-item a{display:flex;align-items:center;gap:.4rem;color:#94A3B8;text-decoration:none;transition:all .2s ease;padding:.25rem .5rem;border-radius:6px}
+    .breadcrumb-item a:hover{color:#10B981;background:rgba(16,185,129,0.08)}
+    .breadcrumb-item i.bi-chevron-right{color:#64748B;font-size:.65rem}
+    .breadcrumb-item.active{color:#F1F5F9;font-weight:500;padding:.25rem .5rem;background:rgba(16,185,129,0.1);border-radius:6px;border:1px solid rgba(16,185,129,0.1)}
+    .blog-hero{padding:3rem 0 2rem;background:linear-gradient(135deg,#0B1120 0%,#111827 50%,#1A2332 100%);text-align:center}
+    .blog-hero-content{max-width:700px;margin:0 auto}
+    .blog-badge{display:inline-block;background:rgba(16,185,129,0.12);color:#10B981;padding:.4rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(16,185,129,0.15)}
+    .blog-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem;line-height:1.2}
+    .blog-hero .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .blog-hero p{font-size:1.0625rem;color:#94A3B8;max-width:550px;margin:0 auto;line-height:1.6}
+    .featured-post{padding:2rem 0 1.5rem;background:#0B1120}
+    .featured-card{background:linear-gradient(135deg,#1E293B 0%,#253349 100%);border-radius:20px;padding:2.5rem;border:1px solid rgba(16,185,129,0.15);position:relative;overflow:hidden;max-width:900px;margin:0 auto}
+    .featured-card::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle,rgba(16,185,129,0.05) 0%,transparent 70%);pointer-events:none}
+    .featured-tag{display:inline-block;background:rgba(16,185,129,0.2);color:#10B981;padding:.2rem .8rem;border-radius:20px;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;border:1px solid rgba(16,185,129,0.2)}
+    .featured-content{position:relative;z-index:1}
+    .featured-category{display:inline-block;font-size:.7rem;color:#10B981;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.5rem}
+    .featured-content h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem;line-height:1.2}
+    .featured-content p{color:#94A3B8;font-size:.9375rem;line-height:1.6;margin-bottom:1rem}
+    .featured-meta{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.25rem;font-size:.8rem;color:#64748B}
+    .featured-meta span{display:flex;align-items:center;gap:.3rem}
+    .btn-read-more{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;text-decoration:none;border-radius:10px;font-size:.875rem;font-weight:600;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.2)}
+    .btn-read-more:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,0.35);color:#fff}
+    .categories-section{padding:1.5rem 0;background:#111827;border-top:1px solid rgba(148,163,184,0.06);border-bottom:1px solid rgba(148,163,184,0.06)}
+    .categories-scroll{display:flex;gap:.5rem;overflow-x:auto;padding:.25rem 0;scrollbar-width:none;-ms-overflow-style:none;justify-content:center;flex-wrap:wrap}
+    .categories-scroll::-webkit-scrollbar{display:none}
+    .category-btn{padding:.5rem 1.25rem;background:transparent;border:1px solid rgba(148,163,184,0.15);border-radius:20px;color:#94A3B8;font-size:.8rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s ease;white-space:nowrap}
+    .category-btn:hover{border-color:#10B981;color:#10B981}
+    .category-btn.active{background:#10B981;border-color:#10B981;color:#fff}
+    .blog-posts{padding:2.5rem 0;background:#0B1120}
+    .posts-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:1100px;margin:0 auto}
+    .post-card{background:#1E293B;border-radius:16px;overflow:hidden;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease}
+    .post-card:hover{transform:translateY(-4px);border-color:rgba(16,185,129,0.2);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+    .post-image{position:relative;height:200px;background:linear-gradient(135deg,#1A2332 0%,#253349 100%);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .post-image-placeholder{font-size:3rem;color:#10B981;opacity:.3}
+    .post-category{position:absolute;top:1rem;left:1rem;background:rgba(16,185,129,0.9);color:#fff;padding:.2rem .8rem;border-radius:20px;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+    .post-body{padding:1.5rem}
+    .post-body h3{font-size:1.0625rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem;line-height:1.3}
+    .post-body h3:hover{color:#10B981}
+    .post-body p{color:#94A3B8;font-size:.85rem;line-height:1.5;margin-bottom:.75rem}
+    .post-meta{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:#64748B;margin-bottom:1rem}
+    .post-meta span{display:flex;align-items:center;gap:.3rem}
+    .btn-read{display:inline-flex;align-items:center;gap:.3rem;color:#10B981;text-decoration:none;font-weight:600;font-size:.85rem;transition:all .3s ease}
+    .btn-read:hover{gap:.6rem;color:#34D399}
+    .newsletter-section{padding:3rem 0;background:#111827;border-top:1px solid rgba(148,163,184,0.06);border-bottom:1px solid rgba(148,163,184,0.06)}
+    .newsletter-card{max-width:600px;margin:0 auto;text-align:center;background:#1E293B;border-radius:20px;padding:2.5rem;border:1px solid rgba(148,163,184,0.08)}
+    .newsletter-icon{font-size:3rem;color:#10B981;margin-bottom:1rem}
+    .newsletter-card h2{font-size:1.5rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem}
+    .newsletter-card p{color:#94A3B8;font-size:.9375rem;margin-bottom:1.25rem}
+    .newsletter-form{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+    .newsletter-input{flex:1;min-width:200px;padding:.75rem 1rem;background:#0F172A;border:1px solid rgba(148,163,184,0.15);border-radius:10px;color:#F1F5F9;font-size:.875rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s ease}
+    .newsletter-input:focus{border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.1)}
+    .newsletter-input::placeholder{color:#64748B}
+    .newsletter-btn{padding:.75rem 1.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;border:none;border-radius:10px;font-size:.875rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.2);white-space:nowrap}
+    .newsletter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,0.35)}
+    .newsletter-note{font-size:.7rem;color:#64748B;margin-top:.75rem}
+    .newsletter-message-success{color:#34D399;font-weight:600;padding:.5rem;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)}
+    .newsletter-message-error{color:#F87171;font-weight:600;padding:.5rem;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2)}
+    .cta-section{padding:3rem 0;background:#0B1120;text-align:center}
+    .cta-content{max-width:600px;margin:0 auto}
+    .cta-content h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem}
+    .cta-content p{color:#94A3B8;font-size:.9375rem;margin-bottom:1.5rem}
+    .btn-get-started{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;text-decoration:none;border-radius:12px;font-size:1rem;font-weight:600;font-family:'Inter',sans-serif;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.25);border:none;cursor:pointer;position:relative;overflow:hidden}
+    .btn-get-started::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left .5s ease}
+    .btn-get-started:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(16,185,129,0.35);color:#fff}
+    .btn-get-started:hover::before{left:100%}
+    
+    /* ============================================
+    FOOTER
+    ============================================ */
+    .blog-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .blog-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .blog-footer-content p {
+        color: #64748B;
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .blog-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .blog-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+    }
+
+    .blog-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* ============================================
+    RESPONSIVE - FOOTER
+    ============================================ */
+    @@media (max-width: 768px) {
+        .blog-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .blog-footer-links {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .blog-footer-links {
+            gap: 1rem;
+        }
+
+        .blog-footer-links a {
+            font-size: 0.7rem;
+        }
+    }
+
+    /* ============================================
+    RESPONSIVE - PAGE
+    ============================================ */
+    @@media(min-width:768px){.posts-grid{grid-template-columns:repeat(2,1fr)}.featured-card{padding:3rem}}
+    @@media(min-width:992px){.posts-grid{grid-template-columns:repeat(3,1fr)}}
+    @@media(max-width:768px){.blog-page{padding-top:70px}.blog-hero{padding:2rem 0 1.5rem}.featured-card{padding:1.5rem;border-radius:16px}.featured-content h2{font-size:1.3rem}.featured-meta{gap:1rem;font-size:.7rem}.blog-posts{padding:1.5rem 0}.post-image{height:160px}.post-body{padding:1.25rem}.categories-scroll{flex-wrap:nowrap;justify-content:flex-start}.newsletter-card{padding:1.5rem}.newsletter-form{flex-direction:column}.newsletter-input{min-width:auto;width:100%}.newsletter-btn{width:100%}.cta-section{padding:2rem 0}.btn-get-started{padding:.8rem 2rem;font-size:.9rem}.breadcrumb-item{font-size:.75rem}}
+    @@media(max-width:480px){.blog-hero h1{font-size:1.8rem}.posts-grid{grid-template-columns:1fr}.featured-card{padding:1.25rem}.featured-content h2{font-size:1.1rem}.post-image{height:140px}.post-body h3{font-size:.95rem}.btn-get-started{padding:.7rem 1.5rem;font-size:.85rem}.breadcrumb-item.active{font-size:.7rem;padding:.15rem .4rem}.breadcrumb-item a span{display:none}.breadcrumb-item a i{font-size:1rem}}
+</style>
+
+<script src="/js/blog.js"></script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "blog";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "blog");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

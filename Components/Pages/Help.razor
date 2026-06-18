@@ -1,0 +1,816 @@
+@page "/help"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Help Center</PageTitle>
+
+<div class="help-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Help Center
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="help-hero">
+        <div class="container">
+            <div class="help-hero-content">
+                <div class="help-badge">❓ Help Center</div>
+                <h1>How Can We <span class="gradient-text">Help You?</span></h1>
+                <p>Find answers to common questions, guides, and support resources.</p>
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="helpSearch" class="search-input" placeholder="Search for help articles..." onkeyup="window.searchHelp()" />
+                        <button class="search-btn" onclick="window.searchHelp()">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    POPULAR TOPICS
+    ============================================ -->
+    <section class="categories-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Popular Topics</span>
+                <h2 class="section-title-pro">Browse by <span class="gradient-text">Category</span></h2>
+                <p class="section-subtitle">Click a category to filter articles below.</p>
+            </div>
+            <div class="categories-grid" id="categoriesGrid">
+                <div class="category-card active" data-category="all" onclick="window.filterHelp('all')">
+                    <div class="category-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+                    <h3>All Topics</h3>
+                    <p>View all help articles</p>
+                    <span class="article-count">10 articles</span>
+                </div>
+                <div class="category-card" data-category="getting-started" onclick="window.filterHelp('getting-started')">
+                    <div class="category-icon"><i class="bi bi-rocket-takeoff"></i></div>
+                    <h3>Getting Started</h3>
+                    <p>Set up your account and start using SmartBudget.</p>
+                    <span class="article-count">2 articles</span>
+                </div>
+                <div class="category-card" data-category="account" onclick="window.filterHelp('account')">
+                    <div class="category-icon"><i class="bi bi-person-circle"></i></div>
+                    <h3>Account Management</h3>
+                    <p>Manage your profile, security, and settings.</p>
+                    <span class="article-count">2 articles</span>
+                </div>
+                <div class="category-card" data-category="budgeting" onclick="window.filterHelp('budgeting')">
+                    <div class="category-icon"><i class="bi bi-wallet2"></i></div>
+                    <h3>Budgeting</h3>
+                    <p>Create and manage budgets effectively.</p>
+                    <span class="article-count">2 articles</span>
+                </div>
+                <div class="category-card" data-category="transactions" onclick="window.filterHelp('transactions')">
+                    <div class="category-icon"><i class="bi bi-arrow-left-right"></i></div>
+                    <h3>Transactions</h3>
+                    <p>Add, edit, and organize your transactions.</p>
+                    <span class="article-count">2 articles</span>
+                </div>
+                <div class="category-card" data-category="savings" onclick="window.filterHelp('savings')">
+                    <div class="category-icon"><i class="bi bi-piggy-bank"></i></div>
+                    <h3>Savings Goals</h3>
+                    <p>Set and track your savings goals.</p>
+                    <span class="article-count">1 article</span>
+                </div>
+                <div class="category-card" data-category="security" onclick="window.filterHelp('security')">
+                    <div class="category-icon"><i class="bi bi-shield-check"></i></div>
+                    <h3>Security & Privacy</h3>
+                    <p>Keep your financial data safe and secure.</p>
+                    <span class="article-count">1 article</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    ALL FAQ ARTICLES (10 Articles - Independent Layout)
+    ============================================ -->
+    <section class="articles-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Help Articles</span>
+                <h2 class="section-title-pro">Frequently Asked <span class="gradient-text">Questions</span></h2>
+                <p class="section-subtitle">Click an article to read the full answer.</p>
+            </div>
+            <div class="articles-grid" id="helpArticles">
+                <!-- FAQ 1 -->
+                <div class="article-card" data-category="getting-started">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Getting Started</span>
+                    </div>
+                    <h3>How do I create a SmartBudget account?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Creating a SmartBudget account is quick and easy:</p>
+                            <ol>
+                                <li>Go to the <a href="/Account/Register">Registration page</a></li>
+                                <li>Enter your full name, email address, and password</li>
+                                <li>Agree to our Terms of Service and Privacy Policy</li>
+                                <li>Click "Create free account"</li>
+                                <li>You'll be redirected to your new dashboard</li>
+                            </ol>
+                            <p>It takes less than 2 minutes and is completely free!</p>
+                            <a href="/Account/Register" class="article-action-btn">Create Account Now →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="article-card" data-category="getting-started">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Getting Started</span>
+                    </div>
+                    <h3>How do I set up my first budget?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Setting up your first budget:</p>
+                            <ol>
+                                <li>Go to the <a href="/budgets">Budgets page</a></li>
+                                <li>Click "Add Budget"</li>
+                                <li>Enter a category name (e.g., Food, Transport)</li>
+                                <li>Set your budget amount</li>
+                                <li>Choose a color</li>
+                                <li>Click "Save Budget"</li>
+                            </ol>
+                            <p>You can create multiple budgets for different spending categories.</p>
+                            <a href="/budgets" class="article-action-btn">Start Budgeting →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="article-card" data-category="account">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Account Management</span>
+                    </div>
+                    <h3>How do I reset my password?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>If you've forgotten your password, follow these steps:</p>
+                            <ol>
+                                <li>Go to the <a href="/Account/Login">Login page</a></li>
+                                <li>Click on "Forgot password?" link</li>
+                                <li>Enter your registered email address</li>
+                                <li>Check your email for a password reset link</li>
+                                <li>Click the link and create a new password</li>
+                            </ol>
+                            <p>For security, the reset link expires in 1 hour.</p>
+                            <a href="/Account/ForgotPassword" class="article-action-btn">Reset Password →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="article-card" data-category="account">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Account Management</span>
+                    </div>
+                    <h3>How do I update my profile?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Update your profile information:</p>
+                            <ol>
+                                <li>Go to <a href="/settings">Settings</a></li>
+                                <li>Click on the "Profile" tab</li>
+                                <li>Update your full name or phone number</li>
+                                <li>Click "Save Changes"</li>
+                            </ol>
+                            <p>Note: Email address cannot be changed for security reasons.</p>
+                            <a href="/settings" class="article-action-btn">Go to Settings →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="article-card" data-category="budgeting">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Budgeting</span>
+                    </div>
+                    <h3>What is the 50/30/20 budgeting rule?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>The 50/30/20 rule is a simple budgeting framework:</p>
+                            <ul>
+                                <li><strong>50% for Needs:</strong> Rent, food, transportation, utilities</li>
+                                <li><strong>30% for Wants:</strong> Entertainment, dining out, shopping</li>
+                                <li><strong>20% for Savings:</strong> Emergency fund, investments, debt repayment</li>
+                            </ul>
+                            <p>This rule helps you balance essential spending with saving for the future.</p>
+                            <a href="/blog/50-30-20-budgeting-rule" class="article-action-btn">Learn More →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="article-card" data-category="budgeting">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Budgeting</span>
+                    </div>
+                    <h3>How do I set a budget limit?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Set budget limits to control your spending:</p>
+                            <ol>
+                                <li>Go to the <a href="/budgets">Budgets page</a></li>
+                                <li>Click "Add Budget"</li>
+                                <li>Enter the category name and amount</li>
+                                <li>Select a color for the budget</li>
+                                <li>Click "Save Budget"</li>
+                            </ol>
+                            <p>You'll get alerts when you're close to exceeding your budget limits.</p>
+                            <a href="/budgets" class="article-action-btn">Go to Budgets →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 7 -->
+                <div class="article-card" data-category="transactions">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Transactions</span>
+                    </div>
+                    <h3>How do I add a transaction?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Adding a transaction in SmartBudget is simple:</p>
+                            <ol>
+                                <li>Log in to your SmartBudget account</li>
+                                <li>Go to the <a href="/transactions">Transactions page</a></li>
+                                <li>Click the "Add Transaction" button</li>
+                                <li>Fill in the description, amount, category, and type</li>
+                                <li>Click "Save Transaction"</li>
+                            </ol>
+                            <p>Your transaction will appear in your transaction list immediately.</p>
+                            <a href="/transactions" class="article-action-btn">Go to Transactions →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 8 -->
+                <div class="article-card" data-category="transactions">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Transactions</span>
+                    </div>
+                    <h3>How do I edit or delete a transaction?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Manage your transactions easily:</p>
+                            <ul>
+                                <li><strong>To edit:</strong> Click the pencil icon on any transaction</li>
+                                <li><strong>To delete:</strong> Click the trash icon on any transaction</li>
+                                <li>Confirm your action when prompted</li>
+                            </ul>
+                            <p>You can also filter and search for specific transactions.</p>
+                            <a href="/transactions" class="article-action-btn">Go to Transactions →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 9 -->
+                <div class="article-card" data-category="savings">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Savings Goals</span>
+                    </div>
+                    <h3>How do I create a savings goal?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Create and track your savings goals:</p>
+                            <ol>
+                                <li>Go to the <a href="/goals">Savings Goals page</a></li>
+                                <li>Click "Add Goal"</li>
+                                <li>Enter the goal name and target amount</li>
+                                <li>Set a target date and color</li>
+                                <li>Click "Save Goal"</li>
+                            </ol>
+                            <p>You can track your progress and add savings contributions anytime.</p>
+                            <a href="/goals" class="article-action-btn">Go to Goals →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+
+                <!-- FAQ 10 -->
+                <div class="article-card" data-category="security">
+                    <div class="article-header">
+                        <div class="article-icon"><i class="bi bi-question-circle"></i></div>
+                        <span class="article-category">Security & Privacy</span>
+                    </div>
+                    <h3>Is my financial data secure?</h3>
+                    <div class="article-content-wrapper">
+                        <div class="article-content">
+                            <p>Yes! SmartBudget takes security seriously:</p>
+                            <ul>
+                                <li><strong>Bank-level encryption:</strong> All your data is encrypted</li>
+                                <li><strong>Secure authentication:</strong> Password protection with 2FA option</li>
+                                <li><strong>Data privacy:</strong> We never share your data with third parties</li>
+                                <li><strong>Regular security audits:</strong> We continuously monitor for threats</li>
+                            </ul>
+                            <p>Your financial information is safe with us.</p>
+                            <a href="/security" class="article-action-btn">Learn More About Security →</a>
+                        </div>
+                    </div>
+                    <button class="btn-toggle-article" onclick="event.stopPropagation(); window.toggleArticle(this.closest('.article-card'))">
+                        <span>Read Article</span> <i class="bi bi-chevron-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CONTACT SUPPORT
+    ============================================ -->
+    <section class="contact-support">
+        <div class="container">
+            <div class="support-card">
+                <div class="support-icon"><i class="bi bi-chat-dots"></i></div>
+                <h2>Still Need Help?</h2>
+                <p>Our support team is here to assist you. Contact us directly and we'll get back to you within 24 hours.</p>
+                <div class="support-options">
+                    <a href="/contact" class="support-btn">
+                        <i class="bi bi-envelope"></i> Contact Support
+                    </a>
+                    <a href="mailto:support@smartbudget.com" class="support-btn-outline">
+                        <i class="bi bi-envelope-paper"></i> Email Us
+                    </a>
+                </div>
+                <div class="support-hours">
+                    <i class="bi bi-clock"></i>
+                    <span>Support Hours: Monday - Friday, 9:00 AM - 6:00 PM WAT</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CTA SECTION
+    ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Take Control of Your Finances?</h2>
+                <p>Join over 50,000 Nigerians who use SmartBudget to track, budget, and save.</p>
+                <a href="/Account/Register" class="btn-get-started">Get Started Free →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="help-footer">
+        <div class="container">
+            <div class="help-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="help-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/guides">Guides</a>
+                    <a href="/help">Help</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/cookies">Cookies</a>
+                    <a href="/security">Security</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .help-page{background:#0B1120;min-height:100vh;padding-top:80px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+    .container{width:100%;max-width:1280px;margin:0 auto;padding:0 1rem}
+    .breadcrumb-container{padding:.75rem 0;background:transparent}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;list-style:none;padding:0;margin:0;flex-wrap:wrap}
+    .breadcrumb-item{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#94A3B8}
+    .breadcrumb-item a{display:flex;align-items:center;gap:.4rem;color:#94A3B8;text-decoration:none;transition:all .2s ease;padding:.25rem .5rem;border-radius:6px}
+    .breadcrumb-item a:hover{color:#10B981;background:rgba(16,185,129,0.08)}
+    .breadcrumb-item i.bi-chevron-right{color:#64748B;font-size:.65rem}
+    .breadcrumb-item.active{color:#F1F5F9;font-weight:500;padding:.25rem .5rem;background:rgba(16,185,129,0.1);border-radius:6px;border:1px solid rgba(16,185,129,0.1)}
+    .help-hero{padding:3rem 0 2rem;background:linear-gradient(135deg,#0B1120 0%,#111827 50%,#1A2332 100%);text-align:center}
+    .help-hero-content{max-width:750px;margin:0 auto}
+    .help-badge{display:inline-block;background:rgba(16,185,129,0.12);color:#10B981;padding:.4rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(16,185,129,0.15)}
+    .help-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem;line-height:1.2}
+    .help-hero .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .help-hero p{font-size:1.0625rem;color:#94A3B8;max-width:600px;margin:0 auto;line-height:1.6}
+    .search-container{max-width:550px;margin:1.5rem auto 0}
+    .search-box{display:flex;gap:.5rem;background:#1E293B;border-radius:12px;padding:.5rem;border:1px solid rgba(148,163,184,0.15)}
+    .search-box:focus-within{border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.1)}
+    .search-box i{color:#64748B;font-size:1.25rem;display:flex;align-items:center;padding-left:.5rem}
+    .search-input{flex:1;background:transparent;border:none;color:#F1F5F9;font-size:.9375rem;outline:none;padding:.5rem;font-family:'Inter',sans-serif}
+    .search-input::placeholder{color:#64748B}
+    .search-btn{padding:.6rem 1.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;border:none;border-radius:8px;font-size:.875rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s ease;white-space:nowrap}
+    .search-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(16,185,129,0.3)}
+    .section-header{text-align:center;margin-bottom:2.5rem}
+    .section-badge{display:inline-block;background:rgba(16,185,129,0.12);color:#10B981;padding:.3rem 1rem;border-radius:20px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;border:1px solid rgba(16,185,129,0.15)}
+    .section-title-pro{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;color:#F1F5F9;margin-bottom:.5rem;line-height:1.2}
+    .section-title-pro .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .section-subtitle{font-size:.9375rem;color:#94A3B8;max-width:550px;margin:0 auto;line-height:1.6}
+    .categories-section{padding:3rem 0;background:#0B1120;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .categories-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;max-width:1100px;margin:0 auto}
+    .category-card{background:#1E293B;border-radius:16px;padding:1.75rem;text-align:center;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease;cursor:pointer}
+    .category-card:hover{transform:translateY(-4px);border-color:rgba(16,185,129,0.2);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+    .category-card.active{border-color:#10B981;box-shadow:0 0 20px rgba(16,185,129,0.1)}
+    .category-icon{width:56px;height:56px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.5rem;color:#10B981;border:1px solid rgba(16,185,129,0.15)}
+    .category-card h3{font-size:1.0625rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem}
+    .category-card p{color:#94A3B8;font-size:.85rem;line-height:1.5;margin-bottom:.5rem}
+    .article-count{display:inline-block;font-size:.7rem;color:#64748B;background:#0F172A;padding:.2rem .8rem;border-radius:20px;border:1px solid rgba(148,163,184,0.08)}
+    .articles-section{padding:3rem 0;background:#111827}
+    .articles-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;max-width:1100px;margin:0 auto}
+    .article-card{background:#1E293B;border-radius:16px;padding:1.5rem;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease;cursor:pointer;display:flex;flex-direction:column;align-self:start;width:100%}
+    .article-card:hover{transform:translateY(-2px);border-color:rgba(16,185,129,0.2);box-shadow:0 8px 20px rgba(0,0,0,0.3)}
+    .article-card.expanded{border-color:#10B981;box-shadow:0 8px 20px rgba(16,185,129,0.1)}
+    .article-content-wrapper{overflow:hidden;transition:all .3s ease;max-height:0;opacity:0;margin:0}
+    .article-card.expanded .article-content-wrapper{max-height:600px;opacity:1;margin-top:.75rem}
+    .article-content{color:#CBD5E1;font-size:.875rem;line-height:1.8;padding-top:.75rem;border-top:1px solid rgba(148,163,184,0.08)}
+    .article-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem}
+    .article-icon{width:32px;height:32px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.875rem;color:#10B981;flex-shrink:0}
+    .article-category{font-size:.65rem;color:#10B981;background:rgba(16,185,129,0.1);padding:.2rem .6rem;border-radius:20px;font-weight:600;border:1px solid rgba(16,185,129,0.15)}
+    .article-card h3{font-size:1rem;font-weight:600;color:#F1F5F9;margin-bottom:0}
+    .article-content ul,.article-content ol{padding-left:1.25rem;margin:.5rem 0}
+    .article-content li{margin-bottom:.3rem}
+    .article-content a{color:#10B981;text-decoration:none;font-weight:500}
+    .article-content a:hover{color:#34D399;text-decoration:underline}
+    .article-action-btn{display:inline-block;margin-top:.75rem;padding:.5rem 1rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.875rem;transition:all .3s ease}
+    .article-action-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(16,185,129,0.3)}
+    .btn-toggle-article{background:transparent;border:none;color:#34D399;font-weight:600;font-size:.875rem;cursor:pointer;font-family:'Inter',sans-serif;padding:.5rem 0 0 0;transition:all .3s ease;display:flex;align-items:center;gap:.3rem;margin-top:.5rem;width:100%;opacity:.9}
+    .btn-toggle-article:hover{color:#6EE7B7;opacity:1}
+    .btn-toggle-article i{transition:transform .3s ease;font-size:.8rem;color:#34D399}
+    .article-card.expanded .btn-toggle-article i{transform:rotate(180deg)}
+    .contact-support{padding:3rem 0;background:#0B1120;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .support-card{max-width:650px;margin:0 auto;background:linear-gradient(135deg,#1E293B 0%,#253349 100%);border-radius:20px;padding:2.5rem;text-align:center;border:1px solid rgba(16,185,129,0.1)}
+    .support-icon{font-size:3rem;color:#10B981;margin-bottom:1rem}
+    .support-card h2{font-size:1.5rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem}
+    .support-card p{color:#94A3B8;font-size:.9375rem;line-height:1.6;margin-bottom:1.25rem}
+    .support-options{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.25rem}
+    .support-btn{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;border-radius:10px;font-weight:600;text-decoration:none;font-size:.875rem;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.2)}
+    .support-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,0.35)}
+    .support-btn-outline{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.5rem;background:transparent;border:1px solid rgba(148,163,184,0.2);color:#CBD5E1;border-radius:10px;font-weight:600;text-decoration:none;font-size:.875rem;transition:all .3s ease}
+    .support-btn-outline:hover{border-color:#10B981;color:#10B981}
+    .support-hours{display:flex;align-items:center;justify-content:center;gap:.5rem;color:#64748B;font-size:.8rem}
+    .support-hours i{color:#10B981}
+    .cta-section{padding:3rem 0;background:#0B1120;text-align:center}
+    .cta-content{max-width:600px;margin:0 auto}
+    .cta-content h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem}
+    .cta-content p{color:#94A3B8;font-size:.9375rem;margin-bottom:1.5rem}
+    .btn-get-started{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;text-decoration:none;border-radius:12px;font-size:1rem;font-weight:600;font-family:'Inter',sans-serif;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.25);border:none;cursor:pointer;position:relative;overflow:hidden}
+    .btn-get-started::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left .5s ease}
+    .btn-get-started:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(16,185,129,0.35);color:#fff}
+    .btn-get-started:hover::before{left:100%}
+    .no-results{grid-column:1/-1;text-align:center;padding:3rem;color:#64748B;background:#1E293B;border-radius:16px;border:1px solid rgba(148,163,184,0.08)}
+    .no-results i{font-size:2rem;display:block;margin-bottom:1rem;color:#10B981}
+    .no-results p{margin-bottom:.5rem}
+    .no-results p:first-of-type{font-size:1rem;font-weight:600;color:#F1F5F9}
+
+    /* ============================================
+    FOOTER
+    ============================================ */
+    .help-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .help-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .help-footer-content p {
+        color: #64748B;
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .help-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .help-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+    }
+
+    .help-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* ============================================
+    RESPONSIVE
+    ============================================ */
+    @@media(min-width:768px){.categories-grid{grid-template-columns:repeat(2,1fr)}.articles-grid{grid-template-columns:repeat(2,1fr)}.support-options{flex-direction:row}.support-btn,.support-btn-outline{flex:1}}
+    @@media(min-width:992px){.categories-grid{grid-template-columns:repeat(3,1fr)}.articles-grid{grid-template-columns:repeat(3,1fr)}}
+    @@media(max-width:768px){
+        .help-page{padding-top:70px}
+        .help-hero{padding:2rem 0 1.5rem}
+        .categories-section,.articles-section,.contact-support{padding:2rem 0}
+        .search-box{flex-wrap:wrap}
+        .search-input{width:100%}
+        .search-btn{width:100%}
+        .support-card{padding:1.5rem}
+        .breadcrumb-item{font-size:.75rem}
+        .help-footer-content{flex-direction:column;text-align:center}
+        .help-footer-links{justify-content:center}
+    }
+    @@media(max-width:480px){
+        .help-hero h1{font-size:1.8rem}
+        .categories-grid,.articles-grid{grid-template-columns:1fr}
+        .category-card{padding:1.25rem}
+        .article-card{padding:1.25rem}
+        .support-card{padding:1.25rem}
+        .btn-get-started{padding:.7rem 1.5rem;font-size:.85rem}
+        .breadcrumb-item.active{font-size:.7rem;padding:.15rem .4rem}
+        .breadcrumb-item a span{display:none}
+        .breadcrumb-item a i{font-size:1rem}
+        .help-footer-links{gap:1rem}
+        .help-footer-links a{font-size:.7rem}
+    }
+</style>
+
+<script>
+    // ============================================
+    // HELP PAGE JAVASCRIPT - FIXED VERSION
+    // ============================================
+    console.log('Help Page JS: Loaded');
+
+    // ============================================
+    // TOGGLE ARTICLE EXPAND - INDEPENDENT
+    // ============================================
+    window.toggleArticle = function(element) {
+        var card = element;
+        var btn = card.querySelector('.btn-toggle-article');
+        var span = btn ? btn.querySelector('span') : null;
+        var icon = btn ? btn.querySelector('i') : null;
+        
+        if (card.classList.contains('expanded')) {
+            card.classList.remove('expanded');
+            if (span) span.textContent = 'Read Article';
+            if (icon) {
+                icon.className = 'bi bi-chevron-down';
+            }
+        } else {
+            card.classList.add('expanded');
+            if (span) span.textContent = 'Close Article';
+            if (icon) {
+                icon.className = 'bi bi-chevron-up';
+            }
+        }
+    };
+
+    // ============================================
+    // SEARCH HELP ARTICLES
+    // ============================================
+    window.searchHelp = function() {
+        var searchInput = document.getElementById('helpSearch');
+        var searchTerm = searchInput.value.toLowerCase().trim();
+        var articles = document.querySelectorAll('.article-card');
+        var categories = document.querySelectorAll('.category-card');
+        
+        categories.forEach(function(cat) {
+            cat.classList.remove('active');
+        });
+        var allCat = document.querySelector('.category-card[data-category="all"]');
+        if (allCat) allCat.classList.add('active');
+        
+        if (searchTerm === '') {
+            articles.forEach(function(article) {
+                article.style.display = 'block';
+            });
+            var grid = document.getElementById('helpArticles');
+            var noResults = grid.querySelector('.no-results');
+            if (noResults) noResults.remove();
+            
+            articles.forEach(function(article) {
+                article.classList.remove('expanded');
+                var btn = article.querySelector('.btn-toggle-article');
+                if (btn) {
+                    var span = btn.querySelector('span');
+                    var icon = btn.querySelector('i');
+                    if (span) span.textContent = 'Read Article';
+                    if (icon) icon.className = 'bi bi-chevron-down';
+                }
+            });
+            return;
+        }
+        
+        var hasResults = false;
+        articles.forEach(function(article) {
+            var title = article.querySelector('h3')?.textContent.toLowerCase() || '';
+            var category = article.querySelector('.article-category')?.textContent.toLowerCase() || '';
+            var content = article.querySelector('.article-content')?.textContent.toLowerCase() || '';
+            
+            article.classList.remove('expanded');
+            var btn = article.querySelector('.btn-toggle-article');
+            if (btn) {
+                var span = btn.querySelector('span');
+                var icon = btn.querySelector('i');
+                if (span) span.textContent = 'Read Article';
+                if (icon) icon.className = 'bi bi-chevron-down';
+            }
+            
+            if (title.includes(searchTerm) || category.includes(searchTerm) || content.includes(searchTerm)) {
+                article.style.display = 'block';
+                hasResults = true;
+            } else {
+                article.style.display = 'none';
+            }
+        });
+        
+        var grid = document.getElementById('helpArticles');
+        var noResults = grid.querySelector('.no-results');
+        if (!hasResults) {
+            if (!noResults) {
+                var msg = document.createElement('div');
+                msg.className = 'no-results';
+                msg.innerHTML = '<i class="bi bi-search"></i><p>No articles found</p><p>Try a different search term or browse our categories above.</p>';
+                grid.appendChild(msg);
+            }
+        } else {
+            if (noResults) {
+                noResults.remove();
+            }
+        }
+    };
+
+    // ============================================
+    // FILTER BY CATEGORY
+    // ============================================
+    window.filterHelp = function(category) {
+        var articles = document.querySelectorAll('.article-card');
+        var searchInput = document.getElementById('helpSearch');
+        var categories = document.querySelectorAll('.category-card');
+        
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        categories.forEach(function(cat) {
+            cat.classList.remove('active');
+            var catName = cat.getAttribute('data-category');
+            if (catName === category) {
+                cat.classList.add('active');
+            }
+        });
+        
+        articles.forEach(function(article) {
+            article.classList.remove('expanded');
+            var btn = article.querySelector('.btn-toggle-article');
+            if (btn) {
+                var span = btn.querySelector('span');
+                var icon = btn.querySelector('i');
+                if (span) span.textContent = 'Read Article';
+                if (icon) icon.className = 'bi bi-chevron-down';
+            }
+        });
+        
+        var hasResults = false;
+        articles.forEach(function(article) {
+            var articleCategory = article.dataset.category || '';
+            if (category === 'all' || articleCategory === category) {
+                article.style.display = 'block';
+                hasResults = true;
+            } else {
+                article.style.display = 'none';
+            }
+        });
+        
+        var grid = document.getElementById('helpArticles');
+        var noResults = grid.querySelector('.no-results');
+        if (noResults) {
+            noResults.remove();
+        }
+        
+        if (!hasResults) {
+            var msg = document.createElement('div');
+            msg.className = 'no-results';
+            msg.innerHTML = '<i class="bi bi-folder-open"></i><p>No articles in this category</p><p>Try selecting a different category or use the search bar.</p>';
+            grid.appendChild(msg);
+        }
+    };
+
+    // ============================================
+    // INIT
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        var allCat = document.querySelector('.category-card[data-category="all"]');
+        if (allCat) {
+            allCat.classList.add('active');
+        }
+        console.log('❓ Help page initialized - 10 FAQ articles loaded (independent toggle)');
+    });
+
+    // ============================================
+    // REGISTER WITH PAGE REGISTRY
+    // ============================================
+    if (window.pageRegistry) {
+        window.pageRegistry.register('help', {
+            init: function() {
+                console.log('❓ Help page initialized');
+                var allCat = document.querySelector('.category-card[data-category="all"]');
+                if (allCat) allCat.classList.add('active');
+            },
+            destroy: function() {
+                console.log('🗑️ Help: Cleanup');
+            },
+            refresh: function() {
+                console.log('🔄 Help: Refresh');
+            }
+        });
+    }
+
+    // Expose functions globally
+    window.toggleArticle = window.toggleArticle;
+    window.searchHelp = window.searchHelp;
+    window.filterHelp = window.filterHelp;
+
+    console.log('✅ Help Page JS: Loaded with independent article toggling');
+</script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "help";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "help");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

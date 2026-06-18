@@ -1,0 +1,112 @@
+@page "/guides/how-to-build-an-emergency-fund"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - How to Build an Emergency Fund</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">How to Build an Emergency Fund</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Saving</span>
+                <h1>How to Build an Emergency Fund</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 12 min read</span>
+                    <span><i class="bi bi-file-text"></i> Beginner</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>An emergency fund is your financial safety net. This guide explains why it's crucial and how to build one effectively.</p>
+
+                <h2>What is an Emergency Fund?</h2>
+                <p>An emergency fund is money set aside for unexpected expenses like:</p>
+                <ul>
+                    <li>Job loss</li>
+                    <li>Medical emergencies</li>
+                    <li>Car repairs</li>
+                    <li>Home repairs</li>
+                    <li>Unexpected travel</li>
+                </ul>
+
+                <h2>How Much Should You Save?</h2>
+                <p>The general recommendation is 3-6 months of living expenses. Here are specific guidelines:</p>
+                <ul>
+                    <li><strong>Single person in Lagos:</strong> Minimum ₦500,000 (3 months)</li>
+                    <li><strong>Family:</strong> Minimum ₦1,500,000 (6 months)</li>
+                    <li><strong>Self-employed:</strong> 6-12 months of expenses</li>
+                    <li><strong>Unstable income:</strong> Aim for 6+ months</li>
+                </ul>
+
+                <h2>Where to Keep Your Emergency Fund</h2>
+                <ul>
+                    <li><strong>High-yield savings account:</strong> Easy access, earns interest</li>
+                    <li><strong>Money market fund:</strong> Higher returns, low risk</li>
+                    <li><strong>Fixed deposit:</strong> Better interest, but less accessible</li>
+                </ul>
+
+                <h2>Step-by-Step Plan to Build Your Emergency Fund</h2>
+                <h3>Step 1: Set a Monthly Savings Goal</h3>
+                <p>Break your target into monthly savings goals. For example, save ₦100,000 per month for 6 months.</p>
+
+                <h3>Step 2: Automate Your Savings</h3>
+                <p>Set up automatic transfers to your emergency fund account on payday. This way, you save first before spending.</p>
+
+                <h3>Step 3: Cut Expenses</h3>
+                <p>Review your spending and identify areas to cut back:</p>
+                <ul>
+                    <li>Reduce dining out</li>
+                    <li>Cancel unused subscriptions</li>
+                    <li>Shop with a list to avoid impulse buys</li>
+                    <li>Use public transportation when possible</li>
+                </ul>
+
+                <h3>Step 4: Use Windfalls</h3>
+                <p>Put bonuses, tax refunds, and gifts toward your emergency fund instead of spending them.</p>
+
+                <h3>Step 5: Track Your Progress</h3>
+                <p>Use SmartBudget to track your savings goal. Seeing your progress keeps you motivated.</p>
+
+                <h2>Common Mistakes to Avoid</h2>
+                <ul>
+                    <li>Using your emergency fund for non-emergencies</li>
+                    <li>Not saving enough (underestimating expenses)</li>
+                    <li>Keeping it in a regular savings account with low interest</li>
+                    <li>Not adjusting for inflation</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Start Building Your Emergency Fund</h3>
+                    <p>Use SmartBudget to track your savings goals and stay motivated.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

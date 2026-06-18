@@ -214,7 +214,6 @@ using (var scope = app.Services.CreateScope())
             
             if (adminUser == null)
             {
-                // Create new admin user
                 var admin = new IdentityUser
                 {
                     UserName = adminEmail,
@@ -230,7 +229,6 @@ using (var scope = app.Services.CreateScope())
                     logger.LogInformation("✅ Created admin user: admin@smartbudget.com");
                     logger.LogInformation("📧 Email: admin@smartbudget.com");
                     logger.LogInformation("🔑 Password: Admin@123");
-                    logger.LogInformation("✅ FullName claim: Admin User");
                 }
                 else
                 {
@@ -239,34 +237,23 @@ using (var scope = app.Services.CreateScope())
             }
             else
             {
-                // ============================================
-                // ✅ FIX: Update existing admin with FullName claim
-                // ============================================
                 logger.LogInformation("ℹ️ Admin user already exists");
                 
-                // Check if FullName claim exists
                 var claims = await userManager.GetClaimsAsync(adminUser);
                 var fullNameClaim = claims.FirstOrDefault(c => c.Type == "FullName");
                 
                 if (fullNameClaim == null)
                 {
-                    // Add FullName claim
                     await userManager.AddClaimAsync(adminUser, new Claim("FullName", "Admin User"));
                     logger.LogInformation("✅ Added FullName claim to existing admin user");
                 }
                 else if (fullNameClaim.Value == adminEmail || fullNameClaim.Value == "admin" || fullNameClaim.Value.Contains('@'))
                 {
-                    // Update if it's just the email or username
                     await userManager.RemoveClaimAsync(adminUser, fullNameClaim);
                     await userManager.AddClaimAsync(adminUser, new Claim("FullName", "Admin User"));
                     logger.LogInformation("✅ Updated FullName claim for admin user");
                 }
-                else
-                {
-                    logger.LogInformation($"✅ FullName claim already exists: {fullNameClaim.Value}");
-                }
                 
-                // Ensure admin is in Admin role
                 var isInRole = await userManager.IsInRoleAsync(adminUser, "Admin");
                 if (!isInRole)
                 {
@@ -317,5 +304,107 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// ============================================
+// ✅ HEALTH CHECK ENDPOINT FOR STATUS PAGE
+// ============================================
+app.MapGet("/api/health", async (IServiceProvider services) =>
+{
+    try
+    {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        
+        var dbType = usePostgres ? "PostgreSQL" : "SQLite";
+        var uptime = DateTime.UtcNow - System.Diagnostics.Process.GetCurrentProcess().StartTime;
+        
+        return Results.Ok(new
+        {
+            status = canConnect ? "healthy" : "degraded",
+            timestamp = DateTime.UtcNow,
+            uptime = $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s",
+            services = new
+            {
+                database = new
+                {
+                    status = canConnect ? "connected" : "disconnected",
+                    type = dbType
+                },
+                api = new
+                {
+                    status = "operational",
+                    version = "1.0.0"
+                },
+                authentication = new
+                {
+                    status = "operational"
+                }
+            },
+            metrics = new
+            {
+                memory = GC.GetTotalMemory(false),
+                threads = System.Diagnostics.Process.GetCurrentProcess().Threads.Count
+            }
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Json(new
+        {
+            status = "unhealthy",
+            timestamp = DateTime.UtcNow,
+            error = ex.Message,
+            services = new
+            {
+                database = new
+                {
+                    status = "disconnected",
+                    error = ex.Message
+                },
+                api = new
+                {
+                    status = "degraded"
+                }
+            }
+        }, statusCode: 503);
+    }
+});
+
+// ============================================
+// ✅ SIMPLE PING ENDPOINT
+// ============================================
+app.MapGet("/api/ping", () => Results.Ok(new
+{
+    status = "ok",
+    timestamp = DateTime.UtcNow
+}));
+
+// ============================================
+// ✅ DATABASE STATUS ENDPOINT
+// ============================================
+app.MapGet("/api/db-status", async (IServiceProvider services) =>
+{
+    try
+    {
+        var dbContext = services.GetRequiredService<ApplicationDbContext>();
+        var canConnect = await dbContext.Database.CanConnectAsync();
+        
+        return Results.Ok(new
+        {
+            connected = canConnect,
+            type = usePostgres ? "PostgreSQL" : "SQLite",
+            timestamp = DateTime.UtcNow
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Json(new
+        {
+            connected = false,
+            error = ex.Message,
+            timestamp = DateTime.UtcNow
+        }, statusCode: 500);
+    }
+});
 
 app.Run();

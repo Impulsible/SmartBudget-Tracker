@@ -1,0 +1,1065 @@
+@page "/about"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - About Us</PageTitle>
+
+<div class="about-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        About Us
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="about-hero">
+        <div class="container">
+            <div class="about-hero-content">
+                <div class="about-badge">🌟 About SmartBudget</div>
+                <h1>Empowering Nigerians to <span class="gradient-text">Take Control</span> of Their Finances</h1>
+                <p>We believe everyone deserves financial freedom. SmartBudget makes it simple to track, budget, and save money.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    MISSION SECTION
+    ============================================ -->
+    <section class="mission-section">
+        <div class="container">
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <div class="mission-icon"><i class="bi bi-bullseye"></i></div>
+                    <h3>Our Mission</h3>
+                    <p>To provide every Nigerian with the tools and knowledge they need to achieve financial freedom and build lasting wealth.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="mission-icon"><i class="bi bi-eye"></i></div>
+                    <h3>Our Vision</h3>
+                    <p>A financially empowered Nigeria where everyone has access to smart money management tools and financial education.</p>
+                </div>
+                <div class="mission-card">
+                    <div class="mission-icon"><i class="bi bi-heart"></i></div>
+                    <h3>Our Values</h3>
+                    <p>Transparency, security, and simplicity. We build tools that are easy to use, safe, and truly helpful for our users.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    STORY SECTION
+    ============================================ -->
+    <section class="story-section">
+        <div class="container">
+            <div class="story-grid">
+                <div class="story-content">
+                    <span class="story-badge">Our Story</span>
+                    <h2>Built for Nigerians, <span class="gradient-text">by Nigerians</span></h2>
+                    <p>SmartBudget was created in 2024 with a simple mission: to help everyday Nigerians take control of their finances.</p>
+                    <p>We noticed that while there were many budgeting apps available, none truly understood the unique financial challenges faced by Nigerians. From managing multiple income sources to dealing with unexpected expenses, we knew we could do better.</p>
+                    <p>Today, SmartBudget is trusted by over 50,000 users across Nigeria. Our platform helps people track expenses, create budgets, and achieve their savings goals.</p>
+                    <div class="story-stats">
+                        <div class="story-stat">
+                            <span class="stat-number">2024</span>
+                            <span class="stat-label">Founded</span>
+                        </div>
+                        <div class="story-stat">
+                            <span class="stat-number">50k+</span>
+                            <span class="stat-label">Users</span>
+                        </div>
+                        <div class="story-stat">
+                            <span class="stat-number">₦20B+</span>
+                            <span class="stat-label">Tracked</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="story-image">
+                    <div class="story-illustration">
+                        <div class="illustration-icon"><i class="bi bi-piggy-bank"></i></div>
+                        <div class="illustration-ring"></div>
+                        <div class="illustration-ring ring-2"></div>
+                        <div class="illustration-ring ring-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    TEAM SECTION
+    ============================================ -->
+    <section class="team-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Our Team</span>
+                <h2 class="section-title-pro">Meet the People Behind <span class="gradient-text">SmartBudget</span></h2>
+                <p class="section-subtitle">A passionate team dedicated to helping you achieve financial freedom.</p>
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h4>Chidi Okonkwo</h4>
+                    <span class="team-role">CEO & Co-Founder</span>
+                    <p>Passionate about financial inclusion and building products that make a difference.</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h4>Amara Obi</h4>
+                    <span class="team-role">CTO & Co-Founder</span>
+                    <p>Tech enthusiast with 10+ years of experience in fintech and software development.</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h4>Folake Adeyemi</h4>
+                    <span class="team-role">Head of Design</span>
+                    <p>UX designer creating intuitive experiences that make money management effortless.</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h4>Emeka Okafor</h4>
+                    <span class="team-role">Product Manager</span>
+                    <p>Focusing on user needs and building features that solve real financial challenges.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    VALUES SECTION
+    ============================================ -->
+    <section class="values-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">What We Stand For</span>
+                <h2 class="section-title-pro">Our Core <span class="gradient-text">Values</span></h2>
+                <p class="section-subtitle">The principles that guide everything we do at SmartBudget.</p>
+            </div>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon"><i class="bi bi-shield-check"></i></div>
+                    <h4>Security First</h4>
+                    <p>Your financial data is protected with bank-level encryption. We never compromise on security.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="bi bi-people"></i></div>
+                    <h4>User-Centric</h4>
+                    <p>Every feature we build is designed with our users in mind. We listen, learn, and improve.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="bi bi-lightbulb"></i></div>
+                    <h4>Simplicity</h4>
+                    <p>We believe financial tools should be simple and easy to use. No complicated jargon or processes.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                    <h4>Innovation</h4>
+                    <p>We're constantly improving and innovating to bring you the best financial tools available.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    STATS SECTION
+    ============================================ -->
+    <section class="about-stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">50,000+</span>
+                    <span class="stat-label">Active Users</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">₦20B+</span>
+                    <span class="stat-label">Money Tracked</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">95%</span>
+                    <span class="stat-label">Satisfaction Rate</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-number">4.9★</span>
+                    <span class="stat-label">User Rating</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CTA SECTION
+    ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Join the SmartBudget Community?</h2>
+                <p>Start your journey to financial freedom today. It's free and takes less than 2 minutes.</p>
+                <a href="/Account/Register" class="btn-get-started">Get Started Free →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="about-footer">
+        <div class="container">
+            <div class="about-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="about-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/cookies">Cookies</a>
+                    <a href="/security">Security</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .about-page {
+        background: #0B1120;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .breadcrumb-container {
+        padding: 0.75rem 0;
+        background: transparent;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: 0.65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .about-hero {
+        padding: 3rem 0 2rem;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        text-align: center;
+    }
+
+    .about-hero-content {
+        max-width: 750px;
+        margin: 0 auto;
+    }
+
+    .about-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: 0.4rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .about-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.75rem;
+        line-height: 1.2;
+    }
+
+    .about-hero .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .about-hero p {
+        font-size: 1.0625rem;
+        color: #94A3B8;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .mission-section {
+        padding: 3rem 0;
+        background: #0B1120;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .mission-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .mission-card {
+        background: #1E293B;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .mission-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(16, 185, 129, 0.2);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .mission-icon {
+        width: 56px;
+        height: 56px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        color: #10B981;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .mission-card h3 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.5rem;
+    }
+
+    .mission-card p {
+        color: #94A3B8;
+        line-height: 1.6;
+        font-size: 0.9rem;
+    }
+
+    .story-section {
+        padding: 4rem 0;
+        background: #111827;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .story-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+        align-items: center;
+    }
+
+    .story-content .story-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .story-content h2 {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .story-content .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .story-content p {
+        color: #94A3B8;
+        line-height: 1.7;
+        font-size: 0.9375rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .story-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .story-stat .stat-number {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10B981;
+    }
+
+    .story-stat .stat-label {
+        font-size: 0.7rem;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .story-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .story-illustration {
+        position: relative;
+        width: 280px;
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .illustration-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.3);
+        z-index: 2;
+        position: relative;
+    }
+
+    .illustration-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 2px solid rgba(16, 185, 129, 0.1);
+        animation: pulse 3s ease-in-out infinite;
+    }
+
+    .illustration-ring:nth-child(2) {
+        width: 200px;
+        height: 200px;
+        animation-delay: 0.5s;
+    }
+
+    .illustration-ring:nth-child(3) {
+        width: 260px;
+        height: 260px;
+        animation-delay: 1s;
+    }
+
+    .illustration-ring:nth-child(4) {
+        width: 320px;
+        height: 320px;
+        animation-delay: 1.5s;
+    }
+
+    
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.3; }
+        50% { transform: scale(1.05); opacity: 0.1; }
+    }
+
+    .team-section {
+        padding: 3rem 0;
+        background: #0B1120;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .section-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: 0.3rem 1rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .section-title-pro {
+        font-size: clamp(1.8rem, 3vw, 2.5rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .section-subtitle {
+        font-size: 0.9375rem;
+        color: #94A3B8;
+        max-width: 550px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .team-card {
+        background: #1E293B;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(16, 185, 129, 0.2);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-avatar {
+        width: 72px;
+        height: 72px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2.5rem;
+        color: #10B981;
+        border: 2px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .team-card h4 {
+        font-size: 1.0625rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.25rem;
+    }
+
+    .team-role {
+        display: block;
+        font-size: 0.75rem;
+        color: #10B981;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .team-card p {
+        color: #94A3B8;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .values-section {
+        padding: 3rem 0;
+        background: #111827;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .value-card {
+        background: #1E293B;
+        border-radius: 16px;
+        padding: 1.75rem;
+        text-align: center;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .value-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(16, 185, 129, 0.2);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .value-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem;
+        font-size: 1.25rem;
+        color: #10B981;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .value-card h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.5rem;
+    }
+
+    .value-card p {
+        color: #94A3B8;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .about-stats {
+        padding: 2.5rem 0;
+        background: #0B1120;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .stats-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #10B981;
+        margin-bottom: 0.1rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .stat-divider {
+        width: 1px;
+        height: 40px;
+        background: rgba(148, 163, 184, 0.15);
+    }
+
+    .cta-section {
+        padding: 3rem 0;
+        background: #0B1120;
+        text-align: center;
+    }
+
+    .cta-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .cta-content h2 {
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 0.75rem;
+    }
+
+    .cta-content p {
+        color: #94A3B8;
+        font-size: 0.9375rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-get-started {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.9rem 2.5rem;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-get-started::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-get-started:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
+        color: white;
+    }
+
+    .btn-get-started:hover::before {
+        left: 100%;
+    }
+
+    /* ============================================
+    FOOTER - Inline Style like API and Status Pages
+    ============================================ */
+    .about-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .about-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .about-footer-content p {
+        color: #64748B;
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .about-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .about-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+    }
+
+    .about-footer-links a:hover {
+        color: #10B981;
+    }
+    
+    @@media (min-width: 768px) {
+        .mission-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .story-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .team-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .values-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stats-grid {
+            gap: 2.5rem;
+        }
+    }
+
+    @@media (min-width: 992px) {
+        .team-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .values-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .stats-grid {
+            gap: 3rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .about-page {
+            padding-top: 70px;
+        }
+
+        .about-hero {
+            padding: 2rem 0 1.5rem;
+        }
+
+        .mission-section,
+        .team-section,
+        .values-section {
+            padding: 2rem 0;
+        }
+
+        .story-section {
+            padding: 2.5rem 0;
+        }
+
+        .mission-card,
+        .team-card,
+        .value-card {
+            padding: 1.5rem;
+        }
+
+        .story-stats {
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .about-stats {
+            padding: 2rem 0;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+        }
+
+        .cta-section {
+            padding: 2rem 0;
+        }
+
+        .btn-get-started {
+            padding: 0.8rem 2rem;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb-item {
+            font-size: 0.75rem;
+        }
+
+        .story-illustration {
+            width: 200px;
+            height: 200px;
+        }
+
+        .illustration-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+
+        .illustration-ring:nth-child(2) {
+            width: 150px;
+            height: 150px;
+        }
+
+        .illustration-ring:nth-child(3) {
+            width: 200px;
+            height: 200px;
+        }
+
+        .illustration-ring:nth-child(4) {
+            width: 250px;
+            height: 250px;
+        }
+
+        .about-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .about-footer-links {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .about-hero h1 {
+            font-size: 1.8rem;
+        }
+
+        .mission-grid,
+        .team-grid,
+        .values-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .story-stats {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .stats-grid {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .stat-divider {
+            display: none;
+        }
+
+        .btn-get-started {
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .breadcrumb-item.active {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+        }
+
+        .breadcrumb-item a span {
+            display: none;
+        }
+
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+
+        .about-footer-links {
+            gap: 1rem;
+        }
+
+        .about-footer-links a {
+            font-size: 0.7rem;
+        }
+    }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "about";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "about");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

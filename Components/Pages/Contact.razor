@@ -10,6 +10,25 @@
 <PageTitle>SmartBudget - Contact Us</PageTitle>
 
 <div class="contact-page">
+    <!-- BREADCRUMB NAVIGATION -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Contact Us
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
     <!-- HERO SECTION -->
     <section class="contact-hero">
         <div class="container">
@@ -172,6 +191,28 @@
             </div>
         </div>
     </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="contact-footer">
+        <div class="container">
+            <div class="contact-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="contact-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/careers">Careers</a>
+                    <a href="/contact">Contact</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/cookies">Cookies</a>
+                    <a href="/security">Security</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
 
 <style>
@@ -179,12 +220,83 @@
         background: #0B1120;
         min-height: 100vh;
         padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
+    /* ============================================
+    BREADCRUMB NAVIGATION - NO LINE
+    ============================================ */
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .breadcrumb-container {
+        padding: 0.75rem 0;
+        margin-top: 0;
+        background: transparent;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item a i {
+        font-size: 0.9rem;
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: 0.65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: 0.25rem 0.5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    /* ============================================
+    HERO SECTION
+    ============================================ */
     .contact-hero {
-        padding: 3rem 0 2rem;
+        padding: 2rem 0 2rem;
         background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
-        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
         text-align: center;
     }
 
@@ -228,6 +340,9 @@
         line-height: 1.6;
     }
 
+    /* ============================================
+    CONTACT SECTION
+    ============================================ */
     .contact-section {
         padding: 3rem 0;
         background: #0B1120;
@@ -696,10 +811,53 @@
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
     }
 
+    /* ============================================
+    FOOTER
+    ============================================ */
+    .contact-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .contact-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .contact-footer-content p {
+        color: #64748B;
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .contact-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .contact-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+    }
+
+    .contact-footer-links a:hover {
+        color: #10B981;
+    }
+
     @@keyframes spin {
         to { transform: rotate(360deg); }
     }
 
+    /* ============================================
+    RESPONSIVE BREAKPOINTS
+    ============================================ */
     @@media (min-width: 992px) {
         .contact-grid {
             grid-template-columns: 2fr 1fr;
@@ -713,7 +871,7 @@
         }
 
         .contact-hero {
-            padding: 2rem 0 1.5rem;
+            padding: 1.5rem 0 1.5rem;
         }
 
         .contact-section {
@@ -744,6 +902,27 @@
         .btn-get-started {
             padding: 0.8rem 2rem;
             font-size: 0.9rem;
+        }
+
+        .breadcrumb-container {
+            padding: 0.5rem 0;
+        }
+
+        .breadcrumb-item {
+            font-size: 0.75rem;
+        }
+
+        .breadcrumb-item a {
+            padding: 0.2rem 0.4rem;
+        }
+
+        .contact-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .contact-footer-links {
+            justify-content: center;
         }
     }
 
@@ -785,6 +964,27 @@
         .btn-get-started {
             padding: 0.7rem 1.5rem;
             font-size: 0.85rem;
+        }
+
+        .breadcrumb-item.active {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+        }
+
+        .breadcrumb-item a span {
+            display: none;
+        }
+
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+
+        .contact-footer-links {
+            gap: 1rem;
+        }
+
+        .contact-footer-links a {
+            font-size: 0.7rem;
         }
     }
 </style>

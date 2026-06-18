@@ -1,0 +1,1473 @@
+@page "/cookies"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Cookie Policy</PageTitle>
+
+<div class="cookies-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Cookie Policy
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="cookies-hero">
+        <div class="container">
+            <div class="cookies-hero-content">
+                <div class="cookies-badge">🍪 Cookie Policy</div>
+                <h1>Cookie <span class="gradient-text">Policy</span></h1>
+                <p>Last updated: @DateTime.Now.ToString("MMMM dd, yyyy")</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    COOKIES CONTENT
+    ============================================ -->
+    <section class="cookies-content">
+        <div class="container">
+            <div class="cookies-card">
+                <!-- Table of Contents -->
+                <div class="toc-section">
+                    <h2>Table of Contents</h2>
+                    <ul class="toc-list">
+                        <li><a href="#section-1">1. What Are Cookies?</a></li>
+                        <li><a href="#section-2">2. How We Use Cookies</a></li>
+                        <li><a href="#section-3">3. Types of Cookies We Use</a></li>
+                        <li><a href="#section-4">4. Specific Cookies We Use</a></li>
+                        <li><a href="#section-5">5. Third-Party Cookies</a></li>
+                        <li><a href="#section-6">6. Managing Cookies</a></li>
+                        <li><a href="#section-7">7. Cookie Settings</a></li>
+                        <li><a href="#section-8">8. Updates to This Policy</a></li>
+                        <li><a href="#section-9">9. Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Section 1 -->
+                <div id="section-1" class="cookies-section">
+                    <h2>1. What Are Cookies?</h2>
+                    <p>Cookies are small text files that are placed on your device (computer, smartphone, tablet) when you visit a website. They help the website remember information about your visit, making your experience more efficient and personalized.</p>
+                    
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <p><strong>Why Cookies Matter:</strong> Cookies are essential for providing a smooth and personalized browsing experience. They help us remember your preferences, keep you logged in, and understand how you interact with our app.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div id="section-2" class="cookies-section">
+                    <h2>2. How We Use Cookies</h2>
+                    <p>SmartBudget uses cookies to enhance your experience and improve our services:</p>
+                    
+                    <div class="use-grid">
+                        <div class="use-item">
+                            <i class="bi bi-person-check"></i>
+                            <div>
+                                <h4>Authentication</h4>
+                                <p>Keep you securely logged in and maintain your session</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-sliders2"></i>
+                            <div>
+                                <h4>Preferences</h4>
+                                <p>Remember your language, theme, and other settings</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-graph-up"></i>
+                            <div>
+                                <h4>Analytics</h4>
+                                <p>Understand how you use the app and improve features</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-shield-check"></i>
+                            <div>
+                                <h4>Security</h4>
+                                <p>Protect against fraud, unauthorized access, and abuse</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-speedometer2"></i>
+                            <div>
+                                <h4>Performance</h4>
+                                <p>Optimize app speed and responsiveness</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-chat"></i>
+                            <div>
+                                <h4>Communication</h4>
+                                <p>Show relevant notifications and messages</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div id="section-3" class="cookies-section">
+                    <h2>3. Types of Cookies We Use</h2>
+                    
+                    <div class="types-grid">
+                        <div class="type-item">
+                            <div class="type-icon"><i class="bi bi-shield-fill-check"></i></div>
+                            <h4>Essential Cookies</h4>
+                            <p><span class="badge-essential">Always Active</span></p>
+                            <p>Required for the app to function properly. These cannot be disabled.</p>
+                            <ul>
+                                <li>Authentication and session management</li>
+                                <li>Security and fraud prevention</li>
+                                <li>Technical functionality</li>
+                            </ul>
+                        </div>
+                        <div class="type-item">
+                            <div class="type-icon"><i class="bi bi-sliders2"></i></div>
+                            <h4>Preference Cookies</h4>
+                            <p><span class="badge-preference">User Choice</span></p>
+                            <p>Remember your settings and preferences for a personalized experience.</p>
+                            <ul>
+                                <li>Language preferences</li>
+                                <li>Theme and display settings</li>
+                                <li>Navigation preferences</li>
+                            </ul>
+                        </div>
+                        <div class="type-item">
+                            <div class="type-icon"><i class="bi bi-bar-chart"></i></div>
+                            <h4>Analytics Cookies</h4>
+                            <p><span class="badge-analytics">User Choice</span></p>
+                            <p>Help us understand how you interact with the app and improve features.</p>
+                            <ul>
+                                <li>Usage statistics</li>
+                                <li>Feature popularity</li>
+                                <li>Performance metrics</li>
+                            </ul>
+                        </div>
+                        <div class="type-item">
+                            <div class="type-icon"><i class="bi bi-megaphone"></i></div>
+                            <h4>Marketing Cookies</h4>
+                            <p><span class="badge-marketing">User Choice</span></p>
+                            <p>Used to show relevant content and measure campaign effectiveness.</p>
+                            <ul>
+                                <li>Campaign tracking</li>
+                                <li>Content personalization</li>
+                                <li>Engagement metrics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4 -->
+                <div id="section-4" class="cookies-section">
+                    <h2>4. Specific Cookies We Use</h2>
+                    
+                    <div class="cookie-table">
+                        <div class="cookie-row header">
+                            <span>Cookie Name</span>
+                            <span>Purpose</span>
+                            <span>Type</span>
+                            <span>Duration</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><code>SmartBudget.Auth</code></span>
+                            <span>Authentication and session management</span>
+                            <span><span class="badge-essential">Essential</span></span>
+                            <span>Session / 30 days</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><code>SmartBudget.Preferences</code></span>
+                            <span>User preferences and settings</span>
+                            <span><span class="badge-preference">Preference</span></span>
+                            <span>1 year</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><code>SmartBudget.Analytics</code></span>
+                            <span>Usage statistics and performance</span>
+                            <span><span class="badge-analytics">Analytics</span></span>
+                            <span>1 year</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><code>SmartBudget.Security</code></span>
+                            <span>Security and fraud prevention</span>
+                            <span><span class="badge-essential">Essential</span></span>
+                            <span>Session</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><code>SmartBudget.Device</code></span>
+                            <span>Device identification for security</span>
+                            <span><span class="badge-essential">Essential</span></span>
+                            <span>Session</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span><code>SmartBudget.Consent</code></span>
+                            <span>Cookie consent preferences</span>
+                            <span><span class="badge-essential">Essential</span></span>
+                            <span>1 year</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5 -->
+                <div id="section-5" class="cookies-section">
+                    <h2>5. Third-Party Cookies</h2>
+                    <p>We use third-party services that may set cookies on your device:</p>
+                    
+                    <div class="third-party-grid">
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-cloud"></i></div>
+                            <div>
+                                <h4>Render</h4>
+                                <p>Hosting infrastructure and performance monitoring</p>
+                                <span class="third-party-type">Essential</span>
+                            </div>
+                        </div>
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-database"></i></div>
+                            <div>
+                                <h4>PostgreSQL</h4>
+                                <p>Database management and query optimization</p>
+                                <span class="third-party-type">Essential</span>
+                            </div>
+                        </div>
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-chart"></i></div>
+                            <div>
+                                <h4>Chart.js</h4>
+                                <p>Data visualization and chart rendering</p>
+                                <span class="third-party-type">Analytics</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-link"></i>
+                        <div>
+                            <p><strong>Third-Party Policies:</strong> These services have their own privacy and cookie policies. We encourage you to review them for more information on their data practices.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6 -->
+                <div id="section-6" class="cookies-section">
+                    <h2>6. Managing Cookies</h2>
+                    <p>You have full control over cookies. Here's how you can manage them:</p>
+                    
+                    <div class="manage-grid">
+                        <div class="manage-item">
+                            <div class="manage-icon"><i class="bi bi-browser-chrome"></i></div>
+                            <div>
+                                <h4>Browser Settings</h4>
+                                <p>Most browsers allow you to control cookies through their settings:</p>
+                                <ul>
+                                    <li><strong>Chrome:</strong> Settings → Privacy and Security → Cookies</li>
+                                    <li><strong>Firefox:</strong> Options → Privacy & Security → Cookies</li>
+                                    <li><strong>Safari:</strong> Preferences → Privacy → Cookies</li>
+                                    <li><strong>Edge:</strong> Settings → Cookies and site permissions</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="manage-item">
+                            <div class="manage-icon"><i class="bi bi-sliders2"></i></div>
+                            <div>
+                                <h4>Cookie Banner</h4>
+                                <p>When you first visit SmartBudget, you'll see a cookie banner allowing you to:</p>
+                                <ul>
+                                    <li>Accept all cookies</li>
+                                    <li>Reject non-essential cookies</li>
+                                    <li>Customize your preferences</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="manage-item">
+                            <div class="manage-icon"><i class="bi bi-gear"></i></div>
+                            <div>
+                                <h4>SmartBudget Settings</h4>
+                                <p>You can manage your cookie preferences in your account settings at any time.</p>
+                                <ul>
+                                    <li>Update preferences anytime</li>
+                                    <li>Withdraw consent</li>
+                                    <li>View current settings</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div>
+                            <p><strong>Important:</strong> Disabling essential cookies may affect the functionality of the app. You may not be able to use certain features or stay logged in.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7 -->
+                <div id="section-7" class="cookies-section">
+                    <h2>7. Cookie Settings</h2>
+                    <p>You can customize your cookie preferences below:</p>
+                    
+                    <div class="settings-panel">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Essential Cookies</h4>
+                                <p>Required for basic functionality. Cannot be disabled.</p>
+                            </div>
+                            <div class="setting-control">
+                                <span class="status-active">Always On</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Preference Cookies</h4>
+                                <p>Remember your settings and personalization.</p>
+                            </div>
+                            <div class="setting-control">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="preferenceCookies" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Analytics Cookies</h4>
+                                <p>Help us improve our services with usage data.</p>
+                            </div>
+                            <div class="setting-control">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="analyticsCookies" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>Marketing Cookies</h4>
+                                <p>Show relevant content and measure engagement.</p>
+                            </div>
+                            <div class="setting-control">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="marketingCookies" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" onclick="window.saveCookieSettings()">Save Preferences</button>
+                        <button class="btn-accept" onclick="window.acceptAllCookies()">Accept All</button>
+                        <button class="btn-reject" onclick="window.rejectAllCookies()">Reject All</button>
+                    </div>
+                </div>
+
+                <!-- Section 8 -->
+                <div id="section-8" class="cookies-section">
+                    <h2>8. Updates to This Policy</h2>
+                    <p>We may update this Cookie Policy periodically to reflect changes in our practices or legal requirements:</p>
+                    
+                    <ul>
+                        <li><strong>Notification:</strong> We will notify you of significant changes via email or in-app notification</li>
+                        <li><strong>Review:</strong> We encourage you to review this policy periodically</li>
+                        <li><strong>Effective Date:</strong> The effective date of the current policy is shown at the top of this page</li>
+                        <li><strong>Consent:</strong> Continued use of the app constitutes acceptance of the updated policy</li>
+                    </ul>
+                </div>
+
+                <!-- Section 9 -->
+                <div id="section-9" class="cookies-section">
+                    <h2>9. Contact Us</h2>
+                    <p>If you have questions, concerns, or requests regarding this Cookie Policy or your cookie preferences, please contact us:</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <strong>Email:</strong>
+                                <a href="mailto:privacy@smartbudget.com">privacy@smartbudget.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-globe"></i>
+                            <div>
+                                <strong>Website:</strong>
+                                <a href="https://smartbudget-tracker.onrender.com">https://smartbudget-tracker.onrender.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Response Time:</strong>
+                                <span>We respond to all inquiries within 48 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="cookies-footer">
+        <div class="container">
+            <div class="cookies-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="cookies-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
+                    <a href="/cookies">Cookie Policy</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .cookies-page {
+        background: #0B1120;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .breadcrumb-container {
+        padding: .75rem 0;
+        background: transparent;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all .2s ease;
+        padding: .25rem .5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: .65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: .25rem .5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .cookies-hero {
+        padding: 3rem 0 2rem;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        text-align: center;
+    }
+
+    .cookies-hero-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .cookies-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: .4rem 1.2rem;
+        border-radius: 20px;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .cookies-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: .5rem;
+        line-height: 1.2;
+    }
+
+    .cookies-hero .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .cookies-hero p {
+        font-size: 1rem;
+        color: #94A3B8;
+        margin-top: .5rem;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .cookies-content {
+        padding: 2.5rem 0;
+        background: #0B1120;
+    }
+
+    .cookies-card {
+        background: #1E293B;
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .toc-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .toc-section h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem 1.5rem;
+    }
+
+    .toc-list li a {
+        color: #94A3B8;
+        text-decoration: none;
+        font-size: .85rem;
+        transition: color .2s ease;
+        display: block;
+        padding: .25rem 0;
+    }
+
+    .toc-list li a:hover {
+        color: #10B981;
+    }
+
+    .cookies-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .cookies-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .cookies-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .cookies-section p {
+        color: #94A3B8;
+        font-size: .95rem;
+        line-height: 1.7;
+        margin-bottom: .75rem;
+    }
+
+    .cookies-section ul {
+        color: #94A3B8;
+        font-size: .9rem;
+        line-height: 1.6;
+        padding-left: 1.5rem;
+        margin-bottom: .75rem;
+    }
+
+    .cookies-section ul li {
+        margin-bottom: .25rem;
+    }
+
+    .info-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        margin: 1rem 0;
+    }
+
+    .info-box i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .info-box p {
+        color: #94A3B8;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .info-box a {
+        color: #10B981;
+        text-decoration: none;
+    }
+
+    .info-box a:hover {
+        text-decoration: underline;
+    }
+
+    .warning-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(239, 68, 68, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(239, 68, 68, 0.15);
+        margin: 1rem 0;
+    }
+
+    .warning-box i {
+        font-size: 1.25rem;
+        color: #EF4444;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .warning-box p {
+        color: #FCA5A5;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .use-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .use-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .use-item i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .1rem;
+    }
+
+    .use-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .use-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .types-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .type-item {
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .type-icon {
+        font-size: 1.5rem;
+        color: #10B981;
+        margin-bottom: .25rem;
+    }
+
+    .type-item h4 {
+        color: #F1F5F9;
+        font-size: .95rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .badge-essential {
+        display: inline-block;
+        background: #10B981;
+        color: #0B1120;
+        padding: .1rem .6rem;
+        border-radius: 12px;
+        font-size: .6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-preference {
+        display: inline-block;
+        background: #3B82F6;
+        color: white;
+        padding: .1rem .6rem;
+        border-radius: 12px;
+        font-size: .6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-analytics {
+        display: inline-block;
+        background: #F59E0B;
+        color: #0B1120;
+        padding: .1rem .6rem;
+        border-radius: 12px;
+        font-size: .6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .badge-marketing {
+        display: inline-block;
+        background: #8B5CF6;
+        color: white;
+        padding: .1rem .6rem;
+        border-radius: 12px;
+        font-size: .6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .type-item ul {
+        font-size: .8rem;
+        padding-left: 1.25rem;
+        margin: .25rem 0;
+    }
+
+    .type-item ul li {
+        margin-bottom: .15rem;
+    }
+
+    .cookie-table {
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .cookie-row {
+        display: grid;
+        grid-template-columns: 1.2fr 1.5fr 0.8fr 0.8fr;
+        padding: .75rem 1rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    .cookie-row:last-child {
+        border-bottom: none;
+    }
+
+    .cookie-row.header {
+        background: rgba(255, 255, 255, 0.03);
+        font-weight: 600;
+        color: #F1F5F9;
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .cookie-row span {
+        color: #94A3B8;
+        font-size: .8rem;
+    }
+
+    .cookie-row.header span {
+        color: #F1F5F9;
+    }
+
+    .cookie-row code {
+        color: #10B981;
+        font-family: 'Courier New', monospace;
+        font-size: .7rem;
+        background: rgba(16, 185, 129, 0.08);
+        padding: .1rem .4rem;
+        border-radius: 4px;
+    }
+
+    .third-party-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .third-party-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .third-party-icon {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .third-party-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .third-party-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0 0 .1rem 0;
+    }
+
+    .third-party-type {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10B981;
+        padding: .05rem .5rem;
+        border-radius: 10px;
+        font-size: .6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .manage-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .manage-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        align-items: flex-start;
+    }
+
+    .manage-icon {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .1rem;
+    }
+
+    .manage-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .manage-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0 0 .25rem 0;
+    }
+
+    .manage-item ul {
+        font-size: .75rem;
+        padding-left: 1.25rem;
+        margin: 0;
+    }
+
+    .manage-item ul li {
+        margin-bottom: .1rem;
+    }
+
+    .settings-panel {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .setting-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    .setting-item:last-child {
+        border-bottom: none;
+    }
+
+    .setting-info h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .setting-info p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .status-active {
+        display: inline-block;
+        background: #10B981;
+        color: #0B1120;
+        padding: .2rem .8rem;
+        border-radius: 12px;
+        font-size: .7rem;
+        font-weight: 600;
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        cursor: pointer;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #1E293B;
+        border-radius: 12px;
+        transition: .3s ease;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .toggle-slider::before {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 2px;
+        bottom: 2px;
+        background: #94A3B8;
+        border-radius: 50%;
+        transition: .3s ease;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: #10B981;
+        border-color: #10B981;
+    }
+
+    .toggle-switch input:checked + .toggle-slider::before {
+        transform: translateX(20px);
+        background: white;
+    }
+
+    .settings-actions {
+        display: flex;
+        gap: .75rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-save {
+        padding: .6rem 1.5rem;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: all .3s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-accept {
+        padding: .6rem 1.5rem;
+        background: #1E293B;
+        color: #94A3B8;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: all .3s ease;
+    }
+
+    .btn-accept:hover {
+        background: #253349;
+        color: #F1F5F9;
+        border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    .btn-reject {
+        padding: .6rem 1.5rem;
+        background: #1E293B;
+        color: #94A3B8;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: 8px;
+        font-size: .85rem;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        transition: all .3s ease;
+    }
+
+    .btn-reject:hover {
+        background: #253349;
+        color: #FCA5A5;
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .contact-details {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: .75rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .contact-item i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .contact-item div {
+        display: flex;
+        flex-direction: column;
+        gap: .1rem;
+    }
+
+    .contact-item strong {
+        color: #94A3B8;
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .contact-item a,
+    .contact-item span {
+        color: #F1F5F9;
+        font-size: .9rem;
+        text-decoration: none;
+    }
+
+    .contact-item a:hover {
+        color: #10B981;
+    }
+
+    .cookies-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .cookies-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .cookies-footer-content p {
+        color: #64748B;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .cookies-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .cookies-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: .8rem;
+        transition: color .2s ease;
+    }
+
+    .cookies-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .toc-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .use-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .types-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .third-party-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .manage-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .cookie-row {
+            grid-template-columns: 1fr;
+            gap: .25rem;
+            padding: .5rem 1rem;
+        }
+        
+        .cookie-row.header {
+            display: none;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .cookies-page {
+            padding-top: 70px;
+        }
+        
+        .cookies-hero {
+            padding: 2rem 0 1.5rem;
+        }
+        
+        .cookies-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+        
+        .use-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .third-party-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .manage-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .setting-item {
+            flex-direction: column;
+            text-align: center;
+            gap: .5rem;
+        }
+        
+        .settings-actions {
+            flex-direction: column;
+        }
+        
+        .settings-actions button {
+            width: 100%;
+        }
+        
+        .contact-item {
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .cookies-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .cookies-footer-links {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .cookies-hero h1 {
+            font-size: 1.8rem;
+        }
+        
+        .cookies-card {
+            padding: 1rem;
+        }
+        
+        .cookies-section h2 {
+            font-size: 1.2rem;
+        }
+        
+        .breadcrumb-item.active {
+            font-size: .7rem;
+            padding: .15rem .4rem;
+        }
+        
+        .breadcrumb-item a span {
+            display: none;
+        }
+        
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+        
+        .toc-list li a {
+            font-size: .75rem;
+        }
+    }
+</style>
+
+<script>
+    // ============================================
+    // COOKIE SETTINGS FUNCTIONS - EXPOSED GLOBALLY
+    // ============================================
+    
+    window.saveCookieSettings = function() {
+        var preference = document.getElementById('preferenceCookies');
+        var analytics = document.getElementById('analyticsCookies');
+        var marketing = document.getElementById('marketingCookies');
+        
+        var settings = {
+            preference: preference ? preference.checked : true,
+            analytics: analytics ? analytics.checked : true,
+            marketing: marketing ? marketing.checked : true
+        };
+        
+        // Save to localStorage
+        localStorage.setItem('smartbudget_cookie_settings', JSON.stringify(settings));
+        
+        showCookieMessage('Preferences saved successfully!', 'success');
+    };
+    
+    window.acceptAllCookies = function() {
+        var preference = document.getElementById('preferenceCookies');
+        var analytics = document.getElementById('analyticsCookies');
+        var marketing = document.getElementById('marketingCookies');
+        
+        if (preference) preference.checked = true;
+        if (analytics) analytics.checked = true;
+        if (marketing) marketing.checked = true;
+        
+        var settings = {
+            preference: true,
+            analytics: true,
+            marketing: true
+        };
+        
+        localStorage.setItem('smartbudget_cookie_settings', JSON.stringify(settings));
+        showCookieMessage('All cookies accepted!', 'success');
+    };
+    
+    window.rejectAllCookies = function() {
+        var preference = document.getElementById('preferenceCookies');
+        var analytics = document.getElementById('analyticsCookies');
+        var marketing = document.getElementById('marketingCookies');
+        
+        if (preference) preference.checked = false;
+        if (analytics) analytics.checked = false;
+        if (marketing) marketing.checked = false;
+        
+        var settings = {
+            preference: false,
+            analytics: false,
+            marketing: false
+        };
+        
+        localStorage.setItem('smartbudget_cookie_settings', JSON.stringify(settings));
+        showCookieMessage('Non-essential cookies rejected.', 'info');
+    };
+    
+    window.loadCookieSettings = function() {
+        try {
+            var saved = localStorage.getItem('smartbudget_cookie_settings');
+            if (saved) {
+                var settings = JSON.parse(saved);
+                
+                var preference = document.getElementById('preferenceCookies');
+                var analytics = document.getElementById('analyticsCookies');
+                var marketing = document.getElementById('marketingCookies');
+                
+                if (preference) preference.checked = settings.preference !== false;
+                if (analytics) analytics.checked = settings.analytics !== false;
+                if (marketing) marketing.checked = settings.marketing !== false;
+            }
+        } catch (e) {
+            console.log('Error loading cookie settings:', e);
+        }
+    };
+    
+    function showCookieMessage(message, type) {
+        var container = document.getElementById('cookieMessageContainer');
+        if (!container) {
+            var newContainer = document.createElement('div');
+            newContainer.id = 'cookieMessageContainer';
+            newContainer.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:1000;';
+            document.body.appendChild(newContainer);
+            container = newContainer;
+        }
+        
+        var toast = document.createElement('div');
+        var iconColor = type === 'success' ? '#10B981' : type === 'info' ? '#3B82F6' : '#EF4444';
+        var icon = type === 'success' ? 'check-circle-fill' : type === 'info' ? 'info-circle-fill' : 'exclamation-triangle-fill';
+        toast.style.cssText = 'background:#1E293B;border-left:3px solid ' + iconColor + ';padding:0.75rem 1rem;margin-bottom:0.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;gap:0.5rem;animation:slideIn 0.3s ease;color:white;';
+        toast.innerHTML = '<i class="bi bi-' + icon + '" style="color:' + iconColor + '"></i><span>' + message + '</span>';
+        
+        // Add animation style if not exists
+        if (!document.getElementById('cookieMessageStyle')) {
+            var style = document.createElement('style');
+            style.id = 'cookieMessageStyle';
+            style.textContent = '@@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}';
+            document.head.appendChild(style);
+        }
+        
+        container.appendChild(toast);
+        
+        setTimeout(function() {
+            toast.remove();
+        }, 4000);
+    }
+    
+    // ============================================
+    // AUTO-LOAD SETTINGS ON PAGE LOAD
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        window.loadCookieSettings();
+        console.log('🍪 Cookie settings loaded');
+    });
+</script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "cookies";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "cookies");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

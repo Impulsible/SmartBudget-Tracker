@@ -1,0 +1,78 @@
+@page "/blog/small-business-money-tips"
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - Small Business Money Tips</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/blog">Blog</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">Small Business Money Tips</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Business</span>
+                <h1>Money Management Tips for Small Business Owners</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> Emeka Okafor</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 7 min read</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Managing business finances is crucial for success. These money management tips will help you grow your small business in @CurrentYear.</p>
+
+                <h2>1. Separate Business and Personal Finances</h2>
+                <p>Open a dedicated business bank account. This makes tracking business expenses easier and helps with tax filing.</p>
+
+                <h2>2. Track Every Expense</h2>
+                <p>Use SmartBudget to track all business expenses. Know where your money is going.</p>
+
+                <h2>3. Create a Business Budget</h2>
+                <p>Plan your business expenses and income. A budget helps you make informed decisions.</p>
+
+                <h2>4. Build an Emergency Fund for Your Business</h2>
+                <p>Save 3-6 months of operating expenses for unexpected challenges.</p>
+
+                <h2>5. Understand Your Business Cash Flow</h2>
+                <p>Monitor when money comes in and goes out. This helps you plan for slow periods.</p>
+
+                <h2>6. Keep Business and Personal Taxes Separate</h2>
+                <p>Set aside money for taxes throughout the year. This prevents surprises during tax season.</p>
+
+                <h2>7. Use SmartBudget for Business</h2>
+                <p>Track business expenses, create budgets, and monitor your financial health.</p>
+
+                <h2>8. Review Your Finances Regularly</h2>
+                <p>Set aside time each week or month to review your business finances.</p>
+
+                <div class="post-cta">
+                    <h3>Grow Your Business</h3>
+                    <p>Use SmartBudget to manage your business finances effectively.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "blog-post";
+        await base.OnInitializedAsync();
+    }
+}

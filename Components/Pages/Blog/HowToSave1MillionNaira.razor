@@ -1,0 +1,136 @@
+@page "/blog/how-to-save-1-million-naira"
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - How to Save ₦1,000,000 in @CurrentYear</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/blog">Blog</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">How to Save ₦1,000,000</li>
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Post Content -->
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Money Management</span>
+                <h1>How to Save ₦1,000,000 in @CurrentYear: The Ultimate Nigerian Savings Guide</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> Chidi Okonkwo</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 8 min read</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Saving ₦1,000,000 in one year might seem like a daunting task, but with the right strategy, it's absolutely achievable. This comprehensive guide will show you exactly how to save your first million Naira in @CurrentYear.</p>
+
+                <h2>Why Save ₦1,000,000?</h2>
+                <p>Having ₦1,000,000 in savings gives you:</p>
+                <ul>
+                    <li><strong>Financial security</strong> - A safety net for emergencies</li>
+                    <li><strong>Investment capital</strong> - Money to start or grow a business</li>
+                    <li><strong>Peace of mind</strong> - Reduced financial stress</li>
+                    <li><strong>Freedom</strong> - The ability to make choices without financial constraints</li>
+                </ul>
+
+                <h2>The Math: How to Save ₦1,000,000 in One Year</h2>
+                <p>To save ₦1,000,000 in 12 months, you need to save:</p>
+                <ul>
+                    <li><strong>Monthly:</strong> ₦83,333</li>
+                    <li><strong>Weekly:</strong> ₦19,230</li>
+                    <li><strong>Daily:</strong> ₦2,740</li>
+                </ul>
+                <p>These numbers might seem intimidating, but let's break down how to achieve them.</p>
+
+                <h2>1. Track Every Naira</h2>
+                <p>The first step to saving money is knowing where your money goes. Use SmartBudget to track your income and expenses. You'll be surprised how small expenses add up.</p>
+
+                <h2>2. Create a Realistic Budget</h2>
+                <p>Follow the 50/30/20 rule adapted for Nigerians:</p>
+                <ul>
+                    <li><strong>50% for Needs:</strong> Rent, food, transportation, utilities</li>
+                    <li><strong>30% for Wants:</strong> Entertainment, dining out, shopping</li>
+                    <li><strong>20% for Savings:</strong> The money you set aside for your goal</li>
+                </ul>
+
+                <h2>3. Cut Unnecessary Expenses</h2>
+                <p>Review your spending and identify areas to cut:</p>
+                <ul>
+                    <li>Cook at home instead of eating out</li>
+                    <li>Use public transportation when possible</li>
+                    <li>Cancel unused subscriptions</li>
+                    <li>Shop with a list and stick to it</li>
+                </ul>
+
+                <h2>4. Increase Your Income</h2>
+                <p>Consider these side hustles:</p>
+                <ul>
+                    <li>Freelancing in your skill area</li>
+                    <li>Starting a small business</li>
+                    <li>Investing in stocks or mutual funds</li>
+                    <li>Offering consulting services</li>
+                </ul>
+
+                <h2>5. Automate Your Savings</h2>
+                <p>Set up automatic transfers to your savings account. When you get paid, save first, then spend what's left.</p>
+
+                <h2>6. Use SmartBudget's Goal Tracking</h2>
+                <p>Set up a savings goal in SmartBudget and track your progress daily. Seeing your progress keeps you motivated.</p>
+
+                <h2>7. Avoid Lifestyle Inflation</h2>
+                <p>As your income increases, resist the urge to increase your spending. Save the extra money instead.</p>
+
+                <h2>Sample Monthly Savings Plan</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount (₦)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Income</td><td>300,000</td></tr>
+                            <tr><td>Needs (50%)</td><td>150,000</td></tr>
+                            <tr><td>Wants (30%)</td><td>90,000</td></tr>
+                            <tr><td>Savings (20%)</td><td><strong>60,000</strong></td></tr>
+                            <tr><td>Additional Side Hustle</td><td>23,333</td></tr>
+                            <tr><td><strong>Total Monthly Savings</strong></td><td><strong>83,333</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Conclusion</h2>
+                <p>Saving ₦1,000,000 in @CurrentYear is achievable with discipline, planning, and the right tools. Start today, and by this time next year, you'll have your first million Naira!</p>
+
+                <div class="post-cta">
+                    <h3>Ready to Start Saving?</h3>
+                    <p>Join over 50,000 Nigerians using SmartBudget to track their savings goals.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "blog-post";
+        await base.OnInitializedAsync();
+    }
+}

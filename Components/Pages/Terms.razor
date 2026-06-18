@@ -1,0 +1,1129 @@
+@page "/terms"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Terms of Service</PageTitle>
+
+<div class="terms-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Terms of Service
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="terms-hero">
+        <div class="container">
+            <div class="terms-hero-content">
+                <div class="terms-badge">📋 Legal Agreement</div>
+                <h1>Terms of <span class="gradient-text">Service</span></h1>
+                <p>Last updated: @DateTime.Now.ToString("MMMM dd, yyyy")</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    TERMS CONTENT
+    ============================================ -->
+    <section class="terms-content">
+        <div class="container">
+            <div class="terms-card">
+                <!-- Table of Contents -->
+                <div class="toc-section">
+                    <h2>Table of Contents</h2>
+                    <ul class="toc-list">
+                        <li><a href="#section-1">1. Acceptance of Terms</a></li>
+                        <li><a href="#section-2">2. User Accounts</a></li>
+                        <li><a href="#section-3">3. User Responsibilities</a></li>
+                        <li><a href="#section-4">4. Financial Data and Accuracy</a></li>
+                        <li><a href="#section-5">5. Intellectual Property</a></li>
+                        <li><a href="#section-6">6. Third-Party Services</a></li>
+                        <li><a href="#section-7">7. Limitation of Liability</a></li>
+                        <li><a href="#section-8">8. Disclaimer of Warranties</a></li>
+                        <li><a href="#section-9">9. Termination</a></li>
+                        <li><a href="#section-10">10. Governing Law</a></li>
+                        <li><a href="#section-11">11. Changes to Terms</a></li>
+                        <li><a href="#section-12">12. Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Section 1 -->
+                <div id="section-1" class="terms-section">
+                    <h2>1. Acceptance of Terms</h2>
+                    <p>By using SmartBudget ("the Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
+                    
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <p><strong>Agreement:</strong> These terms constitute a legally binding agreement between you and SmartBudget. By creating an account or using the Service, you accept these terms in full.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div id="section-2" class="terms-section">
+                    <h2>2. User Accounts</h2>
+                    <h3>2.1 Account Creation</h3>
+                    <ul>
+                        <li>You must provide accurate and complete information when creating an account</li>
+                        <li>You are responsible for maintaining the security of your account credentials</li>
+                        <li>You must be at least 13 years old to use the Service</li>
+                        <li>Users between 13-18 years old must have parental consent</li>
+                    </ul>
+
+                    <h3>2.2 Account Security</h3>
+                    <ul>
+                        <li>You are solely responsible for all activities that occur under your account</li>
+                        <li>You must notify us immediately of any unauthorized use of your account</li>
+                        <li>We are not liable for any loss or damage arising from unauthorized access</li>
+                        <li>We recommend using strong passwords and enabling two-factor authentication</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div>
+                            <p><strong>Important:</strong> You must not share your account credentials with anyone. SmartBudget will never ask for your password.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div id="section-3" class="terms-section">
+                    <h2>3. User Responsibilities</h2>
+                    <p>As a user of SmartBudget, you agree to:</p>
+                    
+                    <div class="responsibilities-grid">
+                        <div class="responsibility-item">
+                            <div class="responsibility-icon"><i class="bi bi-check-circle"></i></div>
+                            <div>
+                                <h4>Provide Accurate Information</h4>
+                                <p>Enter truthful and up-to-date financial information</p>
+                            </div>
+                        </div>
+                        <div class="responsibility-item">
+                            <div class="responsibility-icon"><i class="bi bi-shield-check"></i></div>
+                            <div>
+                                <h4>Maintain Security</h4>
+                                <p>Keep your account secure and report any suspicious activity</p>
+                            </div>
+                        </div>
+                        <div class="responsibility-item">
+                            <div class="responsibility-icon"><i class="bi bi-gavel"></i></div>
+                            <div>
+                                <h4>Comply with Laws</h4>
+                                <p>Use the Service in compliance with all applicable laws and regulations</p>
+                            </div>
+                        </div>
+                        <div class="responsibility-item">
+                            <div class="responsibility-icon"><i class="bi bi-person-x"></i></div>
+                            <div>
+                                <h4>No Abuse</h4>
+                                <p>Do not use the Service for illegal, fraudulent, or harmful activities</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="terms-section">
+                        <h3>3.1 Prohibited Activities</h3>
+                        <ul>
+                            <li>Attempting to gain unauthorized access to any part of the Service</li>
+                            <li>Using the Service to store or transmit malware or viruses</li>
+                            <li>Harassing, abusing, or harming other users</li>
+                            <li>Misrepresenting your identity or affiliation</li>
+                            <li>Interfering with the proper functioning of the Service</li>
+                            <li>Reverse engineering or decompiling any part of the Service</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 4 -->
+                <div id="section-4" class="terms-section">
+                    <h2>4. Financial Data and Accuracy</h2>
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <p><strong>Disclaimer:</strong> SmartBudget provides financial management tools for informational purposes only. We are not a financial advisor and do not provide financial, legal, or tax advice.</p>
+                        </div>
+                    </div>
+                    
+                    <ul>
+                        <li><strong>Data Entry:</strong> You are responsible for the accuracy of the financial data you enter</li>
+                        <li><strong>Decisions:</strong> All financial decisions are your responsibility</li>
+                        <li><strong>Errors:</strong> We are not responsible for any losses resulting from errors in data entry or system use</li>
+                        <li><strong>Third-Party Integrations:</strong> We are not responsible for the accuracy of data from third-party services</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div>
+                            <p><strong>Important:</strong> SmartBudget is a tool to help you manage your finances, not a financial advisory service. Always consult a qualified financial professional for important decisions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5 -->
+                <div id="section-5" class="terms-section">
+                    <h2>5. Intellectual Property</h2>
+                    <p>All content, features, and functionality of SmartBudget are owned by SmartBudget and protected by intellectual property laws.</p>
+                    
+                    <div class="ip-grid">
+                        <div class="ip-item">
+                            <h4><i class="bi bi-code-square"></i> Software</h4>
+                            <p>The source code, algorithms, and software architecture are proprietary</p>
+                        </div>
+                        <div class="ip-item">
+                            <h4><i class="bi bi-palette"></i> Design</h4>
+                            <p>UI design, logos, graphics, and visual elements are copyrighted</p>
+                        </div>
+                        <div class="ip-item">
+                            <h4><i class="bi bi-file-earmark-text"></i> Content</h4>
+                            <p>Text, images, and documentation are protected by copyright</p>
+                        </div>
+                        <div class="ip-item">
+                            <h4><i class="bi bi-trademark"></i> Trademarks</h4>
+                            <p>"SmartBudget" and related marks are registered trademarks</p>
+                        </div>
+                    </div>
+
+                    <h3>5.1 Permitted Use</h3>
+                    <ul>
+                        <li>You may use the Service for personal, non-commercial purposes</li>
+                        <li>You may not copy, modify, or distribute any part of the Service without permission</li>
+                        <li>You may not use our intellectual property for commercial purposes</li>
+                    </ul>
+                </div>
+
+                <!-- Section 6 -->
+                <div id="section-6" class="terms-section">
+                    <h2>6. Third-Party Services</h2>
+                    <p>SmartBudget may integrate with third-party services to provide enhanced functionality:</p>
+                    
+                    <div class="third-party-grid">
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-cloud"></i></div>
+                            <div>
+                                <h4>Hosting Services</h4>
+                                <p>Render provides cloud hosting infrastructure</p>
+                            </div>
+                        </div>
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-database"></i></div>
+                            <div>
+                                <h4>Database Services</h4>
+                                <p>PostgreSQL provides database management</p>
+                            </div>
+                        </div>
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-chart"></i></div>
+                            <div>
+                                <h4>Analytics Services</h4>
+                                <p>Chart.js powers data visualizations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-link"></i>
+                        <div>
+                            <p><strong>Third-Party Terms:</strong> Your use of third-party services is subject to their respective terms and policies. We are not responsible for the practices of third-party services.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7 -->
+                <div id="section-7" class="terms-section">
+                    <h2>7. Limitation of Liability</h2>
+                    <p>To the maximum extent permitted by law, SmartBudget shall not be liable for:</p>
+                    
+                    <div class="liability-grid">
+                        <div class="liability-item">
+                            <i class="bi bi-exclamation-diamond"></i>
+                            <div>
+                                <h4>Financial Losses</h4>
+                                <p>Any direct or indirect financial losses resulting from use of the Service</p>
+                            </div>
+                        </div>
+                        <div class="liability-item">
+                            <i class="bi bi-power"></i>
+                            <div>
+                                <h4>Service Interruptions</h4>
+                                <p>Losses from temporary service interruptions or downtime</p>
+                            </div>
+                        </div>
+                        <div class="liability-item">
+                            <i class="bi bi-shield-slash"></i>
+                            <div>
+                                <h4>Data Loss</h4>
+                                <p>Loss of data or inability to access your information</p>
+                            </div>
+                        </div>
+                        <div class="liability-item">
+                            <i class="bi bi-people"></i>
+                            <div>
+                                <h4>User Actions</h4>
+                                <p>Actions or omissions of other users or third parties</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <i class="bi bi-gavel"></i>
+                        <div>
+                            <p><strong>Limitation:</strong> In no event shall our total liability exceed the amount you paid us in the 12 months preceding the claim, or $100, whichever is greater.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 8 -->
+                <div id="section-8" class="terms-section">
+                    <h2>8. Disclaimer of Warranties</h2>
+                    <p>The Service is provided "as is" and "as available" without warranties of any kind:</p>
+                    
+                    <ul>
+                        <li><strong>No Guarantee:</strong> We do not guarantee the Service will be error-free, uninterrupted, or secure</li>
+                        <li><strong>No Fitness:</strong> The Service may not meet your specific requirements or expectations</li>
+                        <li><strong>No Accuracy:</strong> We do not guarantee the accuracy or reliability of any information provided</li>
+                        <li><strong>No Liability:</strong> We are not liable for any damages arising from use of the Service</li>
+                    </ul>
+                </div>
+
+                <!-- Section 9 -->
+                <div id="section-9" class="terms-section">
+                    <h2>9. Termination</h2>
+                    <p>We reserve the right to terminate or suspend your account:</p>
+                    
+                    <div class="termination-grid">
+                        <div class="termination-item">
+                            <h4><i class="bi bi-person-x"></i> By You</h4>
+                            <p>You may delete your account at any time through your account settings</p>
+                        </div>
+                        <div class="termination-item">
+                            <h4><i class="bi bi-shield-x"></i> By Us</h4>
+                            <p>We may terminate accounts for violation of these terms or for any reason</p>
+                        </div>
+                        <div class="termination-item">
+                            <h4><i class="bi bi-database-down"></i> Data Retention</h4>
+                            <p>Your data will be retained for 30 days after termination, then permanently deleted</p>
+                        </div>
+                        <div class="termination-item">
+                            <h4><i class="bi bi-arrow-repeat"></i> Reinstatement</h4>
+                            <p>You may create a new account after termination, subject to our discretion</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 10 -->
+                <div id="section-10" class="terms-section">
+                    <h2>10. Governing Law</h2>
+                    <p>These Terms shall be governed by and construed in accordance with the laws of:</p>
+                    
+                    <div class="info-box">
+                        <i class="bi bi-geo-alt"></i>
+                        <div>
+                            <p><strong>Jurisdiction:</strong> All matters relating to these terms shall be governed by the laws of Nigeria, without regard to conflict of law principles.</p>
+                            <p style="margin-top:.5rem;"><strong>Dispute Resolution:</strong> Any disputes arising from these terms shall be resolved through binding arbitration in Lagos, Nigeria.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 11 -->
+                <div id="section-11" class="terms-section">
+                    <h2>11. Changes to Terms</h2>
+                    <p>We reserve the right to update these terms at any time:</p>
+                    
+                    <ul>
+                        <li><strong>Notification:</strong> We will notify you of significant changes via email or in-app notification</li>
+                        <li><strong>Effective Date:</strong> Changes become effective 30 days after posting</li>
+                        <li><strong>Review:</strong> You are responsible for reviewing these terms periodically</li>
+                        <li><strong>Acceptance:</strong> Continued use of the Service constitutes acceptance of updated terms</li>
+                    </ul>
+
+                    <div class="info-box">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <p><strong>History:</strong> The current version of these terms is displayed at the top of this page. Previous versions are available upon request.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 12 -->
+                <div id="section-12" class="terms-section">
+                    <h2>12. Contact Us</h2>
+                    <p>If you have questions, concerns, or requests regarding these Terms of Service, please contact us:</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <strong>Email:</strong>
+                                <a href="mailto:legal@smartbudget.com">legal@smartbudget.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-globe"></i>
+                            <div>
+                                <strong>Website:</strong>
+                                <a href="https://smartbudget-tracker.onrender.com">https://smartbudget-tracker.onrender.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Response Time:</strong>
+                                <span>We respond to all inquiries within 48 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acceptance Section -->
+                <div class="acceptance-section">
+                    <div class="acceptance-banner">
+                        <i class="bi bi-hand-thumbs-up"></i>
+                        <div>
+                            <h3>By using SmartBudget, you accept these Terms of Service</h3>
+                            <p>If you do not agree with any part of these terms, please do not use the Service.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="terms-footer">
+        <div class="container">
+            <div class="terms-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="terms-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .terms-page {
+        background: #0B1120;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .breadcrumb-container {
+        padding: .75rem 0;
+        background: transparent;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all .2s ease;
+        padding: .25rem .5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: .65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: .25rem .5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .terms-hero {
+        padding: 3rem 0 2rem;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        text-align: center;
+    }
+
+    .terms-hero-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .terms-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: .4rem 1.2rem;
+        border-radius: 20px;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .terms-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: .5rem;
+        line-height: 1.2;
+    }
+
+    .terms-hero .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .terms-hero p {
+        font-size: 1rem;
+        color: #94A3B8;
+        margin-top: .5rem;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .terms-content {
+        padding: 2.5rem 0;
+        background: #0B1120;
+    }
+
+    .terms-card {
+        background: #1E293B;
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .toc-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .toc-section h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem 1.5rem;
+    }
+
+    .toc-list li a {
+        color: #94A3B8;
+        text-decoration: none;
+        font-size: .85rem;
+        transition: color .2s ease;
+        display: block;
+        padding: .25rem 0;
+    }
+
+    .toc-list li a:hover {
+        color: #10B981;
+    }
+
+    .terms-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .terms-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .terms-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .terms-section h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #E2E8F0;
+        margin-top: 1.25rem;
+        margin-bottom: .5rem;
+    }
+
+    .terms-section p {
+        color: #94A3B8;
+        font-size: .95rem;
+        line-height: 1.7;
+        margin-bottom: .75rem;
+    }
+
+    .terms-section ul {
+        color: #94A3B8;
+        font-size: .9rem;
+        line-height: 1.6;
+        padding-left: 1.5rem;
+        margin-bottom: .75rem;
+    }
+
+    .terms-section ul li {
+        margin-bottom: .25rem;
+    }
+
+    .info-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        margin: 1rem 0;
+    }
+
+    .info-box i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .info-box p {
+        color: #94A3B8;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .info-box a {
+        color: #10B981;
+        text-decoration: none;
+    }
+
+    .info-box a:hover {
+        text-decoration: underline;
+    }
+
+    .warning-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(239, 68, 68, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(239, 68, 68, 0.15);
+        margin: 1rem 0;
+    }
+
+    .warning-box i {
+        font-size: 1.25rem;
+        color: #EF4444;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .warning-box p {
+        color: #FCA5A5;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .responsibilities-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .responsibility-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        align-items: flex-start;
+    }
+
+    .responsibility-icon {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .1rem;
+    }
+
+    .responsibility-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .responsibility-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .ip-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .ip-item {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        text-align: center;
+    }
+
+    .ip-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .ip-item h4 i {
+        color: #10B981;
+        margin-right: .3rem;
+    }
+
+    .ip-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .third-party-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .third-party-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .third-party-icon {
+        font-size: 1.5rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .third-party-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .third-party-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+    }
+
+    .liability-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .liability-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .liability-item i {
+        font-size: 1.25rem;
+        color: #EF4444;
+        flex-shrink: 0;
+        margin-top: .1rem;
+    }
+
+    .liability-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .liability-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+    }
+
+    .termination-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .termination-item {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        text-align: center;
+    }
+
+    .termination-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .termination-item h4 i {
+        color: #10B981;
+        margin-right: .3rem;
+    }
+
+    .termination-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .contact-details {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: .75rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .contact-item i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .contact-item div {
+        display: flex;
+        flex-direction: column;
+        gap: .1rem;
+    }
+
+    .contact-item strong {
+        color: #94A3B8;
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .contact-item a,
+    .contact-item span {
+        color: #F1F5F9;
+        font-size: .9rem;
+        text-decoration: none;
+    }
+
+    .contact-item a:hover {
+        color: #10B981;
+    }
+
+    .acceptance-section {
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 2px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .acceptance-banner {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+        padding: 1.5rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .acceptance-banner i {
+        font-size: 2rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .acceptance-banner h3 {
+        color: #F1F5F9;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .acceptance-banner p {
+        color: #94A3B8;
+        font-size: .9rem;
+        margin: 0;
+    }
+
+    .terms-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .terms-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .terms-footer-content p {
+        color: #64748B;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .terms-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .terms-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: .8rem;
+        transition: color .2s ease;
+    }
+
+    .terms-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .toc-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .responsibilities-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .ip-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .third-party-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .liability-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .termination-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .terms-page {
+            padding-top: 70px;
+        }
+        
+        .terms-hero {
+            padding: 2rem 0 1.5rem;
+        }
+        
+        .terms-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+        
+        .responsibility-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .liability-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .third-party-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .contact-item {
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .acceptance-banner {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .terms-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .terms-footer-links {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .terms-hero h1 {
+            font-size: 1.8rem;
+        }
+        
+        .terms-card {
+            padding: 1rem;
+        }
+        
+        .terms-section h2 {
+            font-size: 1.2rem;
+        }
+        
+        .breadcrumb-item.active {
+            font-size: .7rem;
+            padding: .15rem .4rem;
+        }
+        
+        .breadcrumb-item a span {
+            display: none;
+        }
+        
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+        
+        .toc-list li a {
+            font-size: .75rem;
+        }
+    }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "terms";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "terms");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

@@ -1,0 +1,693 @@
+@page "/careers"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Careers</PageTitle>
+
+<div class="careers-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Careers
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="careers-hero">
+        <div class="container">
+            <div class="careers-hero-content">
+                <div class="careers-badge">💼 Join Our Team</div>
+                <h1>Build the Future of <span class="gradient-text">Financial Technology</span></h1>
+                <p>Help us empower millions of Nigerians to take control of their finances. Join a team that's passionate about making a difference.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="stat-number">15+</span>
+                        <span class="stat-label">Team Members</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="hero-stat">
+                        <span class="stat-number">50k+</span>
+                        <span class="stat-label">Users Impacted</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="hero-stat">
+                        <span class="stat-number">5+</span>
+                        <span class="stat-label">Open Positions</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    WHY JOIN US
+    ============================================ -->
+    <section class="why-join">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Why Join Us</span>
+                <h2 class="section-title-pro">Work That <span class="gradient-text">Matters</span></h2>
+                <p class="section-subtitle">At SmartBudget, you'll work on meaningful projects that impact real people's lives.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon"><i class="bi bi-rocket-takeoff"></i></div>
+                    <h3>Make an Impact</h3>
+                    <p>Your work will help thousands of Nigerians achieve financial freedom. Every line of code, every design decision makes a difference.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon"><i class="bi bi-people"></i></div>
+                    <h3>Amazing Culture</h3>
+                    <p>Work with a diverse, talented team that values collaboration, innovation, and personal growth. We support each other to succeed.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon"><i class="bi bi-graph-up"></i></div>
+                    <h3>Growth & Learning</h3>
+                    <p>We invest in your development. Learn from experienced colleagues, attend conferences, and grow your career with us.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon"><i class="bi bi-house-heart"></i></div>
+                    <h3>Work-Life Balance</h3>
+                    <p>We believe in working smart, not just hard. Flexible hours, remote options, and a supportive environment for work-life balance.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon"><i class="bi bi-cup-hot"></i></div>
+                    <h3>Perks & Benefits</h3>
+                    <p>Competitive salary, health insurance, wellness allowance, and a budget for professional development.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon"><i class="bi bi-building"></i></div>
+                    <h3>Great Location</h3>
+                    <p>Modern office in the heart of Lagos, with a collaborative and inspiring workspace designed for creativity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    OPEN POSITIONS
+    ============================================ -->
+    <section id="open-positions" class="open-positions">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Open Positions</span>
+                <h2 class="section-title-pro">Join Our <span class="gradient-text">Team</span></h2>
+                <p class="section-subtitle">We're looking for talented individuals to help us build the future of fintech in Nigeria.</p>
+            </div>
+            <div class="positions-grid">
+                <!-- Position 1 -->
+                <div class="position-card" data-position="Senior Software Engineer">
+                    <div class="position-header">
+                        <div class="position-icon"><i class="bi bi-code-square"></i></div>
+                        <div>
+                            <h3>Senior Software Engineer</h3>
+                            <span class="position-type">Full-time</span>
+                        </div>
+                    </div>
+                    <div class="position-body">
+                        <p>Build scalable, secure financial applications using .NET, Blazor, and modern cloud technologies. Lead technical decisions and mentor junior developers.</p>
+                        <div class="position-tags">
+                            <span class="tag">.NET</span>
+                            <span class="tag">Blazor</span>
+                            <span class="tag">Azure</span>
+                            <span class="tag">C#</span>
+                            <span class="tag">PostgreSQL</span>
+                        </div>
+                        <div class="position-location">
+                            <i class="bi bi-geo-alt"></i> Lagos, Nigeria (Hybrid)
+                        </div>
+                    </div>
+                    <div class="position-footer">
+                        <span class="position-salary">₦15M - ₦25M per year</span>
+                        <button class="btn-apply" onclick="window.openJobApplication('Senior Software Engineer')">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Position 2 -->
+                <div class="position-card" data-position="UI/UX Designer">
+                    <div class="position-header">
+                        <div class="position-icon"><i class="bi bi-palette"></i></div>
+                        <div>
+                            <h3>UI/UX Designer</h3>
+                            <span class="position-type">Full-time</span>
+                        </div>
+                    </div>
+                    <div class="position-body">
+                        <p>Design intuitive, user-friendly interfaces for our financial applications. Conduct user research and create beautiful, functional designs.</p>
+                        <div class="position-tags">
+                            <span class="tag">Figma</span>
+                            <span class="tag">UX Research</span>
+                            <span class="tag">Prototyping</span>
+                            <span class="tag">Design Systems</span>
+                            <span class="tag">User Testing</span>
+                        </div>
+                        <div class="position-location">
+                            <i class="bi bi-geo-alt"></i> Lagos, Nigeria (Hybrid)
+                        </div>
+                    </div>
+                    <div class="position-footer">
+                        <span class="position-salary">₦10M - ₦18M per year</span>
+                        <button class="btn-apply" onclick="window.openJobApplication('UI/UX Designer')">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Position 3 -->
+                <div class="position-card" data-position="Data Engineer">
+                    <div class="position-header">
+                        <div class="position-icon"><i class="bi bi-database"></i></div>
+                        <div>
+                            <h3>Data Engineer</h3>
+                            <span class="position-type">Full-time</span>
+                        </div>
+                    </div>
+                    <div class="position-body">
+                        <p>Build and maintain our data infrastructure. Create pipelines for financial data processing and analytics. Ensure data quality and security.</p>
+                        <div class="position-tags">
+                            <span class="tag">Python</span>
+                            <span class="tag">SQL</span>
+                            <span class="tag">ETL</span>
+                            <span class="tag">AWS</span>
+                            <span class="tag">Snowflake</span>
+                        </div>
+                        <div class="position-location">
+                            <i class="bi bi-geo-alt"></i> Lagos, Nigeria (Hybrid)
+                        </div>
+                    </div>
+                    <div class="position-footer">
+                        <span class="position-salary">₦12M - ₦20M per year</span>
+                        <button class="btn-apply" onclick="window.openJobApplication('Data Engineer')">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Position 4 -->
+                <div class="position-card" data-position="Growth Marketing Manager">
+                    <div class="position-header">
+                        <div class="position-icon"><i class="bi bi-bullhorn"></i></div>
+                        <div>
+                            <h3>Growth Marketing Manager</h3>
+                            <span class="position-type">Full-time</span>
+                        </div>
+                    </div>
+                    <div class="position-body">
+                        <p>Drive user acquisition and growth strategies. Manage campaigns across channels and optimize conversion funnels for our financial products.</p>
+                        <div class="position-tags">
+                            <span class="tag">SEO</span>
+                            <span class="tag">Content Marketing</span>
+                            <span class="tag">Analytics</span>
+                            <span class="tag">Google Ads</span>
+                            <span class="tag">Social Media</span>
+                        </div>
+                        <div class="position-location">
+                            <i class="bi bi-geo-alt"></i> Lagos, Nigeria (Hybrid)
+                        </div>
+                    </div>
+                    <div class="position-footer">
+                        <span class="position-salary">₦8M - ₦15M per year</span>
+                        <button class="btn-apply" onclick="window.openJobApplication('Growth Marketing Manager')">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Position 5 -->
+                <div class="position-card" data-position="Customer Success Manager">
+                    <div class="position-header">
+                        <div class="position-icon"><i class="bi bi-people"></i></div>
+                        <div>
+                            <h3>Customer Success Manager</h3>
+                            <span class="position-type">Full-time</span>
+                        </div>
+                    </div>
+                    <div class="position-body">
+                        <p>Ensure our users get the most value from SmartBudget. Handle support, collect feedback, and help users achieve their financial goals.</p>
+                        <div class="position-tags">
+                            <span class="tag">Customer Support</span>
+                            <span class="tag">Communication</span>
+                            <span class="tag">CRM</span>
+                            <span class="tag">Training</span>
+                            <span class="tag">Feedback</span>
+                        </div>
+                        <div class="position-location">
+                            <i class="bi bi-geo-alt"></i> Lagos, Nigeria (Hybrid)
+                        </div>
+                    </div>
+                    <div class="position-footer">
+                        <span class="position-salary">₦6M - ₦10M per year</span>
+                        <button class="btn-apply" onclick="window.openJobApplication('Customer Success Manager')">Apply Now</button>
+                    </div>
+                </div>
+
+                <!-- Position 6 -->
+                <div class="position-card" data-position="Security Engineer">
+                    <div class="position-header">
+                        <div class="position-icon"><i class="bi bi-shield-check"></i></div>
+                        <div>
+                            <h3>Security Engineer</h3>
+                            <span class="position-type">Full-time</span>
+                        </div>
+                    </div>
+                    <div class="position-body">
+                        <p>Protect our users' financial data. Implement security best practices, conduct audits, and respond to security incidents.</p>
+                        <div class="position-tags">
+                            <span class="tag">Cyber Security</span>
+                            <span class="tag">Penetration Testing</span>
+                            <span class="tag">AWS Security</span>
+                            <span class="tag">Compliance</span>
+                            <span class="tag">Encryption</span>
+                        </div>
+                        <div class="position-location">
+                            <i class="bi bi-geo-alt"></i> Lagos, Nigeria (Hybrid)
+                        </div>
+                    </div>
+                    <div class="position-footer">
+                        <span class="position-salary">₦14M - ₦22M per year</span>
+                        <button class="btn-apply" onclick="window.openJobApplication('Security Engineer')">Apply Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CULTURE SECTION
+    ============================================ -->
+    <section class="culture-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Our Culture</span>
+                <h2 class="section-title-pro">Life at <span class="gradient-text">SmartBudget</span></h2>
+                <p class="section-subtitle">We're building a culture where everyone can thrive and make a real impact.</p>
+            </div>
+            <div class="culture-grid">
+                <div class="culture-card">
+                    <div class="culture-icon"><i class="bi bi-lightbulb"></i></div>
+                    <h3>Innovation First</h3>
+                    <p>We embrace new ideas and technologies. Everyone has a voice in shaping our products and processes.</p>
+                </div>
+                <div class="culture-card">
+                    <div class="culture-icon"><i class="bi bi-heart"></i></div>
+                    <h3>User-Centric</h3>
+                    <p>Everything we do is driven by our users' needs. We build products that solve real problems for real people.</p>
+                </div>
+                <div class="culture-card">
+                    <div class="culture-icon"><i class="bi bi-people"></i></div>
+                    <h3>Collaboration</h3>
+                    <p>We work together across teams and disciplines. The best ideas come from diverse perspectives.</p>
+                </div>
+                <div class="culture-card">
+                    <div class="culture-icon"><i class="bi bi-trophy"></i></div>
+                    <h3>Excellence</h3>
+                    <p>We strive for excellence in everything we do. Quality, reliability, and performance are non-negotiable.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    PERKS SECTION
+    ============================================ -->
+    <section class="perks-section">
+        <div class="container">
+            <div class="perks-content">
+                <div class="perks-text">
+                    <span class="perks-badge">Perks & Benefits</span>
+                    <h2>We Take Care of <span class="gradient-text">Our Team</span></h2>
+                    <p>We believe that happy, healthy employees do their best work. That's why we offer comprehensive benefits.</p>
+                    <ul class="perks-list">
+                        <li><i class="bi bi-check-circle-fill"></i> Competitive salary and performance bonuses</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Comprehensive health insurance for you and your family</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Flexible working hours and hybrid work options</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Professional development budget</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Wellness allowance and gym membership</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Annual team retreats and off-sites</li>
+                        <li><i class="bi bi-check-circle-fill"></i> Catered lunches and snacks</li>
+                        <li><i class="bi bi-check-circle-fill"></i> 25 days of paid time off</li>
+                    </ul>
+                </div>
+                <div class="perks-image">
+                    <div class="perks-illustration">
+                        <i class="bi bi-heart-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    APPLICATION PROCESS
+    ============================================ -->
+    <section class="process-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">How to Apply</span>
+                <h2 class="section-title-pro">Simple <span class="gradient-text">Application Process</span></h2>
+                <p class="section-subtitle">We make it easy to apply and join our team. Here's what to expect:</p>
+            </div>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Submit Application</h3>
+                        <p>Send us your resume and a brief introduction. Tell us why you'd be a great fit for SmartBudget.</p>
+                    </div>
+                </div>
+                <div class="process-arrow"><i class="bi bi-arrow-down"></i></div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Initial Review</h3>
+                        <p>Our team reviews applications within 3-5 business days. We'll reach out if there's a fit.</p>
+                    </div>
+                </div>
+                <div class="process-arrow"><i class="bi bi-arrow-down"></i></div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Interviews</h3>
+                        <p>Meet the team through 2-3 interviews. We'll discuss your experience, skills, and cultural fit.</p>
+                    </div>
+                </div>
+                <div class="process-arrow"><i class="bi bi-arrow-down"></i></div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Offer</h3>
+                        <p>If all goes well, we'll make an offer. Welcome to the SmartBudget team!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    CTA SECTION
+    ============================================ -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Make an Impact?</h2>
+                <p>Join us in building the future of financial technology in Nigeria.</p>
+                <a href="#open-positions" class="btn-get-started">View Open Positions →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="careers-footer">
+        <div class="container">
+            <div class="careers-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="careers-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/about">About</a>
+                    <a href="/blog">Blog</a>
+                    <a href="/careers">Careers</a>
+                    <a href="/privacy">Privacy</a>
+                    <a href="/terms">Terms</a>
+                    <a href="/cookies">Cookies</a>
+                    <a href="/security">Security</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .careers-page{background:#0B1120;min-height:100vh;padding-top:80px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+    .container{width:100%;max-width:1280px;margin:0 auto;padding:0 1rem}
+    .breadcrumb-container{padding:.75rem 0;background:transparent}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;list-style:none;padding:0;margin:0;flex-wrap:wrap}
+    .breadcrumb-item{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#94A3B8}
+    .breadcrumb-item a{display:flex;align-items:center;gap:.4rem;color:#94A3B8;text-decoration:none;transition:all .2s ease;padding:.25rem .5rem;border-radius:6px}
+    .breadcrumb-item a:hover{color:#10B981;background:rgba(16,185,129,0.08)}
+    .breadcrumb-item i.bi-chevron-right{color:#64748B;font-size:.65rem}
+    .breadcrumb-item.active{color:#F1F5F9;font-weight:500;padding:.25rem .5rem;background:rgba(16,185,129,0.1);border-radius:6px;border:1px solid rgba(16,185,129,0.1)}
+    .careers-hero{padding:3rem 0 2rem;background:linear-gradient(135deg,#0B1120 0%,#111827 50%,#1A2332 100%);text-align:center}
+    .careers-hero-content{max-width:750px;margin:0 auto}
+    .careers-badge{display:inline-block;background:rgba(16,185,129,0.12);color:#10B981;padding:.4rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(16,185,129,0.15)}
+    .careers-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem;line-height:1.2}
+    .careers-hero .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .careers-hero p{font-size:1.0625rem;color:#94A3B8;max-width:600px;margin:0 auto;line-height:1.6}
+    .hero-stats{display:flex;justify-content:center;gap:1.5rem;margin-top:2rem;flex-wrap:wrap}
+    .hero-stat{text-align:center}
+    .hero-stat .stat-number{display:block;font-size:1.8rem;font-weight:800;color:#10B981}
+    .hero-stat .stat-label{font-size:.7rem;color:#64748B;text-transform:uppercase;letter-spacing:.05em}
+    .stat-divider{width:1px;height:40px;background:rgba(148,163,184,0.15)}
+    .section-header{text-align:center;margin-bottom:2.5rem}
+    .section-badge{display:inline-block;background:rgba(16,185,129,0.12);color:#10B981;padding:.3rem 1rem;border-radius:20px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;border:1px solid rgba(16,185,129,0.15)}
+    .section-title-pro{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;color:#F1F5F9;margin-bottom:.5rem;line-height:1.2}
+    .section-title-pro .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .section-subtitle{font-size:.9375rem;color:#94A3B8;max-width:550px;margin:0 auto;line-height:1.6}
+    .why-join{padding:3rem 0;background:#0B1120;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .benefits-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;max-width:1100px;margin:0 auto}
+    .benefit-card{background:#1E293B;border-radius:16px;padding:1.75rem;text-align:center;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease}
+    .benefit-card:hover{transform:translateY(-4px);border-color:rgba(16,185,129,0.2);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+    .benefit-icon{width:52px;height:52px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.5rem;color:#10B981;border:1px solid rgba(16,185,129,0.15)}
+    .benefit-card h3{font-size:1.0625rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem}
+    .benefit-card p{color:#94A3B8;font-size:.85rem;line-height:1.5;margin:0}
+    .open-positions{padding:3rem 0;background:#111827;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .positions-grid{display:grid;grid-template-columns:1fr;gap:1.5rem;max-width:1100px;margin:0 auto}
+    .position-card{background:#1E293B;border-radius:16px;padding:1.75rem;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease}
+    .position-card:hover{border-color:rgba(16,185,129,0.2);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+    .position-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+    .position-icon{width:44px;height:44px;background:rgba(16,185,129,0.1);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#10B981;flex-shrink:0}
+    .position-header h3{font-size:1.0625rem;font-weight:700;color:#F1F5F9;margin:0}
+    .position-type{font-size:.7rem;color:#10B981;font-weight:600;background:rgba(16,185,129,0.1);padding:.15rem .6rem;border-radius:20px;border:1px solid rgba(16,185,129,0.15);display:inline-block}
+    .position-body p{color:#94A3B8;font-size:.85rem;line-height:1.6;margin-bottom:.75rem}
+    .position-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.75rem}
+    .tag{background:#0F172A;color:#94A3B8;padding:.2rem .6rem;border-radius:6px;font-size:.7rem;border:1px solid rgba(148,163,184,0.08)}
+    .position-location{font-size:.8rem;color:#64748B;display:flex;align-items:center;gap:.3rem}
+    .position-location i{color:#10B981}
+    .position-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(148,163,184,0.08);flex-wrap:wrap;gap:.75rem}
+    .position-salary{font-weight:600;color:#10B981;font-size:.9rem}
+    .btn-apply{padding:.5rem 1.25rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;border:none;border-radius:10px;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.2)}
+    .btn-apply:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,0.35)}
+    .culture-section{padding:3rem 0;background:#0B1120;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .culture-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;max-width:1100px;margin:0 auto}
+    .culture-card{background:#1E293B;border-radius:16px;padding:1.75rem;text-align:center;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease}
+    .culture-card:hover{transform:translateY(-4px);border-color:rgba(16,185,129,0.2);box-shadow:0 8px 30px rgba(0,0,0,0.3)}
+    .culture-icon{width:48px;height:48px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;font-size:1.25rem;color:#10B981;border:1px solid rgba(16,185,129,0.15)}
+    .culture-card h3{font-size:1rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem}
+    .culture-card p{color:#94A3B8;font-size:.85rem;line-height:1.5;margin:0}
+    .perks-section{padding:3rem 0;background:#111827;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .perks-content{display:grid;grid-template-columns:1fr;gap:2rem;max-width:1100px;margin:0 auto;align-items:center}
+    .perks-text .perks-badge{display:inline-block;background:rgba(16,185,129,0.12);color:#10B981;padding:.3rem 1rem;border-radius:20px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;border:1px solid rgba(16,185,129,0.15)}
+    .perks-text h2{font-size:clamp(1.8rem,3vw,2.5rem);font-weight:700;color:#F1F5F9;margin-bottom:.5rem;line-height:1.2}
+    .perks-text .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .perks-text p{color:#94A3B8;font-size:.9375rem;line-height:1.6;margin-bottom:1.25rem}
+    .perks-list{list-style:none;padding:0;margin:0}
+    .perks-list li{display:flex;align-items:center;gap:.6rem;color:#94A3B8;font-size:.85rem;padding:.4rem 0;border-bottom:1px solid rgba(148,163,184,0.04)}
+    .perks-list li:last-child{border-bottom:none}
+    .perks-list i{color:#10B981;font-size:1rem;flex-shrink:0}
+    .perks-image{display:flex;align-items:center;justify-content:center}
+    .perks-illustration{width:200px;height:200px;background:linear-gradient(135deg,rgba(16,185,129,0.1) 0%,rgba(16,185,129,0.05) 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:5rem;color:#10B981;border:2px solid rgba(16,185,129,0.15)}
+    .process-section{padding:3rem 0;background:#0B1120;border-bottom:1px solid rgba(148,163,184,0.06)}
+    .process-steps{max-width:700px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:.5rem}
+    .process-step{display:flex;gap:1.25rem;width:100%;background:#1E293B;border-radius:14px;padding:1.5rem;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease;align-items:flex-start}
+    .process-step:hover{border-color:rgba(16,185,129,0.2);transform:translateX(4px)}
+    .step-number{width:40px;height:40px;background:rgba(16,185,129,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#10B981;flex-shrink:0;border:1px solid rgba(16,185,129,0.15)}
+    .step-content h3{font-size:1rem;font-weight:600;color:#F1F5F9;margin-bottom:.25rem}
+    .step-content p{color:#94A3B8;font-size:.85rem;line-height:1.5;margin:0}
+    .process-arrow{color:#64748B;font-size:1.25rem}
+    .cta-section{padding:3rem 0;background:#0B1120;text-align:center}
+    .cta-content{max-width:600px;margin:0 auto}
+    .cta-content h2{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem}
+    .cta-content p{color:#94A3B8;font-size:.9375rem;margin-bottom:1.5rem}
+    .btn-get-started{display:inline-flex;align-items:center;gap:.5rem;padding:.9rem 2.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;text-decoration:none;border-radius:12px;font-size:1rem;font-weight:600;font-family:'Inter',sans-serif;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.25);border:none;cursor:pointer;position:relative;overflow:hidden}
+    .btn-get-started::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left .5s ease}
+    .btn-get-started:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(16,185,129,0.35);color:#fff}
+    .btn-get-started:hover::before{left:100%}
+
+    /* ============================================
+    FOOTER
+    ============================================ */
+    .careers-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .careers-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .careers-footer-content p {
+        color: #64748B;
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .careers-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .careers-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+    }
+
+    .careers-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* ============================================
+    RESPONSIVE
+    ============================================ */
+    @@media(min-width:768px){.benefits-grid{grid-template-columns:repeat(2,1fr)}.positions-grid{grid-template-columns:repeat(2,1fr)}.culture-grid{grid-template-columns:repeat(2,1fr)}.perks-content{grid-template-columns:1fr 1fr;gap:3rem}.hero-stats{gap:2.5rem}}
+    @@media(min-width:992px){.benefits-grid{grid-template-columns:repeat(3,1fr)}.culture-grid{grid-template-columns:repeat(4,1fr)}}
+    @@media(max-width:768px){
+        .careers-page{padding-top:70px}
+        .careers-hero{padding:2rem 0 1.5rem}
+        .why-join,.open-positions,.culture-section,.perks-section,.process-section{padding:2rem 0}
+        .position-footer{flex-direction:column;align-items:stretch}
+        .btn-apply{width:100%;justify-content:center;padding:.6rem}
+        .perks-content{gap:1.5rem}
+        .perks-illustration{width:140px;height:140px;font-size:3.5rem}
+        .process-arrow{transform:rotate(90deg)}
+        .hero-stats{gap:1rem}
+        .stat-divider{display:none}
+        .breadcrumb-item{font-size:.75rem}
+        .careers-footer-content{flex-direction:column;text-align:center}
+        .careers-footer-links{justify-content:center}
+    }
+    @@media(max-width:480px){
+        .careers-hero h1{font-size:1.8rem}
+        .benefits-grid,.positions-grid,.culture-grid{grid-template-columns:1fr}
+        .position-header{flex-direction:column;text-align:center}
+        .position-header h3{font-size:.95rem}
+        .position-tags{justify-content:center}
+        .position-location{justify-content:center}
+        .perks-illustration{width:120px;height:120px;font-size:3rem}
+        .btn-get-started{padding:.7rem 1.5rem;font-size:.85rem}
+        .breadcrumb-item.active{font-size:.6rem;padding:.1rem .3rem}
+        .careers-footer-links{gap:1rem}
+        .careers-footer-links a{font-size:.7rem}
+    }
+</style>
+
+<script>
+    // ============================================
+    // CAREERS PAGE JAVASCRIPT
+    // ============================================
+    console.log('Careers Page JS: Loaded');
+
+    // ============================================
+    // OPEN JOB APPLICATION
+    // ============================================
+    window.openJobApplication = function(position) {
+        // Show a professional application modal/alert
+        var message = 'Thank you for your interest in the ' + position + ' position!\n\n' +
+                      'To apply, please send your CV and portfolio to:\n' +
+                      '📧 careers@smartbudget.com\n\n' +
+                      'Please include:\n' +
+                      '• Your updated CV/Resume\n' +
+                      '• A brief cover letter\n' +
+                      '• Portfolio or GitHub link (if applicable)\n\n' +
+                      'We\'ll review your application and get back to you within 3-5 business days.\n\n' +
+                      'Good luck! 🚀';
+        
+        alert(message);
+        
+        // Track application click (for analytics)
+        console.log('📝 Job application opened for:', position);
+        
+        // You can also log to your analytics service here
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'job_application_click', {
+                'event_category': 'Careers',
+                'event_label': position
+            });
+        }
+    };
+
+    // ============================================
+    // SMOOTH SCROLL FOR CTA BUTTON
+    // ============================================
+    document.addEventListener('DOMContentLoaded', function() {
+        var ctaBtn = document.querySelector('.btn-get-started');
+        if (ctaBtn) {
+            ctaBtn.addEventListener('click', function(e) {
+                var targetId = this.getAttribute('href');
+                if (targetId && targetId.startsWith('#')) {
+                    e.preventDefault();
+                    var target = document.querySelector(targetId);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        }
+    });
+
+    // ============================================
+    // REGISTER WITH PAGE REGISTRY
+    // ============================================
+    if (window.pageRegistry) {
+        window.pageRegistry.register('careers', {
+            init: function() {
+                console.log('💼 Careers page initialized');
+            },
+            destroy: function() {
+                console.log('🗑️ Careers: Cleanup');
+            },
+            refresh: function() {
+                console.log('🔄 Careers: Refresh');
+            }
+        });
+    }
+
+    // Expose functions globally
+    window.openJobApplication = window.openJobApplication;
+
+    console.log('✅ Careers Page JS: Loaded');
+</script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "careers";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "careers");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

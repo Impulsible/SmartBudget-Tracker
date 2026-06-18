@@ -359,21 +359,13 @@
                 // Get email
                 _userEmail = user.FindFirst(ClaimTypes.Email)?.Value ?? "";
                 
-                // ✅ FIX: Get FullName claim
+                // ✅ FIX: Get FullName claim - Check multiple claim types
                 var fullNameClaim = user.FindFirst("FullName")?.Value;
                 var nameClaim = user.FindFirst(ClaimTypes.Name)?.Value;
                 var givenNameClaim = user.FindFirst(ClaimTypes.GivenName)?.Value;
+                var surnameClaim = user.FindFirst(ClaimTypes.Surname)?.Value;
                 
-                // Debug: Log all claims
-                Console.WriteLine("🔍 === USER CLAIMS ===");
-                foreach (var claim in user.Claims)
-                {
-                    Console.WriteLine($"  {claim.Type} = {claim.Value}");
-                }
-                Console.WriteLine($"📌 FullName claim: '{fullNameClaim ?? "NULL"}'");
-                Console.WriteLine("🔍 ===================");
-                
-                // Priority: FullName > Name > GivenName > Email username
+                // Priority: FullName > Name > GivenName + Surname > GivenName > Surname > Email username
                 if (!string.IsNullOrEmpty(fullNameClaim))
                 {
                     _fullName = fullNameClaim;
@@ -382,14 +374,34 @@
                 {
                     _fullName = nameClaim;
                 }
+                else if (!string.IsNullOrEmpty(givenNameClaim) && !string.IsNullOrEmpty(surnameClaim))
+                {
+                    _fullName = $"{givenNameClaim} {surnameClaim}";
+                }
                 else if (!string.IsNullOrEmpty(givenNameClaim))
                 {
                     _fullName = givenNameClaim;
+                }
+                else if (!string.IsNullOrEmpty(surnameClaim))
+                {
+                    _fullName = surnameClaim;
                 }
                 else if (!string.IsNullOrEmpty(_userEmail))
                 {
                     // Use email username as fallback
                     _fullName = _userEmail.Split('@')[0];
+                    // Clean up: replace dots and underscores with spaces
+                    _fullName = _fullName.Replace('.', ' ').Replace('_', ' ');
+                    // Capitalize each word
+                    var words = _fullName.Split(' ');
+                    for (int i = 0; i < words.Length; i++)
+                    {
+                        if (words[i].Length > 0)
+                        {
+                            words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
+                        }
+                    }
+                    _fullName = string.Join(" ", words);
                 }
                 else
                 {
@@ -399,23 +411,35 @@
                 // ✅ FIX: Extract first name
                 _firstName = _fullName.Split(' ')[0];
                 
-                // ✅ FIX: If firstName is still the email, clean it up
-                if (_firstName.Contains('@') || _firstName.Length < 2)
+                // ✅ FIX: If firstName is still the email or too short, use full name
+                if (string.IsNullOrEmpty(_firstName) || _firstName.Contains('@') || _firstName.Length < 2)
                 {
                     _firstName = _fullName;
                 }
                 
-                // ✅ FIX: Generate initials
+                // ✅ FIX: Generate initials (first 2 characters of first name)
                 if (_firstName.Length >= 2)
                 {
                     _initials = _firstName.Substring(0, 2).ToUpper();
                 }
-                else
+                else if (_firstName.Length == 1)
                 {
                     _initials = _firstName.ToUpper();
                 }
+                else
+                {
+                    // If still empty, use first letter of email
+                    if (!string.IsNullOrEmpty(_userEmail))
+                    {
+                        _initials = _userEmail.Substring(0, 1).ToUpper();
+                    }
+                    else
+                    {
+                        _initials = "U";
+                    }
+                }
                 
-                Console.WriteLine($"✅ User loaded: FullName='{_fullName}', FirstName='{_firstName}', Email='{_userEmail}'");
+                Console.WriteLine($"✅ User loaded: FullName='{_fullName}', FirstName='{_firstName}', Initials='{_initials}', Email='{_userEmail}'");
             }
         }
         catch (Exception ex)

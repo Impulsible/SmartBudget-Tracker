@@ -1,0 +1,106 @@
+@page "/blog/debt-free-plan"
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - How to Get Out of Debt</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/blog">Blog</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">Debt-Free Plan</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Debt Management</span>
+                <h1>How to Get Out of Debt: A Step-by-Step Plan</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> Chidi Okonkwo</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 7 min read</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Getting out of debt is one of the most important steps to financial freedom. This step-by-step plan will help you become debt-free in @CurrentYear.</p>
+
+                <h2>Step 1: List All Your Debts</h2>
+                <p>Write down every debt you have:</p>
+                <ul>
+                    <li>Credit card balances</li>
+                    <li>Personal loans</li>
+                    <li>Student loans</li>
+                    <li>Car loans</li>
+                    <li>Mortgage</li>
+                    <li>Money owed to family and friends</li>
+                </ul>
+
+                <h2>Step 2: Know Your Numbers</h2>
+                <p>For each debt, note:</p>
+                <ul>
+                    <li>Total balance</li>
+                    <li>Interest rate</li>
+                    <li>Minimum monthly payment</li>
+                </ul>
+
+                <h2>Step 3: Choose a Debt Repayment Strategy</h2>
+                <h3>Method 1: Debt Avalanche</h3>
+                <p>Pay off debts with the highest interest rates first. This saves you the most money in interest.</p>
+
+                <h3>Method 2: Debt Snowball</h3>
+                <p>Pay off the smallest debt first, then move to the next. This gives you quick wins and motivation.</p>
+
+                <h2>Step 4: Create a Budget</h2>
+                <p>Allocate as much money as possible to debt repayment. Cut unnecessary expenses.</p>
+
+                <h2>Step 5: Increase Your Income</h2>
+                <ul>
+                    <li>Get a side hustle</li>
+                    <li>Ask for a raise</li>
+                    <li>Freelance in your skill area</li>
+                    <li>Sell items you don't need</li>
+                </ul>
+
+                <h2>Step 6: Negotiate with Creditors</h2>
+                <ul>
+                    <li>Ask for lower interest rates</li>
+                    <li>Request payment plans</li>
+                    <li>Consider debt consolidation</li>
+                </ul>
+
+                <h2>Step 7: Stay Motivated</h2>
+                <ul>
+                    <li>Track your progress</li>
+                    <li>Celebrate milestones</li>
+                    <li>Visualize a debt-free future</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Take Control of Your Debt</h3>
+                    <p>Track your debt repayment progress with SmartBudget.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "blog-post";
+        await base.OnInitializedAsync();
+    }
+}

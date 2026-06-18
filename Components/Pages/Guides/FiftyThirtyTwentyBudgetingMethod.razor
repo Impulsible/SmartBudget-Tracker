@@ -1,0 +1,135 @@
+@page "/guides/50-30-20-budgeting-method"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - The 50/30/20 Budgeting Method Explained</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">50/30/20 Budgeting Method</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Budgeting</span>
+                <h1>The 50/30/20 Budgeting Method Explained</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 8 min read</span>
+                    <span><i class="bi bi-file-text"></i> Beginner</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>The 50/30/20 budgeting rule is one of the simplest and most effective ways to manage your money. This guide explains how it works and how to apply it.</p>
+
+                <h2>What is the 50/30/20 Rule?</h2>
+                <p>The rule divides your after-tax income into three categories:</p>
+                <ul>
+                    <li><strong>50% for Needs:</strong> Essential expenses</li>
+                    <li><strong>30% for Wants:</strong> Non-essential spending</li>
+                    <li><strong>20% for Savings:</strong> Financial goals and debt repayment</li>
+                </ul>
+
+                <h2>Needs (50%)</h2>
+                <p>These are expenses you must pay to survive and function:</p>
+                <ul>
+                    <li>Rent or mortgage payments</li>
+                    <li>Utilities (electricity, water, internet)</li>
+                    <li>Food and groceries</li>
+                    <li>Transportation</li>
+                    <li>Healthcare</li>
+                    <li>Minimum debt payments</li>
+                </ul>
+
+                <h2>Wants (30%)</h2>
+                <p>These are non-essential expenses that improve your quality of life:</p>
+                <ul>
+                    <li>Dining out and takeout</li>
+                    <li>Entertainment (movies, concerts, events)</li>
+                    <li>Shopping and clothes</li>
+                    <li>Vacations and travel</li>
+                    <li>Subscriptions (Netflix, Spotify, Gym)</li>
+                </ul>
+
+                <h2>Savings (20%)</h2>
+                <p>This money goes toward your financial goals:</p>
+                <ul>
+                    <li>Emergency fund</li>
+                    <li>Retirement savings</li>
+                    <li>Investments</li>
+                    <li>Extra debt payments</li>
+                    <li>Major purchases (car, house, education)</li>
+                </ul>
+
+                <h2>How to Calculate Your 50/30/20 Budget</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Category</th><th>Percentage</th><th>Amount (₦)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Monthly Income</td><td>100%</td><td>500,000</td></tr>
+                            <tr><td>Needs</td><td>50%</td><td>250,000</td></tr>
+                            <tr><td>Wants</td><td>30%</td><td>150,000</td></tr>
+                            <tr><td>Savings</td><td>20%</td><td>100,000</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Adapting the 50/30/20 Rule for Nigeria</h2>
+                <p>In Nigeria, you might need to adjust the percentages:</p>
+                <ul>
+                    <li><strong>Housing:</strong> Rent in Lagos or Abuja can exceed 50%</li>
+                    <li><strong>Transport:</strong> Fuel prices fluctuate significantly</li>
+                    <li><strong>Food:</strong> Food inflation requires careful budgeting</li>
+                    <li><strong>Remittances:</strong> Many Nigerians support extended family</li>
+                </ul>
+
+                <h2>How to Apply the 50/30/20 Rule in SmartBudget</h2>
+                <ol>
+                    <li>Go to <a href="/budgets">Budgets</a> in SmartBudget</li>
+                    <li>Create three main budget categories: Needs, Wants, Savings</li>
+                    <li>Add sub-categories under each main category</li>
+                    <li>Allocate your income according to the 50/30/20 split</li>
+                    <li>Track your spending and adjust monthly</li>
+                </ol>
+
+                <h2>Benefits of the 50/30/20 Rule</h2>
+                <ul>
+                    <li><strong>Simple:</strong> Easy to understand and follow</li>
+                    <li><strong>Flexible:</strong> Can be adjusted to your situation</li>
+                    <li><strong>Balanced:</strong> Ensures you're saving while still enjoying life</li>
+                    <li><strong>Stress-free:</strong> Takes the guilt out of spending on wants</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Start Budgeting with SmartBudget</h3>
+                    <p>Join thousands of Nigerians using SmartBudget to manage their money.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

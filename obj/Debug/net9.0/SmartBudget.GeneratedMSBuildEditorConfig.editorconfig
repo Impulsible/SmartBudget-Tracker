@@ -52,12 +52,56 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/About.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBYm91dC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Api.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBcGkucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/BlogIndex.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Blog/DebtFreePlan.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nXERlYnRGcmVlUGxhbi5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Blog/FiftyThirtyTwentyBudgetingRule.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nXEZpZnR5VGhpcnR5VHdlbnR5QnVkZ2V0aW5nUnVsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Blog/FinancialWellness.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nXEZpbmFuY2lhbFdlbGxuZXNzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Blog/HowToSave1MillionNaira.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nXEhvd1RvU2F2ZTFNaWxsaW9uTmFpcmEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Blog/InvestingGuideNigeria.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nXEludmVzdGluZ0d1aWRlTmlnZXJpYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Blog/SmallBusinessMoneyTips.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCbG9nXFNtYWxsQnVzaW5lc3NNb25leVRpcHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Budgets.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xCdWRnZXRzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Careers.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDYXJlZXJzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Contact.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb250YWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Cookies.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb29raWVzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Dashboard.razor]
@@ -76,16 +120,80 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHb2Fscy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/GuidesIndex.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNJbmRleC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/BeginnersGuideToInvestingNigeria.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcQmVnaW5uZXJzR3VpZGVUb0ludmVzdGluZ05pZ2VyaWEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/FiftyThirtyTwentyBudgetingMethod.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcRmlmdHlUaGlydHlUd2VudHlCdWRnZXRpbmdNZXRob2QucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/FinancialManagementSmallBusiness.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcRmluYW5jaWFsTWFuYWdlbWVudFNtYWxsQnVzaW5lc3MucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/FinancialWellnessGuide.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcRmluYW5jaWFsV2VsbG5lc3NHdWlkZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/HowToBuildAnEmergencyFund.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcSG93VG9CdWlsZEFuRW1lcmdlbmN5RnVuZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/HowToCreateYourFirstBudget.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcSG93VG9DcmVhdGVZb3VyRmlyc3RCdWRnZXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/HowToGetOutOfDebt.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcSG93VG9HZXRPdXRPZkRlYnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/HowToSave1MillionNaira.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcSG93VG9TYXZlMU1pbGxpb25OYWlyYS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/RealEstateInvestingNigeria.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcUmVhbEVzdGF0ZUludmVzdGluZ05pZ2VyaWEucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Guides/UsingSmartBudgetTrackExpenses.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xHdWlkZXNcVXNpbmdTbWFydEJ1ZGdldFRyYWNrRXhwZW5zZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Help.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIZWxwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Marketing.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNYXJrZXRpbmcucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Privacy.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcml2YWN5LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Reports.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSZXBvcnRzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Security.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTZWN1cml0eS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Settings.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTZXR0aW5ncy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Status.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTdGF0dXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Terms.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xUZXJtcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/IMPULSE/Documents/SmartBudget/Components/Pages/Transactions.razor]

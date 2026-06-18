@@ -1,0 +1,1518 @@
+@page "/security"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Security</PageTitle>
+
+<div class="security-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Security
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="security-hero">
+        <div class="container">
+            <div class="security-hero-content">
+                <div class="security-badge">🔒 Your Security Matters</div>
+                <h1>Security <span class="gradient-text">Commitment</span></h1>
+                <p>How we protect your financial data and keep your information safe.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    SECURITY OVERVIEW
+    ============================================ -->
+    <section class="security-overview">
+        <div class="container">
+            <div class="security-stats-grid">
+                <div class="security-stat">
+                    <div class="security-stat-number">256-bit</div>
+                    <div class="security-stat-label">Encryption</div>
+                    <p>Industry-standard AES encryption for all data</p>
+                </div>
+                <div class="security-stat">
+                    <div class="security-stat-number">24/7</div>
+                    <div class="security-stat-label">Monitoring</div>
+                    <p>Continuous security monitoring and threat detection</p>
+                </div>
+                <div class="security-stat">
+                    <div class="security-stat-number">99.9%</div>
+                    <div class="security-stat-label">Uptime</div>
+                    <p>Reliable infrastructure with redundant systems</p>
+                </div>
+                <div class="security-stat">
+                    <div class="security-stat-number">SOC 2</div>
+                    <div class="security-stat-label">Compliant</div>
+                    <p>Following industry security best practices</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    SECURITY CONTENT
+    ============================================ -->
+    <section class="security-content">
+        <div class="container">
+            <div class="security-card">
+                <!-- Table of Contents -->
+                <div class="toc-section">
+                    <h2>Table of Contents</h2>
+                    <ul class="toc-list">
+                        <li><a href="#section-1">1. Encryption Standards</a></li>
+                        <li><a href="#section-2">2. Authentication & Access Control</a></li>
+                        <li><a href="#section-3">3. Data Protection</a></li>
+                        <li><a href="#section-4">4. Infrastructure Security</a></li>
+                        <li><a href="#section-5">5. Security Best Practices</a></li>
+                        <li><a href="#section-6">6. Incident Response</a></li>
+                        <li><a href="#section-7">7. Third-Party Security</a></li>
+                        <li><a href="#section-8">8. Vulnerability Management</a></li>
+                        <li><a href="#section-9">9. Compliance & Certifications</a></li>
+                        <li><a href="#section-10">10. Security Tips for Users</a></li>
+                        <li><a href="#section-11">11. Contact Security Team</a></li>
+                    </ul>
+                </div>
+
+                <!-- Section 1 -->
+                <div id="section-1" class="security-section">
+                    <h2>1. Encryption Standards</h2>
+                    <p>SmartBudget uses industry-leading encryption to protect your data at every stage:</p>
+                    
+                    <div class="encryption-grid">
+                        <div class="encryption-item">
+                            <div class="encryption-icon"><i class="bi bi-lock-fill"></i></div>
+                            <div>
+                                <h4>Data at Rest</h4>
+                                <p>All stored data is encrypted using AES-256 encryption, the same standard used by banks and government agencies.</p>
+                                <span class="encryption-badge">AES-256</span>
+                            </div>
+                        </div>
+                        <div class="encryption-item">
+                            <div class="encryption-icon"><i class="bi bi-shield-lock-fill"></i></div>
+                            <div>
+                                <h4>Data in Transit</h4>
+                                <p>All data transmitted between your device and our servers is encrypted with TLS 1.2+ (Transport Layer Security).</p>
+                                <span class="encryption-badge">TLS 1.2+</span>
+                            </div>
+                        </div>
+                        <div class="encryption-item">
+                            <div class="encryption-icon"><i class="bi bi-key-fill"></i></div>
+                            <div>
+                                <h4>Key Management</h4>
+                                <p>Encryption keys are securely managed with strict access controls and regular rotation.</p>
+                                <span class="encryption-badge">Secure</span>
+                            </div>
+                        </div>
+                        <div class="encryption-item">
+                            <div class="encryption-icon"><i class="bi bi-file-lock-fill"></i></div>
+                            <div>
+                                <h4>End-to-End Encryption</h4>
+                                <p>Your financial data is encrypted before it leaves your device and remains encrypted until it reaches our secure servers.</p>
+                                <span class="encryption-badge">End-to-End</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div id="section-2" class="security-section">
+                    <h2>2. Authentication & Access Control</h2>
+                    <p>Multiple layers of authentication protect your account:</p>
+                    
+                    <div class="auth-grid">
+                        <div class="auth-item">
+                            <div class="auth-icon"><i class="bi bi-person-check"></i></div>
+                            <h4>Strong Password Requirements</h4>
+                            <ul>
+                                <li>Minimum 8 characters</li>
+                                <li>Requires uppercase and lowercase letters</li>
+                                <li>Must include at least one number</li>
+                                <li>No common or easily guessable passwords</li>
+                            </ul>
+                        </div>
+                        <div class="auth-item">
+                            <div class="auth-icon"><i class="bi bi-shield-check"></i></div>
+                            <h4>Multi-Factor Authentication</h4>
+                            <ul>
+                                <li>Two-factor authentication (2FA) support</li>
+                                <li>Email verification for new logins</li>
+                                <li>Device recognition</li>
+                                <li>Optional authenticator app integration</li>
+                            </ul>
+                        </div>
+                        <div class="auth-item">
+                            <div class="auth-icon"><i class="bi bi-clock-history"></i></div>
+                            <h4>Session Management</h4>
+                            <ul>
+                                <li>Automatic session timeout after inactivity</li>
+                                <li>Ability to view and manage active sessions</li>
+                                <li>Remote logout for all devices</li>
+                                <li>Secure cookie handling</li>
+                            </ul>
+                        </div>
+                        <div class="auth-item">
+                            <div class="auth-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                            <h4>Login Protection</h4>
+                            <ul>
+                                <li>Rate limiting on login attempts</li>
+                                <li>Account lockout after failed attempts</li>
+                                <li>CAPTCHA protection for suspicious activity</li>
+                                <li>Email alerts for new device logins</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-shield-check"></i>
+                        <div>
+                            <p><strong>Recommendation:</strong> We strongly recommend enabling Two-Factor Authentication (2FA) for an extra layer of security on your account.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div id="section-3" class="security-section">
+                    <h2>3. Data Protection</h2>
+                    <p>We implement comprehensive data protection measures:</p>
+                    
+                    <div class="data-protection-grid">
+                        <div class="data-protection-item">
+                            <h4><i class="bi bi-database"></i> Data Isolation</h4>
+                            <p>Your data is stored in isolated, secure databases with strict access controls. No one can access your data without proper authorization.</p>
+                        </div>
+                        <div class="data-protection-item">
+                            <h4><i class="bi bi-clock-history"></i> Regular Backups</h4>
+                            <p>Automated, encrypted backups are performed daily to ensure data recovery in case of any incident. Backups are stored in secure locations.</p>
+                        </div>
+                        <div class="data-protection-item">
+                            <h4><i class="bi bi-trash"></i> Secure Deletion</h4>
+                            <p>When you delete data, it's securely wiped and cannot be recovered. We follow strict data destruction protocols.</p>
+                        </div>
+                        <div class="data-protection-item">
+                            <h4><i class="bi bi-shield-lock"></i> Data Minimization</h4>
+                            <p>We only collect and store data that's essential for providing our services. We never store unnecessary personal information.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4 -->
+                <div id="section-4" class="security-section">
+                    <h2>4. Infrastructure Security</h2>
+                    <p>Our infrastructure is designed with security at its core:</p>
+                    
+                    <div class="infrastructure-grid">
+                        <div class="infrastructure-item">
+                            <i class="bi bi-server"></i>
+                            <div>
+                                <h4>Secure Cloud Hosting</h4>
+                                <p>Hosted on enterprise-grade cloud infrastructure with built-in security features and DDoS protection.</p>
+                            </div>
+                        </div>
+                        <div class="infrastructure-item">
+                            <i class="bi bi-shield-plus"></i>
+                            <div>
+                                <h4>Network Security</h4>
+                                <p>Multiple layers of network security including firewalls, intrusion detection, and traffic monitoring.</p>
+                            </div>
+                        </div>
+                        <div class="infrastructure-item">
+                            <i class="bi bi-eye-slash"></i>
+                            <div>
+                                <h4>Access Controls</h4>
+                                <p>Strict access controls with principle of least privilege. Only authorized personnel have access to infrastructure.</p>
+                            </div>
+                        </div>
+                        <div class="infrastructure-item">
+                            <i class="bi bi-graph-up"></i>
+                            <div>
+                                <h4>Continuous Monitoring</h4>
+                                <p>24/7 automated monitoring with real-time alerts for any suspicious activity or potential threats.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5 -->
+                <div id="section-5" class="security-section">
+                    <h2>5. Security Best Practices</h2>
+                    <p>We follow industry-standard security practices:</p>
+                    
+                    <div class="best-practices">
+                        <div class="practice-item">
+                            <span class="practice-number">01</span>
+                            <div>
+                                <h4>Security by Design</h4>
+                                <p>Security is integrated into every stage of development, from design to deployment.</p>
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-number">02</span>
+                            <div>
+                                <h4>Regular Security Audits</h4>
+                                <p>Independent security audits and penetration testing are conducted regularly.</p>
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-number">03</span>
+                            <div>
+                                <h4>Secure Development</h4>
+                                <p>Developers follow secure coding practices with code reviews and security testing.</p>
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-number">04</span>
+                            <div>
+                                <h4>Employee Training</h4>
+                                <p>All employees undergo regular security awareness training.</p>
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-number">05</span>
+                            <div>
+                                <h4>Incident Response Plan</h4>
+                                <p>A comprehensive incident response plan is in place and regularly tested.</p>
+                            </div>
+                        </div>
+                        <div class="practice-item">
+                            <span class="practice-number">06</span>
+                            <div>
+                                <h4>Vendor Security</h4>
+                                <p>Third-party vendors are vetted for security compliance and best practices.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6 -->
+                <div id="section-6" class="security-section">
+                    <h2>6. Incident Response</h2>
+                    <p>We have a robust incident response framework:</p>
+                    
+                    <div class="incident-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-number">1</div>
+                            <div class="timeline-content">
+                                <h4>Detection</h4>
+                                <p>Continuous monitoring systems detect potential security incidents in real-time.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number">2</div>
+                            <div class="timeline-content">
+                                <h4>Containment</h4>
+                                <p>Immediate action is taken to contain and isolate any potential threat.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number">3</div>
+                            <div class="timeline-content">
+                                <h4>Investigation</h4>
+                                <p>Security experts investigate to determine the scope and impact of the incident.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number">4</div>
+                            <div class="timeline-content">
+                                <h4>Resolution</h4>
+                                <p>Incident is resolved, and measures are implemented to prevent future occurrences.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-number">5</div>
+                            <div class="timeline-content">
+                                <h4>Communication</h4>
+                                <p>Affected users are notified promptly and transparently about any security incidents.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-bell"></i>
+                        <div>
+                            <p><strong>Reporting:</strong> If you suspect any security issue, please contact us immediately at <a href="mailto:security@smartbudget.com">security@smartbudget.com</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 7 -->
+                <div id="section-7" class="security-section">
+                    <h2>7. Third-Party Security</h2>
+                    <p>We carefully vet all third-party services and vendors:</p>
+                    
+                    <div class="third-party-grid">
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-cloud-check"></i></div>
+                            <div>
+                                <h4>Render</h4>
+                                <p>Hosting provider with SOC 2 compliance and enterprise-grade security</p>
+                                <span class="third-party-status secure">✓ Secure</span>
+                            </div>
+                        </div>
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-database-check"></i></div>
+                            <div>
+                                <h4>PostgreSQL</h4>
+                                <p>Secure database with encryption and access controls</p>
+                                <span class="third-party-status secure">✓ Secure</span>
+                            </div>
+                        </div>
+                        <div class="third-party-item">
+                            <div class="third-party-icon"><i class="bi bi-shield-check"></i></div>
+                            <div>
+                                <h4>Chart.js</h4>
+                                <p>Client-side library with no data collection or storage</p>
+                                <span class="third-party-status secure">✓ Secure</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <i class="bi bi-link"></i>
+                        <div>
+                            <p><strong>Third-Party Security:</strong> All third-party services are reviewed for security compliance and data protection practices.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 8 -->
+                <div id="section-8" class="security-section">
+                    <h2>8. Vulnerability Management</h2>
+                    <p>We take a proactive approach to identifying and addressing vulnerabilities:</p>
+                    
+                    <ul>
+                        <li><strong>Regular Scanning:</strong> Automated vulnerability scans are performed daily on all systems</li>
+                        <li><strong>Penetration Testing:</strong> Regular penetration tests by certified security professionals</li>
+                        <li><strong>Bug Bounty Program:</strong> We have a responsible disclosure program for security researchers</li>
+                        <li><strong>Patch Management:</strong> Security patches are applied promptly after testing</li>
+                        <li><strong>Dependency Monitoring:</strong> All third-party dependencies are monitored for known vulnerabilities</li>
+                    </ul>
+
+                    <div class="warning-box">
+                        <i class="bi bi-bug"></i>
+                        <div>
+                            <p><strong>Responsible Disclosure:</strong> If you discover a security vulnerability, please contact us at <a href="mailto:security@smartbudget.com" style="color:#FCA5A5;">security@smartbudget.com</a>. We appreciate your help in keeping SmartBudget secure.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 9 -->
+                <div id="section-9" class="security-section">
+                    <h2>9. Compliance & Certifications</h2>
+                    <p>We adhere to industry standards and regulations:</p>
+                    
+                    <div class="compliance-grid">
+                        <div class="compliance-item">
+                            <div class="compliance-icon"><i class="bi bi-shield-check"></i></div>
+                            <h4>GDPR Compliant</h4>
+                            <p>Data protection compliant with GDPR regulations for European users</p>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-icon"><i class="bi bi-lock"></i></div>
+                            <h4>Data Protection Act</h4>
+                            <p>Compliant with local and international data protection laws</p>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-icon"><i class="bi bi-file-check"></i></div>
+                            <h4>Industry Standards</h4>
+                            <p>Following industry best practices for financial data security</p>
+                        </div>
+                        <div class="compliance-item">
+                            <div class="compliance-icon"><i class="bi bi-shield-shaded"></i></div>
+                            <h4>PCI-DSS Aligned</h4>
+                            <p>Security practices aligned with Payment Card Industry standards</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 10 -->
+                <div id="section-10" class="security-section">
+                    <h2>10. Security Tips for Users</h2>
+                    <p>Help us keep your account secure by following these best practices:</p>
+                    
+                    <div class="tips-grid">
+                        <div class="tip-item">
+                            <div class="tip-number">🔑</div>
+                            <div>
+                                <h4>Use Strong Passwords</h4>
+                                <p>Create unique, complex passwords and avoid using the same password across multiple sites.</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-number">📱</div>
+                            <div>
+                                <h4>Enable 2FA</h4>
+                                <p>Two-Factor Authentication adds an extra layer of security to your account.</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-number">🔒</div>
+                            <div>
+                                <h4>Keep Software Updated</h4>
+                                <p>Regularly update your browser and operating system for the latest security patches.</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-number">⚠️</div>
+                            <div>
+                                <h4>Be Cautious with Links</h4>
+                                <p>Never click on suspicious links or download attachments from unknown sources.</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-number">🔐</div>
+                            <div>
+                                <h4>Use a Password Manager</h4>
+                                <p>Password managers help you create and securely store strong, unique passwords.</p>
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-number">📧</div>
+                            <div>
+                                <h4>Watch for Phishing</h4>
+                                <p>SmartBudget will never ask for your password via email. Always verify the sender.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 11 -->
+                <div id="section-11" class="security-section">
+                    <h2>11. Contact Security Team</h2>
+                    <p>Have questions or concerns about security? Reach out to our security team:</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <strong>Security Email:</strong>
+                                <a href="mailto:security@smartbudget.com">security@smartbudget.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-shield-lock"></i>
+                            <div>
+                                <strong>Report a Vulnerability:</strong>
+                                <a href="mailto:security@smartbudget.com">security@smartbudget.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Response Time:</strong>
+                                <span>Security issues are prioritized and responded to within 24 hours</span>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-lock"></i>
+                            <div>
+                                <strong>Encrypted Communication:</strong>
+                                <span>PGP keys are available for sensitive security communications</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="security-banner">
+                        <i class="bi bi-shield-check"></i>
+                        <div>
+                            <h3>Your Security is Our Priority</h3>
+                            <p>We're committed to continuously improving our security measures and protecting your data.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="security-footer">
+        <div class="container">
+            <div class="security-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="security-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
+                    <a href="/cookies">Cookie Policy</a>
+                    <a href="/security">Security</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .security-page {
+        background: #0B1120;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .breadcrumb-container {
+        padding: .75rem 0;
+        background: transparent;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all .2s ease;
+        padding: .25rem .5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: .65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: .25rem .5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .security-hero {
+        padding: 3rem 0 2rem;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        text-align: center;
+    }
+
+    .security-hero-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .security-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: .4rem 1.2rem;
+        border-radius: 20px;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .security-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: .5rem;
+        line-height: 1.2;
+    }
+
+    .security-hero .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .security-hero p {
+        font-size: 1rem;
+        color: #94A3B8;
+        margin-top: .5rem;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .security-overview {
+        padding: 2rem 0;
+        background: #111827;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .security-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .security-stat {
+        text-align: center;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .security-stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10B981;
+    }
+
+    .security-stat-label {
+        font-size: .8rem;
+        font-weight: 600;
+        color: #F1F5F9;
+        margin: .25rem 0;
+    }
+
+    .security-stat p {
+        font-size: .75rem;
+        color: #94A3B8;
+        margin: 0;
+    }
+
+    .security-content {
+        padding: 2.5rem 0;
+        background: #0B1120;
+    }
+
+    .security-card {
+        background: #1E293B;
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .toc-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .toc-section h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem 1.5rem;
+    }
+
+    .toc-list li a {
+        color: #94A3B8;
+        text-decoration: none;
+        font-size: .85rem;
+        transition: color .2s ease;
+        display: block;
+        padding: .25rem 0;
+    }
+
+    .toc-list li a:hover {
+        color: #10B981;
+    }
+
+    .security-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .security-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .security-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .security-section h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #E2E8F0;
+        margin-top: 1.25rem;
+        margin-bottom: .5rem;
+    }
+
+    .security-section p {
+        color: #94A3B8;
+        font-size: .95rem;
+        line-height: 1.7;
+        margin-bottom: .75rem;
+    }
+
+    .security-section ul {
+        color: #94A3B8;
+        font-size: .9rem;
+        line-height: 1.6;
+        padding-left: 1.5rem;
+        margin-bottom: .75rem;
+    }
+
+    .security-section ul li {
+        margin-bottom: .25rem;
+    }
+
+    .info-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        margin: 1rem 0;
+    }
+
+    .info-box i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .info-box p {
+        color: #94A3B8;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .info-box a {
+        color: #10B981;
+        text-decoration: none;
+    }
+
+    .info-box a:hover {
+        text-decoration: underline;
+    }
+
+    .warning-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(239, 68, 68, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(239, 68, 68, 0.15);
+        margin: 1rem 0;
+    }
+
+    .warning-box i {
+        font-size: 1.25rem;
+        color: #EF4444;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .warning-box p {
+        color: #FCA5A5;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .warning-box a {
+        color: #FCA5A5;
+        text-decoration: underline;
+    }
+
+    .encryption-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .encryption-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .encryption-icon {
+        font-size: 1.5rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .encryption-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .encryption-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0 0 .5rem 0;
+    }
+
+    .encryption-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10B981;
+        padding: .1rem .6rem;
+        border-radius: 12px;
+        font-size: .6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .auth-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .auth-item {
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .auth-icon {
+        font-size: 1.5rem;
+        color: #10B981;
+        margin-bottom: .5rem;
+    }
+
+    .auth-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .auth-item ul {
+        font-size: .8rem;
+        padding-left: 1.25rem;
+        margin: 0;
+    }
+
+    .auth-item ul li {
+        margin-bottom: .15rem;
+    }
+
+    .data-protection-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .data-protection-item {
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .data-protection-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .data-protection-item h4 i {
+        color: #10B981;
+        margin-right: .3rem;
+    }
+
+    .data-protection-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .infrastructure-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .infrastructure-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .infrastructure-item i {
+        font-size: 1.5rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .infrastructure-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .infrastructure-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .best-practices {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+        margin: 1rem 0;
+    }
+
+    .practice-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        align-items: flex-start;
+    }
+
+    .practice-number {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #10B981;
+        flex-shrink: 0;
+        min-width: 2rem;
+    }
+
+    .practice-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .practice-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+    }
+
+    .incident-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        margin: 1rem 0;
+    }
+
+    .timeline-item {
+        display: flex;
+        gap: 1rem;
+        padding: .75rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        align-items: center;
+    }
+
+    .timeline-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #10B981;
+        color: #0B1120;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: .8rem;
+        flex-shrink: 0;
+    }
+
+    .timeline-content h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin: 0 0 .1rem 0;
+    }
+
+    .timeline-content p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+    }
+
+    .third-party-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .third-party-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .third-party-icon {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .third-party-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .third-party-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0 0 .25rem 0;
+    }
+
+    .third-party-status {
+        font-size: .65rem;
+        font-weight: 600;
+        padding: .05rem .5rem;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    .third-party-status.secure {
+        color: #34D399;
+        background: rgba(52, 211, 153, 0.1);
+    }
+
+    .compliance-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .compliance-item {
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        text-align: center;
+    }
+
+    .compliance-icon {
+        font-size: 1.5rem;
+        color: #10B981;
+        margin-bottom: .5rem;
+    }
+
+    .compliance-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .compliance-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .tips-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .75rem;
+        margin: 1rem 0;
+    }
+
+    .tip-item {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        align-items: flex-start;
+    }
+
+    .tip-number {
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .tip-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .1rem;
+    }
+
+    .tip-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+    }
+
+    .contact-details {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: .75rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .contact-item i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .contact-item div {
+        display: flex;
+        flex-direction: column;
+        gap: .1rem;
+    }
+
+    .contact-item strong {
+        color: #94A3B8;
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .contact-item a,
+    .contact-item span {
+        color: #F1F5F9;
+        font-size: .9rem;
+        text-decoration: none;
+    }
+
+    .contact-item a:hover {
+        color: #10B981;
+    }
+
+    .security-banner {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 12px;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        align-items: flex-start;
+    }
+
+    .security-banner i {
+        font-size: 2rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .security-banner h3 {
+        color: #F1F5F9;
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .security-banner p {
+        color: #94A3B8;
+        font-size: .9rem;
+        margin: 0;
+    }
+
+    .security-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .security-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .security-footer-content p {
+        color: #64748B;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .security-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .security-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: .8rem;
+        transition: color .2s ease;
+    }
+
+    .security-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .toc-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .encryption-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .auth-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .data-protection-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .infrastructure-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .best-practices {
+            grid-template-columns: 1fr;
+        }
+        
+        .third-party-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .compliance-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .tips-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .security-page {
+            padding-top: 70px;
+        }
+        
+        .security-hero {
+            padding: 2rem 0 1.5rem;
+        }
+        
+        .security-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+        
+        .security-stats-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .encryption-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .infrastructure-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .third-party-item {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .contact-item {
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .security-banner {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+        }
+        
+        .security-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .security-footer-links {
+            justify-content: center;
+        }
+        
+        .timeline-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .security-hero h1 {
+            font-size: 1.8rem;
+        }
+        
+        .security-card {
+            padding: 1rem;
+        }
+        
+        .security-section h2 {
+            font-size: 1.2rem;
+        }
+        
+        .security-stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .breadcrumb-item.active {
+            font-size: .7rem;
+            padding: .15rem .4rem;
+        }
+        
+        .breadcrumb-item a span {
+            display: none;
+        }
+        
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+        
+        .toc-list li a {
+            font-size: .75rem;
+        }
+        
+        .practice-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .tip-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "security";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "security");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

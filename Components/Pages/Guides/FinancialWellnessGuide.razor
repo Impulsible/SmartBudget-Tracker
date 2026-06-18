@@ -1,0 +1,94 @@
+@page "/guides/financial-wellness-guide"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - Financial Wellness: Reduce Money Stress</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">Financial Wellness</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Saving</span>
+                <h1>Financial Wellness: Reduce Money Stress</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 10 min read</span>
+                    <span><i class="bi bi-file-text"></i> Beginner</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Financial stress affects your mental and physical health. This guide will help you improve your financial wellness and reduce money stress.</p>
+
+                <h2>What is Financial Wellness?</h2>
+                <p>Financial wellness means having a healthy relationship with money. It includes:</p>
+                <ul>
+                    <li>Feeling in control of your finances</li>
+                    <li>Having a financial plan</li>
+                    <li>Feeling confident about your financial decisions</li>
+                    <li>Having a safety net for emergencies</li>
+                </ul>
+
+                <h2>Signs of Financial Stress</h2>
+                <ul>
+                    <li>Constantly worrying about money</li>
+                    <li>Avoiding looking at your bank account</li>
+                    <li>Difficulty sleeping due to financial concerns</li>
+                    <li>Using credit cards for necessities</li>
+                    <li>Feeling overwhelmed by debt</li>
+                </ul>
+
+                <h2>How to Reduce Financial Stress</h2>
+                <h3>1. Know Your Numbers</h3>
+                <p>Track your income and expenses. Use SmartBudget to get a clear picture of your finances.</p>
+
+                <h3>2. Create a Budget</h3>
+                <p>A budget gives you control. It helps you plan and avoid surprises.</p>
+
+                <h3>3. Build an Emergency Fund</h3>
+                <p>Having a financial safety net reduces anxiety about unexpected expenses.</p>
+
+                <h3>4. Get Professional Help</h3>
+                <p>Consider working with a financial advisor or credit counselor.</p>
+
+                <h3>5. Practice Self-Care</h3>
+                <ul>
+                    <li>Exercise regularly</li>
+                    <li>Practice mindfulness and meditation</li>
+                    <li>Talk to someone about your financial concerns</li>
+                    <li>Take breaks from financial planning</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Reduce Your Financial Stress</h3>
+                    <p>Take control of your finances with SmartBudget.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+    </div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

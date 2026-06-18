@@ -1,0 +1,936 @@
+@page "/privacy"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+
+<PageTitle>SmartBudget - Privacy Policy</PageTitle>
+
+<div class="privacy-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Privacy Policy
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="privacy-hero">
+        <div class="container">
+            <div class="privacy-hero-content">
+                <div class="privacy-badge">🔒 Your Privacy Matters</div>
+                <h1>Privacy <span class="gradient-text">Policy</span></h1>
+                <p>Last updated: @DateTime.Now.ToString("MMMM dd, yyyy")</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    PRIVACY CONTENT
+    ============================================ -->
+    <section class="privacy-content">
+        <div class="container">
+            <div class="privacy-card">
+                <!-- Table of Contents -->
+                <div class="toc-section">
+                    <h2>Table of Contents</h2>
+                    <ul class="toc-list">
+                        <li><a href="#section-1">1. Information We Collect</a></li>
+                        <li><a href="#section-2">2. How We Use Your Information</a></li>
+                        <li><a href="#section-3">3. Data Storage and Security</a></li>
+                        <li><a href="#section-4">4. Data Sharing and Disclosure</a></li>
+                        <li><a href="#section-5">5. Your Rights</a></li>
+                        <li><a href="#section-6">6. Cookies and Tracking</a></li>
+                        <li><a href="#section-7">7. Data Retention</a></li>
+                        <li><a href="#section-8">8. Children's Privacy</a></li>
+                        <li><a href="#section-9">9. Changes to This Policy</a></li>
+                        <li><a href="#section-10">10. Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Section 1 -->
+                <div id="section-1" class="policy-section">
+                    <h2>1. Information We Collect</h2>
+                    <p>SmartBudget collects information to provide and improve our financial management services. We collect the following types of information:</p>
+                    
+                    <h3>1.1 Personal Information</h3>
+                    <ul>
+                        <li><strong>Account Information:</strong> Name, email address, and password when you create an account</li>
+                        <li><strong>Profile Information:</strong> Optional profile details you choose to provide</li>
+                        <li><strong>Financial Data:</strong> Income, expenses, budget categories, savings goals, and transaction history</li>
+                        <li><strong>Communication:</strong> Correspondence with our support team</li>
+                    </ul>
+
+                    <h3>1.2 Usage Information</h3>
+                    <ul>
+                        <li><strong>Log Data:</strong> IP address, browser type, pages visited, and time spent on the site</li>
+                        <li><strong>Device Information:</strong> Device type, operating system, and screen resolution</li>
+                        <li><strong>Feature Usage:</strong> How you interact with different features of the app</li>
+                    </ul>
+                </div>
+
+                <!-- Section 2 -->
+                <div id="section-2" class="policy-section">
+                    <h2>2. How We Use Your Information</h2>
+                    <p>We use your information to provide, improve, and personalize our services:</p>
+                    
+                    <div class="use-grid">
+                        <div class="use-item">
+                            <i class="bi bi-shield-check"></i>
+                            <div>
+                                <h4>Service Delivery</h4>
+                                <p>Process transactions, track budgets, and provide financial insights</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-graph-up"></i>
+                            <div>
+                                <h4>Improvement</h4>
+                                <p>Analyze usage patterns to enhance features and user experience</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <h4>Communication</h4>
+                                <p>Send important updates, security alerts, and support responses</p>
+                            </div>
+                        </div>
+                        <div class="use-item">
+                            <i class="bi bi-shield-lock"></i>
+                            <div>
+                                <h4>Security</h4>
+                                <p>Protect against fraud, unauthorized access, and abuse</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div id="section-3" class="policy-section">
+                    <h2>3. Data Storage and Security</h2>
+                    <p>We take data security seriously and implement multiple layers of protection:</p>
+                    
+                    <div class="security-grid">
+                        <div class="security-item">
+                            <div class="security-icon"><i class="bi bi-lock"></i></div>
+                            <h4>Encryption</h4>
+                            <p>All data is encrypted at rest and in transit using industry-standard encryption (AES-256 and TLS 1.2+)</p>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-icon"><i class="bi bi-server"></i></div>
+                            <h4>Secure Infrastructure</h4>
+                            <p>Data is hosted on secure, enterprise-grade cloud infrastructure with regular security audits</p>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-icon"><i class="bi bi-person-badge"></i></div>
+                            <h4>Access Control</h4>
+                            <p>Strict access controls with multi-factor authentication for administrative access</p>
+                        </div>
+                        <div class="security-item">
+                            <div class="security-icon"><i class="bi bi-clock"></i></div>
+                            <h4>Regular Backups</h4>
+                            <p>Automated, encrypted backups with point-in-time recovery capabilities</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4 -->
+                <div id="section-4" class="policy-section">
+                    <h2>4. Data Sharing and Disclosure</h2>
+                    <p>We do not sell, trade, or rent your personal information. Your data is shared only in these limited circumstances:</p>
+                    <ul>
+                        <li><strong>Service Providers:</strong> Trusted third parties who assist in operating our service (hosting, email delivery, analytics)</li>
+                        <li><strong>Legal Requirements:</strong> When required by law, court order, or government regulation</li>
+                        <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or asset sale</li>
+                        <li><strong>Your Consent:</strong> When you have explicitly given us permission to share</li>
+                    </ul>
+                    <div class="info-box">
+                        <i class="bi bi-info-circle"></i>
+                        <p><strong>Third-Party Services:</strong> We use the following third-party services that may process your data:</p>
+                        <ul>
+                            <li>Render (Hosting)</li>
+                            <li>PostgreSQL (Database)</li>
+                            <li>Chart.js (Analytics visualization)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 5 -->
+                <div id="section-5" class="policy-section">
+                    <h2>5. Your Rights</h2>
+                    <p>Depending on your location, you have the following rights regarding your personal data:</p>
+                    
+                    <div class="rights-grid">
+                        <div class="right-item">
+                            <h4><i class="bi bi-eye"></i> Right to Access</h4>
+                            <p>Request a copy of the personal data we hold about you</p>
+                        </div>
+                        <div class="right-item">
+                            <h4><i class="bi bi-pencil"></i> Right to Rectify</h4>
+                            <p>Correct inaccurate or incomplete data</p>
+                        </div>
+                        <div class="right-item">
+                            <h4><i class="bi bi-trash"></i> Right to Delete</h4>
+                            <p>Request deletion of your personal data</p>
+                        </div>
+                        <div class="right-item">
+                            <h4><i class="bi bi-file-earmark-arrow-down"></i> Right to Export</h4>
+                            <p>Receive your data in a portable format</p>
+                        </div>
+                        <div class="right-item">
+                            <h4><i class="bi bi-sliders"></i> Right to Object</h4>
+                            <p>Object to processing of your data for specific purposes</p>
+                        </div>
+                        <div class="right-item">
+                            <h4><i class="bi bi-x-circle"></i> Right to Withdraw</h4>
+                            <p>Withdraw consent at any time</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <i class="bi bi-envelope"></i>
+                        <p><strong>Exercising Your Rights:</strong> To exercise any of these rights, contact us at <a href="mailto:privacy@smartbudget.com">privacy@smartbudget.com</a></p>
+                    </div>
+                </div>
+
+                <!-- Section 6 -->
+                <div id="section-6" class="policy-section">
+                    <h2>6. Cookies and Tracking</h2>
+                    <p>We use cookies and similar tracking technologies to enhance your experience:</p>
+                    
+                    <div class="cookie-table">
+                        <div class="cookie-row header">
+                            <span>Type</span>
+                            <span>Purpose</span>
+                            <span>Duration</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span>Essential</span>
+                            <span>Authentication, session management, security</span>
+                            <span>Session / 30 days</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span>Preferences</span>
+                            <span>Remember user preferences and settings</span>
+                            <span>1 year</span>
+                        </div>
+                        <div class="cookie-row">
+                            <span>Analytics</span>
+                            <span>Understand how users interact with the app</span>
+                            <span>1 year</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-box">
+                        <i class="bi bi-sliders2"></i>
+                        <p><strong>Cookie Control:</strong> You can manage your cookie preferences in your browser settings. Note that disabling essential cookies may affect functionality.</p>
+                    </div>
+                </div>
+
+                <!-- Section 7 -->
+                <div id="section-7" class="policy-section">
+                    <h2>7. Data Retention</h2>
+                    <p>We retain your data for as long as your account is active or as needed to provide services:</p>
+                    <ul>
+                        <li><strong>Active Accounts:</strong> All data is retained while your account is active</li>
+                        <li><strong>Closed Accounts:</strong> Data is retained for up to 30 days after account closure, then permanently deleted</li>
+                        <li><strong>Legal Obligations:</strong> Some data may be retained longer to comply with legal requirements</li>
+                        <li><strong>Anonymized Data:</strong> Aggregated, non-identifiable data may be retained for analytics</li>
+                    </ul>
+                </div>
+
+                <!-- Section 8 -->
+                <div id="section-8" class="policy-section">
+                    <h2>8. Children's Privacy</h2>
+                    <p>SmartBudget is not intended for children under the age of 13. We do not knowingly collect personal information from children under 13.</p>
+                    <ul>
+                        <li>We do not market our services to children</li>
+                        <li>We do not knowingly collect data from children</li>
+                        <li>If you believe we have collected data from a child, please contact us immediately</li>
+                    </ul>
+                    <div class="info-box">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <p><strong>Parental Consent:</strong> Users between 13-18 years old must have parental consent to use SmartBudget.</p>
+                    </div>
+                </div>
+
+                <!-- Section 9 -->
+                <div id="section-9" class="policy-section">
+                    <h2>9. Changes to This Policy</h2>
+                    <p>We may update this privacy policy periodically to reflect changes in our practices or legal requirements:</p>
+                    <ul>
+                        <li><strong>Notification:</strong> We will notify you of significant changes via email or in-app notification</li>
+                        <li><strong>Review:</strong> We encourage you to review this policy periodically</li>
+                        <li><strong>Effective Date:</strong> The effective date of the current policy is shown at the top of this page</li>
+                    </ul>
+                </div>
+
+                <!-- Section 10 -->
+                <div id="section-10" class="policy-section">
+                    <h2>10. Contact Us</h2>
+                    <p>If you have questions, concerns, or requests regarding this privacy policy or your personal data, please contact us:</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="bi bi-envelope"></i>
+                            <div>
+                                <strong>Email:</strong>
+                                <a href="mailto:privacy@smartbudget.com">privacy@smartbudget.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-globe"></i>
+                            <div>
+                                <strong>Website:</strong>
+                                <a href="https://smartbudget-tracker.onrender.com">https://smartbudget-tracker.onrender.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Response Time:</strong>
+                                <span>We respond to all privacy inquiries within 48 hours</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="privacy-footer">
+        <div class="container">
+            <div class="privacy-footer-content">
+                <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                <div class="privacy-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/privacy">Privacy Policy</a>
+                    <a href="/terms">Terms of Service</a>
+                    <a href="/contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .privacy-page {
+        background: #0B1120;
+        min-height: 100vh;
+        padding-top: 80px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .breadcrumb-container {
+        padding: .75rem 0;
+        background: transparent;
+    }
+
+    .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
+    }
+
+    .breadcrumb-item {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        font-size: .85rem;
+        color: #94A3B8;
+    }
+
+    .breadcrumb-item a {
+        display: flex;
+        align-items: center;
+        gap: .4rem;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all .2s ease;
+        padding: .25rem .5rem;
+        border-radius: 6px;
+    }
+
+    .breadcrumb-item a:hover {
+        color: #10B981;
+        background: rgba(16, 185, 129, 0.08);
+    }
+
+    .breadcrumb-item i.bi-chevron-right {
+        color: #64748B;
+        font-size: .65rem;
+    }
+
+    .breadcrumb-item.active {
+        color: #F1F5F9;
+        font-weight: 500;
+        padding: .25rem .5rem;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 6px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+    }
+
+    .privacy-hero {
+        padding: 3rem 0 2rem;
+        background: linear-gradient(135deg, #0B1120 0%, #111827 50%, #1A2332 100%);
+        text-align: center;
+    }
+
+    .privacy-hero-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .privacy-badge {
+        display: inline-block;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10B981;
+        padding: .4rem 1.2rem;
+        border-radius: 20px;
+        font-size: .8rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+    }
+
+    .privacy-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: .5rem;
+        line-height: 1.2;
+    }
+
+    .privacy-hero .gradient-text {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    .privacy-hero p {
+        font-size: 1rem;
+        color: #94A3B8;
+        margin-top: .5rem;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .privacy-content {
+        padding: 2.5rem 0;
+        background: #0B1120;
+    }
+
+    .privacy-card {
+        background: #1E293B;
+        border-radius: 20px;
+        padding: 2.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .toc-section {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .toc-section h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+    }
+
+    .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .5rem 1.5rem;
+    }
+
+    .toc-list li a {
+        color: #94A3B8;
+        text-decoration: none;
+        font-size: .85rem;
+        transition: color .2s ease;
+        display: block;
+        padding: .25rem 0;
+    }
+
+    .toc-list li a:hover {
+        color: #10B981;
+    }
+
+    .policy-section {
+        margin-bottom: 2.5rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .policy-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .policy-section h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #F1F5F9;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+    }
+
+    .policy-section h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #E2E8F0;
+        margin-top: 1.25rem;
+        margin-bottom: .5rem;
+    }
+
+    .policy-section p {
+        color: #94A3B8;
+        font-size: .95rem;
+        line-height: 1.7;
+        margin-bottom: .75rem;
+    }
+
+    .policy-section ul {
+        color: #94A3B8;
+        font-size: .9rem;
+        line-height: 1.6;
+        padding-left: 1.5rem;
+        margin-bottom: .75rem;
+    }
+
+    .policy-section ul li {
+        margin-bottom: .25rem;
+    }
+
+    .use-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .use-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .use-item i {
+        font-size: 1.5rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .use-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .2rem;
+    }
+
+    .use-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .security-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .security-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+        transition: all .3s ease;
+    }
+
+    .security-item:hover {
+        transform: translateY(-2px);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .security-icon {
+        font-size: 2rem;
+        color: #10B981;
+        margin-bottom: .5rem;
+    }
+
+    .security-item h4 {
+        color: #F1F5F9;
+        font-size: .9rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .security-item p {
+        color: #94A3B8;
+        font-size: .8rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .info-box {
+        display: flex;
+        gap: .75rem;
+        padding: 1rem 1.25rem;
+        background: rgba(16, 185, 129, 0.05);
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        margin: 1rem 0;
+    }
+
+    .info-box i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+        margin-top: .2rem;
+    }
+
+    .info-box p {
+        color: #94A3B8;
+        font-size: .85rem;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .info-box a {
+        color: #10B981;
+        text-decoration: none;
+    }
+
+    .info-box a:hover {
+        text-decoration: underline;
+    }
+
+    .info-box ul {
+        margin: .25rem 0 0 0;
+    }
+
+    .rights-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: .75rem;
+        margin: 1rem 0;
+    }
+
+    .right-item {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .right-item h4 {
+        color: #F1F5F9;
+        font-size: .85rem;
+        font-weight: 600;
+        margin-bottom: .25rem;
+    }
+
+    .right-item h4 i {
+        color: #10B981;
+        margin-right: .3rem;
+    }
+
+    .right-item p {
+        color: #94A3B8;
+        font-size: .75rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .cookie-table {
+        border: 1px solid rgba(148, 163, 184, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 1rem 0;
+    }
+
+    .cookie-row {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        padding: .75rem 1rem;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+    }
+
+    .cookie-row:last-child {
+        border-bottom: none;
+    }
+
+    .cookie-row.header {
+        background: rgba(255, 255, 255, 0.03);
+        font-weight: 600;
+        color: #F1F5F9;
+        font-size: .75rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .cookie-row span {
+        color: #94A3B8;
+        font-size: .8rem;
+    }
+
+    .cookie-row.header span {
+        color: #F1F5F9;
+    }
+
+    .contact-details {
+        display: flex;
+        flex-direction: column;
+        gap: .75rem;
+        margin-top: 1rem;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: .75rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .contact-item i {
+        font-size: 1.25rem;
+        color: #10B981;
+        flex-shrink: 0;
+    }
+
+    .contact-item div {
+        display: flex;
+        flex-direction: column;
+        gap: .1rem;
+    }
+
+    .contact-item strong {
+        color: #94A3B8;
+        font-size: .75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+    }
+
+    .contact-item a,
+    .contact-item span {
+        color: #F1F5F9;
+        font-size: .9rem;
+        text-decoration: none;
+    }
+
+    .contact-item a:hover {
+        color: #10B981;
+    }
+
+    .privacy-footer {
+        padding: 1.5rem 0;
+        background: #0B1120;
+        border-top: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .privacy-footer-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .privacy-footer-content p {
+        color: #64748B;
+        font-size: .8rem;
+        margin: 0;
+    }
+
+    .privacy-footer-links {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .privacy-footer-links a {
+        color: #64748B;
+        text-decoration: none;
+        font-size: .8rem;
+        transition: color .2s ease;
+    }
+
+    .privacy-footer-links a:hover {
+        color: #10B981;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+        .toc-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .use-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .security-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .rights-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .privacy-page {
+            padding-top: 70px;
+        }
+        
+        .privacy-hero {
+            padding: 2rem 0 1.5rem;
+        }
+        
+        .privacy-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+        }
+        
+        .security-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .rights-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .cookie-row {
+            grid-template-columns: 1fr;
+            gap: .25rem;
+            padding: .5rem 1rem;
+        }
+        
+        .cookie-row.header {
+            display: none;
+        }
+        
+        .contact-item {
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .privacy-footer-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .privacy-footer-links {
+            justify-content: center;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .privacy-hero h1 {
+            font-size: 1.8rem;
+        }
+        
+        .privacy-card {
+            padding: 1rem;
+        }
+        
+        .policy-section h2 {
+            font-size: 1.2rem;
+        }
+        
+        .use-item {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .breadcrumb-item.active {
+            font-size: .7rem;
+            padding: .15rem .4rem;
+        }
+        
+        .breadcrumb-item a span {
+            display: none;
+        }
+        
+        .breadcrumb-item a i {
+            font-size: 1rem;
+        }
+    }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "privacy";
+        await base.OnInitializedAsync();
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyPage", "privacy");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

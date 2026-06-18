@@ -12,6 +12,7 @@ var liveSpendingData = null;
 var chartAnimationInterval = null;
 var dashboardBudgets = [];
 var dashboardTransactions = [];
+var isDataLoaded = false;
 
 // Predefined colors for common categories
 var categoryColors = {
@@ -77,12 +78,24 @@ function renderCategoryOptions() {
     var select = document.getElementById('txCategory');
     if (!select) {
         console.log('Dashboard: txCategory select not found in DOM - will retry');
+        setTimeout(function() {
+            renderCategoryOptions();
+        }, 200);
         return;
     }
     
     console.log('Dashboard: Rendering category options...');
     console.log('Dashboard: dashboardBudgets:', dashboardBudgets.length);
     console.log('Dashboard: dashboardTransactions:', dashboardTransactions.length);
+    
+    // Wait for data to load if not ready
+    if (!isDataLoaded) {
+        console.log('Dashboard: Data not loaded yet, waiting...');
+        setTimeout(function() {
+            renderCategoryOptions();
+        }, 300);
+        return;
+    }
     
     var allCategories = {};
     
@@ -362,11 +375,12 @@ async function loadAllData() {
         updateBudgetCategoriesFromTransactions();
     }
     
+    isDataLoaded = true;
     console.log('Dashboard: Data loaded - Tx:', dashboardTransactions.length, 'Budgets:', dashboardBudgets.length);
 }
 
 // ============================================
-// ANIMATE COUNTERS - FIXED (Added missing function)
+// ANIMATE COUNTERS
 // ============================================
 function animateCounters() {
     var counters = document.querySelectorAll('.stat-value');
@@ -390,7 +404,7 @@ function animateCounters() {
 }
 
 // ============================================
-// UPDATE SPENDING PERIOD - FIXED (Added full implementation)
+// UPDATE SPENDING PERIOD
 // ============================================
 window.updateSpendingPeriod = function(period) {
     console.log('📊 updateSpendingPeriod:', period);
@@ -410,7 +424,6 @@ window.updateSpendingPeriod = function(period) {
     
     var data = generateSpendingData(period);
     
-    // Set active button
     var activeBtn = period === 'Monthly' ? btns[0] : btns[1];
     if (activeBtn) activeBtn.classList.add('active');
     
@@ -547,7 +560,7 @@ function generateSpendingData(period) {
 }
 
 // ============================================
-// WINDOW.LOADUSERINFO - FIXED (Added missing function)
+// WINDOW.LOADUSERINFO
 // ============================================
 window.loadUserInfo = function(userInfo) {
     console.log('👤 Loading user info from Blazor:', userInfo);
@@ -561,7 +574,6 @@ window.loadUserInfo = function(userInfo) {
     var email = userInfo.email || '';
     var initials = userInfo.initials || 'U';
     
-    // Update sidebar
     var sidebarName = document.getElementById('sidebarFullName');
     var sidebarEmail = document.getElementById('sidebarEmail');
     var sidebarInitials = document.getElementById('sidebarInitials');
@@ -570,7 +582,6 @@ window.loadUserInfo = function(userInfo) {
     if (sidebarEmail) sidebarEmail.textContent = email;
     if (sidebarInitials) sidebarInitials.textContent = initials;
     
-    // Update header
     var headerInitials = document.getElementById('headerInitials');
     var headerGreeting = document.getElementById('headerGreeting');
     
@@ -618,7 +629,6 @@ window.addTransaction = async function() {
         });
         
         if (!response.ok) {
-            // Save to fallback
             var newTx = {
                 id: Date.now(),
                 desc: desc,
@@ -657,7 +667,6 @@ window.addTransaction = async function() {
             alert('Failed to add transaction: ' + (data.message || 'Unknown error')); 
         }
     } catch (e) { 
-        // Save to fallback on network error
         var newTx = {
             id: Date.now(),
             desc: desc,
@@ -708,7 +717,6 @@ window.addCategory = async function() {
             closeModal('categoryModal');
             showToast('Category "' + name + '" added successfully!', 'success');
         } else {
-            // Save to fallback
             var fallbackBudgets = getFallbackBudgets() || [];
             fallbackBudgets.push({ id: Date.now(), name: name, amount: amount, color: color, spent: 0 });
             localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(fallbackBudgets));
@@ -721,7 +729,6 @@ window.addCategory = async function() {
         }
     } catch (e) {
         console.error('Error adding category:', e);
-        // Save to fallback
         var fallbackBudgets = getFallbackBudgets() || [];
         fallbackBudgets.push({ id: Date.now(), name: name, amount: amount, color: color, spent: 0 });
         localStorage.setItem('smartbudget_budgets_fallback', JSON.stringify(fallbackBudgets));
@@ -772,7 +779,6 @@ window.deleteTransaction = async function(id) {
             });
             
             if (!response.ok) {
-                // Delete from fallback
                 var fallbackTxs = getFallbackTransactions() || [];
                 fallbackTxs = fallbackTxs.filter(function(t) { return t.id !== id; });
                 setFallbackTransactions(fallbackTxs);
@@ -796,7 +802,6 @@ window.deleteTransaction = async function(id) {
                 updateBudgetChart();
             }
         } catch (e) { 
-            // Delete from fallback on network error
             var fallbackTxs = getFallbackTransactions() || [];
             fallbackTxs = fallbackTxs.filter(function(t) { return t.id !== id; });
             setFallbackTransactions(fallbackTxs);
@@ -837,7 +842,6 @@ window.clearAllTransactions = async function() {
             });
             
             if (!response.ok) {
-                // Clear fallback
                 setFallbackTransactions([]);
                 dashboardTransactions = [];
                 await loadAllData();
@@ -903,7 +907,7 @@ function closeSidebar() {
 }
 
 // ============================================
-// USER INFO - FIXED (Combined fetch function)
+// USER INFO - FIXED
 // ============================================
 async function fetchUserProfile() {
     try {
@@ -987,9 +991,18 @@ function openModal(id) {
     if (id === 'transactionModal') {
         document.getElementById('txDescription').value = '';
         document.getElementById('txAmount').value = '';
+        // ✅ FIX: Use setTimeout to ensure DOM is ready and data is loaded
         setTimeout(function() {
-            renderCategoryOptions();
-        }, 50);
+            // Make sure data is loaded before rendering categories
+            if (!isDataLoaded) {
+                console.log('⏳ Data not loaded yet, waiting...');
+                loadAllData().then(function() {
+                    renderCategoryOptions();
+                });
+            } else {
+                renderCategoryOptions();
+            }
+        }, 100);
     }
 }
 
@@ -1422,7 +1435,7 @@ window.cleanupDashboard = function() {
 };
 
 // ============================================
-// DASHBOARD INIT FUNCTION - EXPOSE FOR BLAZOR (SINGLE DEFINITION)
+// DASHBOARD INIT FUNCTION
 // ============================================
 window.initDashboardPage = function() {
     console.log('🔄 dashboard: init called from Blazor');
@@ -1443,7 +1456,7 @@ window.initDashboardPage = function() {
 };
 
 // ============================================
-// DESTROY PAGE - REGISTER WITH PAGE REGISTRY
+// DESTROY PAGE
 // ============================================
 window.destroyPage = function(pageName) {
     if (pageName === 'dashboard' || !pageName) {

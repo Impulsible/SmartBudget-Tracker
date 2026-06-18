@@ -1,0 +1,137 @@
+@page "/guides/real-estate-investing-nigeria"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - Real Estate Investing for Nigerians</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">Real Estate Investing</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Investing</span>
+                <h1>Real Estate Investing for Nigerians</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 18 min read</span>
+                    <span><i class="bi bi-file-text"></i> Intermediate</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>Real estate is one of the most reliable ways to build long-term wealth. This guide covers everything you need to know about real estate investing in Nigeria.</p>
+
+                <h2>Why Invest in Real Estate?</h2>
+                <ul>
+                    <li><strong>Tangible asset:</strong> Physical property you can see and touch</li>
+                    <li><strong>Rental income:</strong> Regular passive income</li>
+                    <li><strong>Appreciation:</strong> Property values increase over time</li>
+                    <li><strong>Inflation hedge:</strong> Real estate keeps pace with inflation</li>
+                </ul>
+
+                <h2>Types of Real Estate Investments</h2>
+                <h3>1. Residential Real Estate</h3>
+                <ul>
+                    <li>Single-family homes</li>
+                    <li>Multi-family apartments</li>
+                    <li>Condos and townhouses</li>
+                </ul>
+
+                <h3>2. Commercial Real Estate</h3>
+                <ul>
+                    <li>Office buildings</li>
+                    <li>Retail spaces</li>
+                    <li>Industrial properties</li>
+                </ul>
+
+                <h3>3. REITs (Real Estate Investment Trusts)</h3>
+                <ul>
+                    <li>Invest in real estate without buying property</li>
+                    <li>Professional management</li>
+                    <li>Regular dividend payments</li>
+                </ul>
+
+                <h2>How to Start Investing in Real Estate</h2>
+                <h3>Step 1: Determine Your Investment Strategy</h3>
+                <ul>
+                    <li>Rental income vs. flipping</li>
+                    <li>Short-term vs. long-term</li>
+                    <li>Active vs. passive investing</li>
+                </ul>
+
+                <h3>Step 2: Research the Market</h3>
+                <ul>
+                    <li>Study property prices in different areas</li>
+                    <li>Research rental demand</li>
+                    <li>Analyze property appreciation trends</li>
+                </ul>
+
+                <h3>Step 3: Calculate Your Finances</h3>
+                <ul>
+                    <li>Determine your budget</li>
+                    <li>Calculate potential returns</li>
+                    <li>Plan for taxes and maintenance costs</li>
+                </ul>
+
+                <h3>Step 4: Get Financing</h3>
+                <ul>
+                    <li>Mortgages and loans</li>
+                    <li>Savings and personal funds</li>
+                    <li>Joint venture partnerships</li>
+                </ul>
+
+                <h2>Key Considerations for Nigerian Real Estate</h2>
+                <ul>
+                    <li><strong>Location:</strong> Lagos, Abuja, Port Harcourt are hot markets</li>
+                    <li><strong>Due diligence:</strong> Verify property documents thoroughly</li>
+                    <li><strong>Property management:</strong> Consider hiring a property manager</li>
+                    <li><strong>Taxation:</strong> Understand property tax and capital gains tax</li>
+                </ul>
+
+                <h2>ROI and Returns</h2>
+                <p>Calculate your potential returns:</p>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Investment Type</th><th>Average ROI</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Rental Properties</td><td>8-12% annually</td></tr>
+                            <tr><td>Flipping</td><td>20-30% per deal</td></tr>
+                            <tr><td>REITs</td><td>10-15% annually</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="post-cta">
+                    <h3>Track Your Real Estate Investments</h3>
+                    <p>Use SmartBudget to track rental income and expenses.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

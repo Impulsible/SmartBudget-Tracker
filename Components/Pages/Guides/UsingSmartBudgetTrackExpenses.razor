@@ -1,0 +1,96 @@
+@page "/guides/using-smartbudget-track-expenses"
+@using SmartBudget.Components.Pages.Blog
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - Using SmartBudget to Track Your Expenses</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/guides">Guides</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">Using SmartBudget</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Budgeting</span>
+                <h1>Using SmartBudget to Track Your Expenses</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> SmartBudget Team</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 8 min read</span>
+                    <span><i class="bi bi-file-text"></i> Beginner</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>SmartBudget makes it easy to track your expenses and take control of your finances. This guide walks you through the features.</p>
+
+                <h2>Getting Started</h2>
+                <ol>
+                    <li><a href="/Account/Register">Create your SmartBudget account</a></li>
+                    <li>Log in to your dashboard</li>
+                    <li>Start adding your transactions</li>
+                </ol>
+
+                <h2>Adding a Transaction</h2>
+                <ol>
+                    <li>Go to the <a href="/transactions">Transactions page</a></li>
+                    <li>Click "Add Transaction"</li>
+                    <li>Enter the description, amount, and category</li>
+                    <li>Select whether it's income or expense</li>
+                    <li>Click "Save Transaction"</li>
+                </ol>
+
+                <h2>Creating a Budget</h2>
+                <ol>
+                    <li>Go to the <a href="/budgets">Budgets page</a></li>
+                    <li>Click "Add Budget"</li>
+                    <li>Enter the category name and amount</li>
+                    <li>Choose a color for the budget</li>
+                    <li>Click "Save Budget"</li>
+                </ol>
+
+                <h2>Setting Savings Goals</h2>
+                <ol>
+                    <li>Go to the <a href="/goals">Goals page</a></li>
+                    <li>Click "Add Goal"</li>
+                    <li>Enter the goal name and target amount</li>
+                    <li>Set a target date</li>
+                    <li>Click "Save Goal"</li>
+                </ol>
+
+                <h2>Viewing Reports</h2>
+                <ul>
+                    <li>Go to <a href="/reports">Reports</a> to see spending patterns</li>
+                    <li>View income vs expense trends</li>
+                    <li>See category breakdowns</li>
+                </ul>
+
+                <div class="post-cta">
+                    <h3>Start Tracking Your Expenses</h3>
+                    <p>Join thousands of Nigerians using SmartBudget to manage their money.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "guide-post";
+        await base.OnInitializedAsync();
+    }
+}

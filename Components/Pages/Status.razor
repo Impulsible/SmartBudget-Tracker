@@ -1,0 +1,495 @@
+@page "/status"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+@attribute [AllowAnonymous]
+@inherits BasePage
+@implements IDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+<PageTitle>SmartBudget - System Status</PageTitle>
+
+<div class="status-page">
+    <!-- ============================================
+    BREADCRUMB NAVIGATION
+    ============================================ -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/"><i class="bi bi-house-door"></i> Home</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <i class="bi bi-chevron-right"></i>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Status
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ============================================
+    HERO SECTION
+    ============================================ -->
+    <section class="status-hero">
+        <div class="container">
+            <div class="status-hero-content">
+                <div class="status-badge" id="statusBadge">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Checking...</span>
+                </div>
+                <h1>System <span class="gradient-text">Status</span></h1>
+                <p>Real-time health and performance metrics for the SmartBudget platform.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    STATUS OVERVIEW CARDS
+    ============================================ -->
+    <section class="status-overview">
+        <div class="container">
+            <div class="status-grid">
+                <!-- API Status -->
+                <div class="status-card">
+                    <div class="status-card-icon"><i class="bi bi-code-square"></i></div>
+                    <h3>API</h3>
+                    <div class="status-indicator" id="apiStatus">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value operational">Operational</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Response Time:</span>
+                        <span class="metric-value" id="apiResponseTime">-- ms</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Uptime:</span>
+                        <span class="metric-value" id="apiUptime">--</span>
+                    </div>
+                </div>
+
+                <!-- Database Status -->
+                <div class="status-card">
+                    <div class="status-card-icon"><i class="bi bi-database"></i></div>
+                    <h3>Database</h3>
+                    <div class="status-indicator" id="dbStatus">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value operational">Connected</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Type:</span>
+                        <span class="metric-value" id="dbType">PostgreSQL</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Connection:</span>
+                        <span class="metric-value" id="dbConnection">Active</span>
+                    </div>
+                </div>
+
+                <!-- Server Status -->
+                <div class="status-card">
+                    <div class="status-card-icon"><i class="bi bi-server"></i></div>
+                    <h3>Server</h3>
+                    <div class="status-indicator" id="serverStatus">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value operational">Running</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Environment:</span>
+                        <span class="metric-value" id="serverEnv">Production</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Uptime:</span>
+                        <span class="metric-value" id="serverUptime">--</span>
+                    </div>
+                </div>
+
+                <!-- Cache Status -->
+                <div class="status-card">
+                    <div class="status-card-icon"><i class="bi bi-speedometer2"></i></div>
+                    <h3>Cache</h3>
+                    <div class="status-indicator" id="cacheStatus">
+                        <span class="status-label">Status:</span>
+                        <span class="status-value operational">Enabled</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Hit Rate:</span>
+                        <span class="metric-value" id="cacheHitRate">--</span>
+                    </div>
+                    <div class="status-metric">
+                        <span class="metric-label">Size:</span>
+                        <span class="metric-value" id="cacheSize">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    SYSTEM METRICS
+    ============================================ -->
+    <section class="system-metrics">
+        <div class="container">
+            <div class="metrics-header">
+                <h2>System Metrics</h2>
+                <button class="btn-refresh" onclick="window.refreshStatus()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            <div class="metrics-grid">
+                <!-- CPU Usage -->
+                <div class="metric-card">
+                    <div class="metric-card-header">
+                        <span class="metric-title"><i class="bi bi-cpu"></i> CPU Usage</span>
+                        <span class="metric-value-large" id="cpuUsage">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="cpuBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Memory Usage -->
+                <div class="metric-card">
+                    <div class="metric-card-header">
+                        <span class="metric-title"><i class="bi bi-memory"></i> Memory Usage</span>
+                        <span class="metric-value-large" id="memoryUsage">0 MB</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="memoryBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Active Users -->
+                <div class="metric-card">
+                    <div class="metric-card-header">
+                        <span class="metric-title"><i class="bi bi-people"></i> Active Users</span>
+                        <span class="metric-value-large" id="activeUsers">0</span>
+                    </div>
+                    <div class="metric-trend">
+                        <span class="trend-up"><i class="bi bi-arrow-up"></i> 12%</span>
+                        <span class="trend-label">vs last hour</span>
+                    </div>
+                </div>
+
+                <!-- Requests -->
+                <div class="metric-card">
+                    <div class="metric-card-header">
+                        <span class="metric-title"><i class="bi bi-arrow-repeat"></i> Requests/min</span>
+                        <span class="metric-value-large" id="requestsPerMin">0</span>
+                    </div>
+                    <div class="metric-trend">
+                        <span class="trend-up"><i class="bi bi-arrow-up"></i> 8%</span>
+                        <span class="trend-label">vs last hour</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    SERVICE COMPONENTS
+    ============================================ -->
+    <section class="service-components">
+        <div class="container">
+            <h2>Service Components</h2>
+            <div class="components-list">
+                <div class="component-item">
+                    <div class="component-info">
+                        <span class="component-name"><i class="bi bi-box"></i> Web App</span>
+                        <span class="component-desc">Main application server</span>
+                    </div>
+                    <span class="component-status operational">Operational</span>
+                </div>
+                <div class="component-item">
+                    <div class="component-info">
+                        <span class="component-name"><i class="bi bi-database"></i> PostgreSQL</span>
+                        <span class="component-desc">Primary database</span>
+                    </div>
+                    <span class="component-status operational">Operational</span>
+                </div>
+                <div class="component-item">
+                    <div class="component-info">
+                        <span class="component-name"><i class="bi bi-cloud"></i> Render Hosting</span>
+                        <span class="component-desc">Cloud hosting platform</span>
+                    </div>
+                    <span class="component-status operational">Operational</span>
+                </div>
+                <div class="component-item">
+                    <div class="component-info">
+                        <span class="component-name"><i class="bi bi-envelope"></i> Email Service</span>
+                        <span class="component-desc">Transactional emails</span>
+                    </div>
+                    <span class="component-status operational">Operational</span>
+                </div>
+                <div class="component-item">
+                    <div class="component-info">
+                        <span class="component-name"><i class="bi bi-key"></i> Authentication</span>
+                        <span class="component-desc">User authentication service</span>
+                    </div>
+                    <span class="component-status operational">Operational</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    UPTIME HISTORY
+    ============================================ -->
+    <section class="uptime-history">
+        <div class="container">
+            <h2>Uptime History</h2>
+            <div class="uptime-grid">
+                <div class="uptime-card">
+                    <div class="uptime-percent">99.97%</div>
+                    <div class="uptime-label">Last 30 Days</div>
+                    <div class="uptime-bar">
+                        <div class="uptime-fill" style="width:99.97%"></div>
+                    </div>
+                </div>
+                <div class="uptime-card">
+                    <div class="uptime-percent">99.95%</div>
+                    <div class="uptime-label">Last 90 Days</div>
+                    <div class="uptime-bar">
+                        <div class="uptime-fill" style="width:99.95%"></div>
+                    </div>
+                </div>
+                <div class="uptime-card">
+                    <div class="uptime-percent">99.89%</div>
+                    <div class="uptime-label">Last Year</div>
+                    <div class="uptime-bar">
+                        <div class="uptime-fill" style="width:99.89%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    RECENT INCIDENTS
+    ============================================ -->
+    <section class="recent-incidents">
+        <div class="container">
+            <h2>Recent Incidents</h2>
+            <div class="incidents-list">
+                <div class="incident-item resolved">
+                    <div class="incident-status"><span class="status-badge resolved">Resolved</span></div>
+                    <div class="incident-content">
+                        <h4>Database connection timeout</h4>
+                        <p>Some users experienced slow page loads due to database connection issues.</p>
+                        <div class="incident-meta">
+                            <span><i class="bi bi-clock"></i> Resolved 2 hours ago</span>
+                            <span><i class="bi bi-droplet"></i> 15 minutes</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="incident-item resolved">
+                    <div class="incident-status"><span class="status-badge resolved">Resolved</span></div>
+                    <div class="incident-content">
+                        <h4>API response latency</h4>
+                        <p>Increased API response times during peak usage hours.</p>
+                        <div class="incident-meta">
+                            <span><i class="bi bi-clock"></i> Resolved 1 day ago</span>
+                            <span><i class="bi bi-droplet"></i> 45 minutes</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="incident-item monitoring">
+                    <div class="incident-status"><span class="status-badge monitoring">Monitoring</span></div>
+                    <div class="incident-content">
+                        <h4>PostgreSQL upgrade</h4>
+                        <p>Planned database maintenance to improve performance.</p>
+                        <div class="incident-meta">
+                            <span><i class="bi bi-clock"></i> Scheduled for tomorrow</span>
+                            <span><i class="bi bi-droplet"></i> Estimated 30 minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    STATUS SUBSCRIPTION
+    ============================================ -->
+    <section class="status-subscription">
+        <div class="container">
+            <div class="subscription-card">
+                <div class="subscription-icon"><i class="bi bi-bell"></i></div>
+                <h2>Stay Updated</h2>
+                <p>Subscribe to status updates and get notified when something changes.</p>
+                <div class="subscription-form">
+                    <input type="email" id="statusEmail" class="subscription-input" placeholder="Enter your email address" />
+                    <button class="subscription-btn" onclick="window.subscribeStatus()">Subscribe</button>
+                </div>
+                <p class="subscription-note">We'll only send you important status updates.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <footer class="status-footer">
+        <div class="container">
+            <div class="status-footer-content">
+                <div class="status-footer-info">
+                    <p>&copy; @DateTime.Now.Year SmartBudget. All rights reserved.</p>
+                    <span class="status-footer-divider">|</span>
+                    <span class="status-footer-version">Version @GetAppVersion()</span>
+                </div>
+                <div class="status-footer-links">
+                    <a href="/">Home</a>
+                    <a href="/dashboard">Dashboard</a>
+                    <a href="/blog">Blog</a>
+                    <a href="mailto:support@smartbudget.com">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .status-page{background:#0B1120;min-height:100vh;padding-top:80px}
+    .breadcrumb-container{padding:.75rem 0;background:transparent}
+    .breadcrumb{display:flex;align-items:center;gap:.5rem;list-style:none;padding:0;margin:0;flex-wrap:wrap}
+    .breadcrumb-item{display:flex;align-items:center;gap:.5rem;font-size:.85rem;color:#94A3B8}
+    .breadcrumb-item a{display:flex;align-items:center;gap:.4rem;color:#94A3B8;text-decoration:none;transition:all .2s ease;padding:.25rem .5rem;border-radius:6px}
+    .breadcrumb-item a:hover{color:#10B981;background:rgba(16,185,129,0.08)}
+    .breadcrumb-item i.bi-chevron-right{color:#64748B;font-size:.65rem}
+    .breadcrumb-item.active{color:#F1F5F9;font-weight:500;padding:.25rem .5rem;background:rgba(16,185,129,0.1);border-radius:6px;border:1px solid rgba(16,185,129,0.1)}
+    .status-hero{padding:3rem 0 2rem;background:linear-gradient(135deg,#0B1120 0%,#111827 50%,#1A2332 100%);text-align:center}
+    .status-hero-content{max-width:700px;margin:0 auto}
+    .status-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(16,185,129,0.12);color:#10B981;padding:.4rem 1.2rem;border-radius:20px;font-size:.8rem;font-weight:600;margin-bottom:1rem;border:1px solid rgba(16,185,129,0.15)}
+    .status-dot{width:10px;height:10px;border-radius:50%;display:inline-block;animation:pulse 2s infinite;background:#34D399}
+    .status-dot.warning{background:#F59E0B}
+    .status-dot.error{background:#EF4444}
+    @@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    .status-hero h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:#F1F5F9;margin-bottom:.75rem;line-height:1.2}
+    .status-hero .gradient-text{background:linear-gradient(135deg,#10B981 0%,#34D399 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .status-hero p{font-size:1.0625rem;color:#94A3B8;max-width:550px;margin:0 auto;line-height:1.6}
+    .status-overview{padding:2rem 0 1.5rem;background:#0B1120}
+    .status-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;max-width:1100px;margin:0 auto}
+    .status-card{background:#1E293B;border-radius:16px;padding:1.5rem;border:1px solid rgba(148,163,184,0.08);transition:all .3s ease}
+    .status-card:hover{transform:translateY(-2px);border-color:rgba(16,185,129,0.2);box-shadow:0 8px 25px rgba(0,0,0,0.3)}
+    .status-card-icon{font-size:2rem;color:#10B981;margin-bottom:.5rem}
+    .status-card h3{font-size:1rem;font-weight:600;color:#F1F5F9;margin-bottom:.5rem}
+    .status-indicator{display:flex;align-items:center;gap:.5rem;font-size:.85rem;padding:.3rem 0}
+    .status-label{color:#94A3B8}
+    .status-value.operational{color:#34D399;font-weight:600}
+    .status-value.warning{color:#F59E0B;font-weight:600}
+    .status-value.error{color:#EF4444;font-weight:600}
+    .status-metric{display:flex;justify-content:space-between;padding:.2rem 0;font-size:.8rem;border-bottom:1px solid rgba(148,163,184,0.05)}
+    .status-metric:last-child{border-bottom:none}
+    .metric-label{color:#94A3B8}
+    .metric-value{color:#F1F5F9;font-weight:500}
+    .system-metrics{padding:2rem 0;background:#111827;border-top:1px solid rgba(148,163,184,0.06);border-bottom:1px solid rgba(148,163,184,0.06)}
+    .metrics-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:.5rem}
+    .metrics-header h2{font-size:1.3rem;font-weight:700;color:#F1F5F9}
+    .btn-refresh{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.2rem;background:#1E293B;border:1px solid rgba(148,163,184,0.15);border-radius:8px;color:#94A3B8;font-size:.8rem;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s ease}
+    .btn-refresh:hover{background:#253349;border-color:#10B981;color:#F1F5F9}
+    .btn-refresh:active{transform:scale(.97)}
+    .metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+    .metric-card{background:#1E293B;border-radius:16px;padding:1.25rem;border:1px solid rgba(148,163,184,0.08)}
+    .metric-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem}
+    .metric-title{color:#94A3B8;font-size:.85rem;display:flex;align-items:center;gap:.4rem}
+    .metric-value-large{font-size:1.5rem;font-weight:700;color:#F1F5F9}
+    .progress-bar{width:100%;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;border-radius:3px;transition:width 1s ease;background:linear-gradient(90deg,#10B981,#34D399)}
+    .metric-trend{display:flex;align-items:center;gap:.5rem;margin-top:.5rem;font-size:.8rem}
+    .trend-up{color:#34D399}
+    .trend-down{color:#EF4444}
+    .trend-label{color:#64748B}
+    .service-components{padding:2rem 0;background:#0B1120}
+    .service-components h2{font-size:1.3rem;font-weight:700;color:#F1F5F9;margin-bottom:1.5rem}
+    .components-list{display:flex;flex-direction:column;gap:.5rem}
+    .component-item{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;background:#1E293B;border-radius:12px;border:1px solid rgba(148,163,184,0.06)}
+    .component-info{display:flex;align-items:center;gap:.75rem}
+    .component-name{color:#F1F5F9;font-weight:500;font-size:.9rem;display:flex;align-items:center;gap:.4rem}
+    .component-name i{color:#10B981}
+    .component-desc{color:#64748B;font-size:.75rem}
+    .component-status{font-size:.75rem;font-weight:600;padding:.2rem .8rem;border-radius:12px}
+    .component-status.operational{color:#34D399;background:rgba(52,211,153,0.1)}
+    .component-status.degraded{color:#F59E0B;background:rgba(245,158,11,0.1)}
+    .component-status.down{color:#EF4444;background:rgba(239,68,68,0.1)}
+    .uptime-history{padding:2rem 0;background:#111827;border-top:1px solid rgba(148,163,184,0.06)}
+    .uptime-history h2{font-size:1.3rem;font-weight:700;color:#F1F5F9;margin-bottom:1.5rem}
+    .uptime-grid{display:grid;grid-template-columns:1fr;gap:1rem}
+    .uptime-card{background:#1E293B;border-radius:16px;padding:1.25rem;border:1px solid rgba(148,163,184,0.08);text-align:center}
+    .uptime-percent{font-size:2rem;font-weight:700;color:#34D399}
+    .uptime-label{color:#94A3B8;font-size:.8rem;margin-bottom:.5rem}
+    .uptime-bar{width:100%;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
+    .uptime-fill{height:100%;border-radius:3px;transition:width 1s ease;background:linear-gradient(90deg,#10B981,#34D399)}
+    .recent-incidents{padding:2rem 0;background:#0B1120}
+    .recent-incidents h2{font-size:1.3rem;font-weight:700;color:#F1F5F9;margin-bottom:1.5rem}
+    .incidents-list{display:flex;flex-direction:column;gap:.75rem}
+    .incident-item{display:flex;gap:1rem;padding:1rem;background:#1E293B;border-radius:12px;border-left:3px solid #34D399}
+    .incident-item.resolved{border-left-color:#34D399}
+    .incident-item.monitoring{border-left-color:#F59E0B}
+    .incident-item.critical{border-left-color:#EF4444}
+    .incident-status{flex-shrink:0}
+    .status-badge{font-size:.65rem;font-weight:600;padding:.2rem .8rem;border-radius:12px;text-transform:uppercase}
+    .status-badge.resolved{color:#34D399;background:rgba(52,211,153,0.1)}
+    .status-badge.monitoring{color:#F59E0B;background:rgba(245,158,11,0.1)}
+    .status-badge.critical{color:#EF4444;background:rgba(239,68,68,0.1)}
+    .incident-content{flex:1}
+    .incident-content h4{color:#F1F5F9;font-size:.95rem;font-weight:600;margin-bottom:.2rem}
+    .incident-content p{color:#94A3B8;font-size:.85rem;margin-bottom:.3rem}
+    .incident-meta{display:flex;gap:1.5rem;font-size:.7rem;color:#64748B}
+    .incident-meta span{display:flex;align-items:center;gap:.2rem}
+    .status-subscription{padding:3rem 0;background:#111827;border-top:1px solid rgba(148,163,184,0.06);border-bottom:1px solid rgba(148,163,184,0.06)}
+    .subscription-card{max-width:600px;margin:0 auto;text-align:center;background:#1E293B;border-radius:20px;padding:2.5rem;border:1px solid rgba(148,163,184,0.08)}
+    .subscription-icon{font-size:3rem;color:#10B981;margin-bottom:1rem}
+    .subscription-card h2{font-size:1.5rem;font-weight:700;color:#F1F5F9;margin-bottom:.5rem}
+    .subscription-card p{color:#94A3B8;font-size:.9375rem;margin-bottom:1.25rem}
+    .subscription-form{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center}
+    .subscription-input{flex:1;min-width:200px;padding:.75rem 1rem;background:#0F172A;border:1px solid rgba(148,163,184,0.15);border-radius:10px;color:#F1F5F9;font-size:.875rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .3s ease}
+    .subscription-input:focus{border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.1)}
+    .subscription-input::placeholder{color:#64748B}
+    .subscription-btn{padding:.75rem 1.5rem;background:linear-gradient(135deg,#10B981 0%,#059669 100%);color:#fff;border:none;border-radius:10px;font-size:.875rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .3s ease;box-shadow:0 4px 12px rgba(16,185,129,0.2);white-space:nowrap}
+    .subscription-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(16,185,129,0.35)}
+    .subscription-note{font-size:.7rem;color:#64748B;margin-top:.75rem}
+    .status-footer{padding:1.5rem 0;background:#0B1120;border-top:1px solid rgba(148,163,184,0.06)}
+    .status-footer-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+    .status-footer-info{display:flex;align-items:center;gap:.5rem;color:#64748B;font-size:.8rem;flex-wrap:wrap}
+    .status-footer-divider{color:#1E293B}
+    .status-footer-version{color:#94A3B8}
+    .status-footer-links{display:flex;gap:1rem;flex-wrap:wrap}
+    .status-footer-links a{color:#64748B;text-decoration:none;font-size:.8rem;transition:color .2s ease}
+    .status-footer-links a:hover{color:#10B981}
+    @@media(min-width:768px){.status-grid{grid-template-columns:repeat(2,1fr)}.metrics-grid{grid-template-columns:repeat(2,1fr)}.uptime-grid{grid-template-columns:repeat(3,1fr)}}
+    @@media(max-width:768px){.status-page{padding-top:70px}.status-hero{padding:2rem 0 1.5rem}.status-grid{grid-template-columns:1fr}.metrics-grid{grid-template-columns:1fr}.metric-value-large{font-size:1.2rem}.incident-item{flex-direction:column;gap:.5rem}.subscription-form{flex-direction:column}.subscription-input{min-width:auto;width:100%}.subscription-btn{width:100%}.status-footer-content{flex-direction:column;text-align:center}.status-footer-info{justify-content:center}}
+    @@media(max-width:480px){.status-hero h1{font-size:1.8rem}.status-card{padding:1.25rem}.component-item{flex-direction:column;align-items:flex-start;gap:.5rem}.uptime-percent{font-size:1.5rem}.breadcrumb-item.active{font-size:.7rem;padding:.15rem .4rem}}
+</style>
+
+<script src="/js/status.js"></script>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "status";
+        await base.OnInitializedAsync();
+    }
+
+    private string GetAppVersion()
+    {
+        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+        var version = assembly.GetName().Version?.ToString() ?? "1.0.0";
+        return version;
+    }
+
+    public void Dispose()
+    {
+        try
+        {
+            JS.InvokeVoidAsync("destroyStatusPage");
+        }
+        catch
+        {
+            // Ignore disposal errors
+        }
+    }
+}

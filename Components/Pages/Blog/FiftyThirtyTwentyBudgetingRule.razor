@@ -1,0 +1,119 @@
+@page "/blog/50-30-20-budgeting-rule"
+@attribute [AllowAnonymous]
+@inherits BlogPostBase
+
+<PageTitle>SmartBudget - The 50/30/20 Budgeting Rule for Nigerians</PageTitle>
+
+<link rel="stylesheet" href="/css/blog.css" />
+
+<div class="blog-post-page">
+    <div class="container">
+        <div class="breadcrumb-container">
+            <nav aria-label="Breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door"></i> Home</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item"><a href="/blog">Blog</a></li>
+                    <li class="breadcrumb-item"><i class="bi bi-chevron-right"></i></li>
+                    <li class="breadcrumb-item active">50/30/20 Budgeting Rule</li>
+                </ol>
+            </nav>
+        </div>
+
+        <article class="blog-post">
+            <div class="post-header">
+                <span class="post-category-badge">Budgeting</span>
+                <h1>The 50/30/20 Budgeting Rule for Nigerians</h1>
+                <div class="post-meta">
+                    <span><i class="bi bi-person-circle"></i> Amara Obi</span>
+                    <span><i class="bi bi-calendar3"></i> @CurrentDate</span>
+                    <span><i class="bi bi-clock"></i> 6 min read</span>
+                </div>
+            </div>
+
+            <div class="post-body-content">
+                <p>The 50/30/20 budgeting rule is a simple but effective way to manage your money. This guide shows you how to adapt it for the Nigerian economy and lifestyle in @CurrentYear.</p>
+
+                <h2>What is the 50/30/20 Rule?</h2>
+                <p>The rule divides your after-tax income into three categories:</p>
+                <ul>
+                    <li><strong>50% for Needs:</strong> Essential expenses</li>
+                    <li><strong>30% for Wants:</strong> Non-essential spending</li>
+                    <li><strong>20% for Savings:</strong> Financial goals and debt repayment</li>
+                </ul>
+
+                <h2>Needs (50%)</h2>
+                <p>These are expenses you must pay to survive and function:</p>
+                <ul>
+                    <li>Rent or mortgage</li>
+                    <li>Utilities (electricity, water, internet)</li>
+                    <li>Food and groceries</li>
+                    <li>Transportation</li>
+                    <li>Healthcare</li>
+                    <li>Minimum debt payments</li>
+                </ul>
+
+                <h2>Wants (30%)</h2>
+                <p>These are non-essential expenses that improve your quality of life:</p>
+                <ul>
+                    <li>Dining out</li>
+                    <li>Entertainment</li>
+                    <li>Shopping</li>
+                    <li>Vacations</li>
+                    <li>Subscriptions (Netflix, Spotify, etc.)</li>
+                </ul>
+
+                <h2>Savings (20%)</h2>
+                <p>This money goes toward your financial goals:</p>
+                <ul>
+                    <li>Emergency fund</li>
+                    <li>Savings goals</li>
+                    <li>Investments</li>
+                    <li>Extra debt payments</li>
+                </ul>
+
+                <h2>Adapting the 50/30/20 Rule for Nigerians</h2>
+                <p>In Nigeria, the 50/30/20 rule might need adjustments:</p>
+                <ul>
+                    <li><strong>Housing:</strong> Rent can be a larger percentage in cities like Lagos or Abuja</li>
+                    <li><strong>Transport:</strong> Fuel costs can fluctuate significantly</li>
+                    <li><strong>Food:</strong> Food inflation requires careful budgeting</li>
+                    <li><strong>Remittances:</strong> Many Nigerians support extended family members</li>
+                </ul>
+
+                <h2>How to Calculate Your Budget</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr><th>Category</th><th>Percentage</th><th>Amount (₦)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Monthly Income</td><td>100%</td><td>500,000</td></tr>
+                            <tr><td>Needs</td><td>50%</td><td>250,000</td></tr>
+                            <tr><td>Wants</td><td>30%</td><td>150,000</td></tr>
+                            <tr><td>Savings</td><td>20%</td><td>100,000</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>Track Your Spending with SmartBudget</h2>
+                <p>Use SmartBudget to track your spending and ensure you stay within your budget limits. Set up budget categories and get alerts when you're approaching your limits.</p>
+
+                <div class="post-cta">
+                    <h3>Start Budgeting Today</h3>
+                    <p>Join thousands of Nigerians using SmartBudget to manage their money.</p>
+                    <a href="/Account/Register" class="btn-cta">Get Started Free →</a>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
+
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        PageName = "blog-post";
+        await base.OnInitializedAsync();
+    }
+}
